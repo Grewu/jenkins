@@ -1,0 +1,11 @@
+CREATE TABLE management.tasks (
+    task_id SERIAL PRIMARY KEY,
+    task_name VARCHAR(255) NOT NULL,
+    project_id INT,
+    assigned_to INT,
+    due_date DATE,
+    status VARCHAR(50),
+    priority INT,
+    FOREIGN KEY (project_id) REFERENCES management.projects(project_id),
+    FOREIGN KEY (assigned_to) REFERENCES management.employees(employee_id)
+);
