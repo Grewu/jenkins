@@ -30,5 +30,8 @@
         <sqlFile encoding="utf8" path="./sql/06.create-index-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
+    <changeSet id="homework-2-add-data-tables" author="Pavel Gurevich">
+        <sqlFile encoding="utf8" path="./sql/07.add-data-tables.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 
 </databaseChangeLog> 
