@@ -1,17 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>   
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
-   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
-      http://www.liquibase.org/xml/ns/pro 
-      http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd"
-      logicalFilePath="homework-2">  
-
-    <changeSet id="homework-2-create-shema-management" author="Pavel Gurevich">
-        <sqlFile encoding="utf8" path="./sql/00.create-schema-management.sql" relativeToChangelogFile="true"/>
-    </changeSet>
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+        logicalFilePath="homework-2">
 
     <changeSet id="homework-2-create-departments-table" author="Pavel Gurevich">
         <sqlFile encoding="utf8" path="./sql/01.create-departments-table.sql" relativeToChangelogFile="true"/>
@@ -21,7 +14,7 @@
         <sqlFile encoding="utf8" path="./sql/02.create-employees-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-   <changeSet id="homework-2-create-projects-table" author="Pavel Gurevich">
+    <changeSet id="homework-2-create-projects-table" author="Pavel Gurevich">
         <sqlFile encoding="utf8" path="./sql/03.create-projects-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
@@ -29,16 +22,12 @@
         <sqlFile encoding="utf8" path="./sql/04.create-tasks-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
-    <changeSet id="homework-2-create-profiles-table" author="Pavel Gurevich">
-        <sqlFile encoding="utf8" path="./sql/05.create-profiles-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="homework-2-create-employee_project-table" author="Pavel Gurevich">
-        <sqlFile encoding="utf8" path="./sql/06.create-employee_project-table.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
     <changeSet id="homework-2-create-comments-table" author="Pavel Gurevich">
-        <sqlFile encoding="utf8" path="./sql/07.create-comments-table.sql" relativeToChangelogFile="true"/>
+        <sqlFile encoding="utf8" path="./sql/05.create-comments-table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="homework-2-create-index-table" author="Pavel Gurevich">
+        <sqlFile encoding="utf8" path="./sql/06.create-index-table.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
 
