@@ -1,6 +1,6 @@
 CREATE TABLE comments
 (
-    comment_id   SERIAL PRIMARY KEY,
+    id   SERIAL PRIMARY KEY,
     task_id      INT,
     employee_id  INT,
     comment_text TEXT NOT NULL,
