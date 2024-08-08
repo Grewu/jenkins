@@ -1,6 +1,6 @@
 CREATE TABLE projects
 (
-    project_id   SERIAL PRIMARY KEY,
+    id   SERIAL PRIMARY KEY,
     project_name VARCHAR(255) NOT NULL,
     description  TEXT,
     start_date   DATE,
