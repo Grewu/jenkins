@@ -8,7 +8,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
+import util.PropertiesUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -17,19 +17,24 @@ import java.util.Map;
 public class ApplicationContext {
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
-    public ApplicationContext(String packageName) throws Exception {
-        initContext(packageName);
+    public ApplicationContext(String... packageNames) throws Exception {
+        initContext(packageNames);
     }
 
-    private void initContext(String packageName) throws Exception {
+    private void initContext(String... packageNames) throws Exception {
         var reflections = new Reflections(new ConfigurationBuilder()
+                .forPackages(packageNames)
                 .setUrls(ClasspathHelper.forJavaClassPath())
-                .setScanners(Scanners.TypesAnnotated)
-                .filterInputsBy(new FilterBuilder().includePackage(packageName)));
+                .setScanners(Scanners.TypesAnnotated));
 
         var components = reflections.getTypesAnnotatedWith(Component.class);
-        for (Class<?> component : components) {
-            beans.put(component, createBean(component));
+        for (var component : components) {
+            Object bean = createBean(component);
+            beans.put(component, bean);
+
+            for (var interfaces : component.getInterfaces()) {
+                beans.put(interfaces, bean);
+            }
         }
 
         for (Object bean : beans.values()) {
@@ -65,22 +70,23 @@ public class ApplicationContext {
             if (field.isAnnotationPresent(Value.class)) {
                 field.setAccessible(true);
                 var value = field.getAnnotation(Value.class).value();
-                field.set(bean, value);
+                String propertiesValue = PropertiesUtil.get(value);
+                field.set(bean, propertiesValue);
             }
         }
     }
 
     private Object createBean(Class<?> clazz) throws Exception {
-        var constructors = clazz.getConstructors();
+        var constructors = clazz.getDeclaredConstructors();
         for (var constructor : constructors) {
             if (constructor.isAnnotationPresent(Autowired.class)) {
                 var parameterTypes = constructor.getParameterTypes();
                 var dependencies = new Object[parameterTypes.length];
 
                 for (int i = 0; i < parameterTypes.length; i++) {
-                    dependencies[i] = beans.get(parameterTypes[i]);
+                    Object dependency = beans.get(parameterTypes[i]);
+                    dependencies[i] = dependency;
                 }
-
                 constructor.setAccessible(true);
                 return constructor.newInstance(dependencies);
             }
@@ -93,3 +99,4 @@ public class ApplicationContext {
         return clazz.cast(beans.get(clazz));
     }
 }
+
