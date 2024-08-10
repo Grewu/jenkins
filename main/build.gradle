@@ -23,7 +23,7 @@ dependencies {
 liquibase {
     activities {
         main {
-            classpath "D:/Programming/Java/project/Senla-Course/liquibase"
+            classpath "$rootDir/liquibase"
             changelogFile 'changelog-master.xml'
             url 'jdbc:postgresql://localhost:5433/postgres'
             username 'postgres'
