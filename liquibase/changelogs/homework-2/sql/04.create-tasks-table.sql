@@ -1,6 +1,6 @@
 CREATE TABLE tasks
 (
-    task_id     SERIAL PRIMARY KEY,
+    id     SERIAL PRIMARY KEY,
     task_name   VARCHAR(255) NOT NULL,
     project_id  INT,
     assigned_to INT,

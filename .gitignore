@@ -21,11 +21,6 @@ bin/
 .idea
 *.iws
 *.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -35,4 +30,6 @@ out/
 
 ### VS Code ###
 .vscode/
-*.jar
+=======
+.class
+/.idea
