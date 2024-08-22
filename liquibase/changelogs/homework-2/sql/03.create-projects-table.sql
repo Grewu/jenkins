@@ -5,6 +5,6 @@ CREATE TABLE projects
     description  TEXT,
     start_date   DATE,
     end_date     DATE,
-    owner_id     INT,
+    owner_id     BIGINT,
     FOREIGN KEY (owner_id) REFERENCES employees (id)
 );
