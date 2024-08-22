@@ -4,7 +4,7 @@ VALUES ('Human Resources'),
        ('Sales'),
        ('Marketing');
 
-INSERT INTO employees (first_name, last_name, position, department_id, email, password_hash)
+INSERT INTO employees (first_name, last_name, position, department_id, email, password)
 VALUES ('Alice', 'Smith', 'Manager', 1, 'alice.smith@example.com', 'password_hash'),
        ('Bob', 'Johnson', 'Developer', 2, 'bob.johnson@example.com', 'password_hash'),
        ('Charlie', 'Williams', 'Salesperson', 3, 'charlie.williams@example.com', 'password_hash'),
