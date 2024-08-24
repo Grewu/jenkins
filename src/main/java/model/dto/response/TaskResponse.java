@@ -1,10 +1,11 @@
-package model.dto.request;
+package model.dto.response;
 
 import model.entity.enums.Status;
 
 import java.time.LocalDateTime;
 
-public record Task(
+public record TaskResponse(
+        Long id,
         String taskName,
         Long assignedTo,
         LocalDateTime dueDate,

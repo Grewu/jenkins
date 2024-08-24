@@ -1,9 +1,8 @@
-package model.dto.response;
+package model.dto.request;
 
 import java.time.LocalDateTime;
 
-public record Project(
-        Long id,
+public record ProjectRequest(
         String projectName,
         String description,
         LocalDateTime startDate,
