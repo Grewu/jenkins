@@ -2,7 +2,7 @@ package model.dto.request;
 
 import model.entity.enums.Position;
 
-public record Employee(
+public record EmployeeRequest(
         String firstName,
         String lastName,
         Position position,

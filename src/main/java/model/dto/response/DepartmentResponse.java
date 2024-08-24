@@ -1,6 +1,6 @@
 package model.dto.response;
 
-public record Department(
+public record DepartmentResponse(
         Long id,
         String name
 ) {
