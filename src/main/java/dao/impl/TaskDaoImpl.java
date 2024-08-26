@@ -62,18 +62,20 @@ public class TaskDaoImpl implements TaskDao {
 
     @Override
     public Task create(Task task) {
-        var id = idGenerator.incrementAndGet();
-        return database.put(task.getId(),
-                new Task.Builder()
-                        .setId(id)
-                        .setTaskName(task.getTaskName())
-                        .setProjectId(task.getProjectId())
-                        .setAssignedTo(task.getAssignedTo())
-                        .setDueDate(task.getDueDate())
-                        .setStatus(task.getStatus())
-                        .setPriority(task.getPriority())
-                        .build()
-        );
+        if (database.containsKey(task.getId())) {
+            throw new IllegalArgumentException("Key is already taken");
+        }
+        var newTask = new Task.Builder()
+                .setId(task.getId())
+                .setTaskName(task.getTaskName())
+                .setProjectId(task.getProjectId())
+                .setAssignedTo(task.getAssignedTo())
+                .setDueDate(task.getDueDate())
+                .setStatus(task.getStatus())
+                .setPriority(task.getPriority())
+                .build();
+        database.put(task.getId(), newTask);
+        return newTask;
     }
 
     @Override
@@ -99,7 +101,7 @@ public class TaskDaoImpl implements TaskDao {
                     .setStatus(task.getStatus())
                     .setPriority(task.getPriority())
                     .build();
-            database.put(existingTask.getId(), existingTask);
+            database.put(updateTask.getId(), updateTask);
             return updateTask;
         }
         throw new IllegalArgumentException("Not found task " + task.getId());

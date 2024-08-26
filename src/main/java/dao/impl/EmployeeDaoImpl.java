@@ -61,18 +61,20 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
     @Override
     public Employee create(Employee employee) {
-        var id = idGenerator.incrementAndGet();
-        return database.put(employee.getId(),
-                new Employee.Builder()
-                        .setId(id)
-                        .setFirstName(employee.getFirstName())
-                        .setLastName(employee.getLastName())
-                        .setDepartmentId(employee.getDepartmentId())
-                        .setEmail(employee.getEmail())
-                        .setPassword(employee.getPassword())
-                        .setPosition(employee.getPosition())
-                        .build()
-        );
+        if (database.containsKey(employee.getId())) {
+            throw new IllegalArgumentException("Key is already taken");
+        }
+        var newEmployee = new Employee.Builder()
+                .setId(employee.getId())
+                .setFirstName(employee.getFirstName())
+                .setLastName(employee.getLastName())
+                .setDepartmentId(employee.getDepartmentId())
+                .setEmail(employee.getEmail())
+                .setPassword(employee.getPassword())
+                .setPosition(employee.getPosition())
+                .build();
+        database.put(employee.getId(), newEmployee);
+        return newEmployee;
     }
 
     @Override

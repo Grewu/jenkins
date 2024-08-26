@@ -51,16 +51,20 @@ public class CommentDaoImpl implements CommentDao {
 
     @Override
     public Comment create(Comment comment) {
-        var id = idGenerator.incrementAndGet();
-        return database.put(comment.getId(),
-                new Comment.Builder()
-                        .setId(id)
-                        .setTaskId(comment.getTaskId())
-                        .setEmployeeId(comment.getEmployeeId())
-                        .setCommentText(comment.getCommentText())
-                        .setCreatedAt(LocalDateTime.now())
-                        .build()
-        );
+        if(database.containsKey(comment.getId())){
+           throw new IllegalArgumentException("Key is already taken");
+        }
+
+        var newComment = new Comment.Builder()
+                .setId(comment.getId())
+                .setTaskId(comment.getTaskId())
+                .setEmployeeId(comment.getEmployeeId())
+                .setCommentText(comment.getCommentText())
+                .setCreatedAt(LocalDateTime.now())
+                .build();
+
+        database.put(newComment.getId(), newComment);
+        return newComment;
     }
 
     @Override

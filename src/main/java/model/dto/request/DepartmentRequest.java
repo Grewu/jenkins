@@ -1,4 +1,7 @@
 package model.dto.request;
 
-public record DepartmentRequest(String name) {
+public record DepartmentRequest(
+        Long id,
+        String name
+) {
 }

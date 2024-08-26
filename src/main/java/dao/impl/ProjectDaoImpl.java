@@ -39,17 +39,19 @@ public class ProjectDaoImpl implements ProjectDao {
 
     @Override
     public Project create(Project project) {
-        var id = idGenerator.incrementAndGet();
-        return database.put(project.getId(),
-                new Project.Builder()
-                        .setId(id)
-                        .setProjectName(project.getProjectName())
-                        .setDescription(project.getDescription())
-                        .setStartDate(project.getStartDate())
-                        .setEndDate(project.getEndDate())
-                        .setOwnerId(project.getOwnerId())
-                        .build()
-        );
+        if(database.containsKey(project.getId())){
+            throw new IllegalArgumentException("Key is already taken");
+        }
+        var newProject = new Project.Builder()
+                .setId(project.getId())
+                .setProjectName(project.getProjectName())
+                .setDescription(project.getDescription())
+                .setStartDate(project.getStartDate())
+                .setEndDate(project.getEndDate())
+                .setOwnerId(project.getOwnerId())
+                .build();
+        database.put(newProject.getId(), newProject);
+        return newProject;
     }
 
     @Override
@@ -74,7 +76,7 @@ public class ProjectDaoImpl implements ProjectDao {
                     .setEndDate(project.getEndDate())
                     .setOwnerId(project.getOwnerId())
                     .build();
-            database.put(existingProject.getId(), existingProject);
+            database.put(updateProject.getId(), updateProject);
             return updateProject;
         }
         throw new IllegalArgumentException("Not found project " + project.getId());
