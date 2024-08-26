@@ -9,13 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class ProjectDaoImpl implements ProjectDao {
 
     private static final Map<Long, Project> database = new HashMap<>();
-    private static final AtomicLong idGenerator = new AtomicLong(0);
 
     static {
         database.put(1L, new Project.Builder()
@@ -39,7 +37,7 @@ public class ProjectDaoImpl implements ProjectDao {
 
     @Override
     public Project create(Project project) {
-        if(database.containsKey(project.getId())){
+        if (database.containsKey(project.getId())) {
             throw new IllegalArgumentException("Key is already taken");
         }
         var newProject = new Project.Builder()

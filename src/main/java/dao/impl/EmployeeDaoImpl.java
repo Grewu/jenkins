@@ -9,13 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class EmployeeDaoImpl implements EmployeeDao {
 
     private static final Map<Long, Employee> database = new HashMap<>();
-    private static final AtomicLong idGenerator = new AtomicLong(0);
 
     static {
         database.put(1L, new Employee.Builder()

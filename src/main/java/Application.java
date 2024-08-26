@@ -128,11 +128,9 @@ public class Application {
         var task = taskController.getById(10L);
         System.out.println("GET BY ID: " + task);
 
-        // Удаление записи
         taskController.delete(11L);
         System.out.println("DELETE WITH ID 11L ");
 
-        // Обновление записи
         var updateTask = taskController.update(
                 new TaskRequest(10L, "UpdatedTask",
                         101L, 1001L,
@@ -140,7 +138,6 @@ public class Application {
                         Status.NOT_STARTED, 0L));
         System.out.println("UPDATE  " + updateTask);
 
-        // Повторное получение обновленной записи
         System.out.println("GET BY ID: " + taskController.getById(10L));
 
         System.out.println("==============");
