@@ -8,13 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class DepartmentDaoImpl implements DepartmentDao {
 
     private static final Map<Long, Department> database = new HashMap<>();
-    private static final AtomicLong idGenerator = new AtomicLong(0);
 
     static {
         database.put(1L, new Department.Builder()
@@ -33,13 +31,15 @@ public class DepartmentDaoImpl implements DepartmentDao {
 
     @Override
     public Department create(Department department) {
-        var id = idGenerator.incrementAndGet();
-        return database.put(department.getId(),
-                new Department.Builder()
-                        .setId(id)
-                        .setName(department.getName())
-                        .build()
-        );
+        if(database.containsKey(department.getId())){
+            throw new IllegalArgumentException("Key is already taken");
+        }
+        var newDepartment = new Department.Builder()
+                .setId(department.getId())
+                .setName(department.getName())
+                .build();
+        database.put(newDepartment.getId(), newDepartment);
+        return newDepartment;
     }
 
     @Override
@@ -58,9 +58,9 @@ public class DepartmentDaoImpl implements DepartmentDao {
         if (existingDepartment != null) {
             var updateDepartment = new Department.Builder()
                     .setId(existingDepartment.getId())
-                    .setName(existingDepartment.getName())
+                    .setName(department.getName())
                     .build();
-            database.put(existingDepartment.getId(), existingDepartment);
+            database.put(updateDepartment.getId(), updateDepartment);
             return updateDepartment;
         }
         throw new IllegalArgumentException("Not found department " + department.getId());

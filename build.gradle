@@ -17,9 +17,11 @@ ext {
     liquibaseCore = '4.5.0'
     picocliVersion = '4.6.3'
     junitVersion = '5.8.1'
+    jacksonCoreVersion = '2.0.1'
 }
 
 dependencies {
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonCoreVersion}"
     implementation "org.springframework:spring-core:${springVersion}"
     implementation "org.springframework:spring-context:${springVersion}"
     liquibaseRuntime "info.picocli:picocli:${picocliVersion}"
