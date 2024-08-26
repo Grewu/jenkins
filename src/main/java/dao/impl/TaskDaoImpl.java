@@ -10,13 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class TaskDaoImpl implements TaskDao {
 
     private static final Map<Long, Task> database = new HashMap<>();
-    private static final AtomicLong idGenerator = new AtomicLong(0);
 
     static {
         database.put(1L, new Task.Builder()

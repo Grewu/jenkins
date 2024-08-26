@@ -9,13 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class CommentDaoImpl implements CommentDao {
 
     private static final Map<Long, Comment> database = new HashMap<>();
-    private static final AtomicLong idGenerator = new AtomicLong(0);
 
     static {
         database.put(1L, new Comment.Builder()
@@ -51,8 +49,8 @@ public class CommentDaoImpl implements CommentDao {
 
     @Override
     public Comment create(Comment comment) {
-        if(database.containsKey(comment.getId())){
-           throw new IllegalArgumentException("Key is already taken");
+        if (database.containsKey(comment.getId())) {
+            throw new IllegalArgumentException("Key is already taken");
         }
 
         var newComment = new Comment.Builder()

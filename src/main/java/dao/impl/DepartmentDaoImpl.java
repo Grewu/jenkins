@@ -31,7 +31,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
 
     @Override
     public Department create(Department department) {
-        if(database.containsKey(department.getId())){
+        if (database.containsKey(department.getId())) {
             throw new IllegalArgumentException("Key is already taken");
         }
         var newDepartment = new Department.Builder()
