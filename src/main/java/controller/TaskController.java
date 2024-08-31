@@ -20,7 +20,6 @@ public class TaskController {
         this.objectMapper = objectMapper;
     }
 
-
     public String create(TaskRequest taskRequest) throws IOException {
         return objectMapper.writeValueAsString(taskService.create(taskRequest));
     }

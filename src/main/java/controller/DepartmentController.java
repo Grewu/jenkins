@@ -20,7 +20,6 @@ public class DepartmentController {
         this.objectMapper = objectMapper;
     }
 
-
     public String create(DepartmentRequest departmentRequest) throws IOException {
         return objectMapper.writeValueAsString(departmentService.create(departmentRequest));
     }

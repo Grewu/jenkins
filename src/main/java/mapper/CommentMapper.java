@@ -5,6 +5,8 @@ import model.dto.response.CommentResponse;
 import model.entity.Comment;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,5 +37,20 @@ public class CommentMapper {
                 .collect(Collectors.toList());
     }
 
+    public static Comment mapRowWithoutEmployeeId(ResultSet resultSet) throws SQLException {
+        return new Comment.Builder()
+                .setId(resultSet.getLong("id"))
+                .setTaskId(resultSet.getLong("task_id"))
+                .setCommentText(resultSet.getString("comment_text"))
+                .setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime())
+                .build();
+    }
+
+    public static Comment mapRowWithoutEmployeeIdAndCreatedAtAndTaskId(ResultSet resultSet) throws SQLException {
+        return new Comment.Builder()
+                .setId(resultSet.getLong("id"))
+                .setCommentText(resultSet.getString("comment_text"))
+                .build();
+    }
 
 }

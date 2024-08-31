@@ -19,7 +19,6 @@ public class ProjectController {
         this.objectMapper = objectMapper;
     }
 
-
     public String create(ProjectRequest projectRequest) throws IOException {
         return objectMapper.writeValueAsString(projectService.create(projectRequest));
     }

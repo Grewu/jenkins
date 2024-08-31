@@ -3,12 +3,15 @@ package service.impl;
 import dao.api.EmployeeDao;
 import mapper.EmployeeMapper;
 import model.dto.request.EmployeeRequest;
+import model.dto.response.CommentResponse;
 import model.dto.response.EmployeeResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import service.api.EmployeeService;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -48,7 +51,24 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void delete(Long id) {
-        employeeDao.delete(id);
+    public boolean delete(Long id) {
+        return employeeDao.delete(id);
     }
+
+    @Override
+    public Map<EmployeeResponse, List<CommentResponse>> getAllEmployeesWithComments() {
+        return employeeMapper.toMapOfEmployeeResponse(employeeDao.getAllEmployeesWithComments());
+    }
+
+    @Override
+    public Map<EmployeeResponse, List<CommentResponse>> getEmployeeCommentsByDateRange(LocalDateTime startDate,
+                                                                                       LocalDateTime endDate) {
+        return employeeMapper.toMapOfEmployeeResponse(employeeDao.getEmployeeCommentsByDateRange(startDate, endDate));
+    }
+
+    @Override
+    public Map<EmployeeResponse, List<CommentResponse>> getEmployeeCommentsByDepartmentId(Long departmentId) {
+        return employeeMapper.toMapOfEmployeeResponse(employeeDao.getEmployeeCommentsByDepartmentId(departmentId));
+    }
+
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import service.api.EmployeeService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Controller
 public class EmployeeController {
@@ -18,7 +19,6 @@ public class EmployeeController {
         this.employeeService = employeeService;
         this.objectMapper = objectMapper;
     }
-
 
     public String create(EmployeeRequest employeeRequest) throws IOException {
         return objectMapper.writeValueAsString(employeeService.create(employeeRequest));
@@ -36,7 +36,19 @@ public class EmployeeController {
         return objectMapper.writeValueAsString(employeeService.update(employeeRequest));
     }
 
-    public void delete(Long id) {
-        employeeService.delete(id);
+    public boolean delete(Long id) {
+        return employeeService.delete(id);
+    }
+
+    public String getAllEmployeesWithComments() throws IOException {
+        return objectMapper.writeValueAsString(employeeService.getAllEmployeesWithComments());
+    }
+
+    public String getEmployeesCommentsByDateRange(LocalDateTime startDate, LocalDateTime endDate) throws IOException {
+        return objectMapper.writeValueAsString(employeeService.getEmployeeCommentsByDateRange(startDate, endDate));
+    }
+
+    public String getEmployeesCommentsByDepartmentId(Long departmentId) throws IOException {
+        return objectMapper.writeValueAsString(employeeService.getEmployeeCommentsByDepartmentId(departmentId));
     }
 }
