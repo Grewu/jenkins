@@ -17,9 +17,12 @@ ext {
     picocliVersion = '4.6.3'
     junitVersion = '5.8.1'
     jacksonCoreVersion = '2.0.1'
+    aspectJVersion = '1.9.20.1'
 }
 
 dependencies {
+    implementation "org.aspectj:aspectjweaver:${aspectJVersion}"
+    implementation "org.aspectj:aspectjrt:${aspectJVersion}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonCoreVersion}"
     implementation "org.springframework:spring-core:${springVersion}"
     implementation "org.springframework:spring-context:${springVersion}"
@@ -42,7 +45,6 @@ liquibase {
             driver 'org.postgresql.Driver'
         }
     }
-    runList = 'main'
 }
 
 tasks.named('build') {

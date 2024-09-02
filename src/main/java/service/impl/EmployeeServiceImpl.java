@@ -1,5 +1,6 @@
 package service.impl;
 
+import annotation.Transactional;
 import dao.api.EmployeeDao;
 import mapper.EmployeeMapper;
 import model.dto.request.EmployeeRequest;
@@ -12,6 +13,7 @@ import service.api.EmployeeService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -26,6 +28,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional
     public EmployeeResponse create(EmployeeRequest employeeRequest) {
         var employee = employeeMapper.toEmployee(employeeRequest);
         return employeeMapper.toEmployeeResponse(employeeDao.create(employee));
@@ -33,8 +36,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeResponse> getAll() {
-        var employees = employeeDao.findAll();
-        return employeeMapper.toListOfEmployeeResponse(employees);
+        return employeeDao.findAll().stream()
+                .map(employeeMapper::toEmployeeResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -45,12 +49,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional
     public EmployeeResponse update(EmployeeRequest employeeRequest) {
         var employee = employeeMapper.toEmployee(employeeRequest);
         return employeeMapper.toEmployeeResponse(employeeDao.update(employee));
     }
 
     @Override
+    @Transactional
     public boolean delete(Long id) {
         return employeeDao.delete(id);
     }

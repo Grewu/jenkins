@@ -6,9 +6,8 @@ import mapper.EmployeeMapper;
 import model.entity.Comment;
 import model.entity.Employee;
 import org.springframework.stereotype.Repository;
-import util.ConnectionManager;
+import util.ConnectionHolder;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -20,8 +19,6 @@ import java.util.Optional;
 
 @Repository
 public class EmployeeDaoImpl implements EmployeeDao {
-
-    private static final Connection connection = ConnectionManager.open();
 
     private static final String INSERT_INTO_EMPLOYEE = """
             INSERT INTO employees (id, first_name, last_name, position, department_id, email, password)
@@ -93,7 +90,8 @@ public class EmployeeDaoImpl implements EmployeeDao {
     @Override
     public Employee create(Employee employee) {
         try {
-            try (var statement = connection.prepareStatement(INSERT_INTO_EMPLOYEE)) {
+            try (var connection = ConnectionHolder.getConnection();
+                 var statement = connection.prepareStatement(INSERT_INTO_EMPLOYEE)) {
                 statement.setLong(1, employee.getId());
                 statement.setString(2, employee.getFirstName());
                 statement.setString(3, employee.getLastName());
@@ -112,13 +110,13 @@ public class EmployeeDaoImpl implements EmployeeDao {
     @Override
     public List<Employee> findAll() {
         List<Employee> employees = new ArrayList<>();
-        try (var statement = connection.prepareStatement(FIND_ALL_EMPLOYEES)) {
+        try (var connection = ConnectionHolder.getConnection();
+             var statement = connection.prepareStatement(FIND_ALL_EMPLOYEES)) {
             var resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 var employee = EmployeeMapper.mapRow(resultSet);
                 employees.add(employee);
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -129,7 +127,8 @@ public class EmployeeDaoImpl implements EmployeeDao {
     @Override
     public Optional<Employee> findById(Long id) {
         try {
-            try (var statement = connection.prepareStatement(FIND_BY_ID)) {
+            try (var connection = ConnectionHolder.getConnection();
+                 var statement = connection.prepareStatement(FIND_BY_ID)) {
                 statement.setLong(1, id);
                 try (var resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
@@ -149,7 +148,8 @@ public class EmployeeDaoImpl implements EmployeeDao {
     public Employee update(Employee employee) {
         var existingEmployee = findById(employee.getId()).isPresent();
         if (existingEmployee) {
-            try (var statement = connection.prepareStatement(UPDATE_EMPLOYEE)) {
+            try (var connection = ConnectionHolder.getConnection();
+                 var statement = connection.prepareStatement(UPDATE_EMPLOYEE)) {
                 statement.setString(1, employee.getFirstName());
                 statement.setString(2, employee.getLastName());
                 statement.setString(3, employee.getPosition().toString());
@@ -170,7 +170,8 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
     @Override
     public boolean delete(Long id) {
-        try (var statement = connection.prepareStatement(DELETE_EMPLOYEE_BY_ID)) {
+        try (var connection = ConnectionHolder.getConnection();
+             var statement = connection.prepareStatement(DELETE_EMPLOYEE_BY_ID)) {
             statement.setLong(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -181,7 +182,8 @@ public class EmployeeDaoImpl implements EmployeeDao {
     @Override
     public Map<Employee, List<Comment>> getAllEmployeesWithComments() {
         Map<Employee, List<Comment>> employeeCommentsMap = new HashMap<>();
-        try (var statement = connection.prepareStatement(GET_ALL_EMPLOYEE_WITH_COMMENTS)) {
+        try (var connection = ConnectionHolder.getConnection();
+             var statement = connection.prepareStatement(GET_ALL_EMPLOYEE_WITH_COMMENTS)) {
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     var employee = EmployeeMapper.mapRowWithoutDepartmentAndEmailPassword(resultSet);
@@ -198,14 +200,15 @@ public class EmployeeDaoImpl implements EmployeeDao {
     @Override
     public Map<Employee, List<Comment>> getEmployeeCommentsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         Map<Employee, List<Comment>> employeeCommentsMap = new HashMap<>();
-        try (var statement = connection.prepareStatement(SELECT_EMPLOYEE_COMMENTS_BY_DATE_RANGE)) {
+        try (var connection = ConnectionHolder.getConnection();
+             var statement = connection.prepareStatement(SELECT_EMPLOYEE_COMMENTS_BY_DATE_RANGE)) {
             statement.setTimestamp(1, Timestamp.valueOf(startDate));
             statement.setTimestamp(2, Timestamp.valueOf(endDate));
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     var employee = EmployeeMapper.mapRowWithoutDepartmentAndEmailPassword(resultSet);
                     var comment = CommentMapper.mapRowWithoutEmployeeIdAndCreatedAtAndTaskId(resultSet);
-                    employeeCommentsMap.computeIfAbsent(employee, k -> new ArrayList<>()).add(comment);
+                    employeeCommentsMap.computeIfAbsent(employee, comments -> new ArrayList<>()).add(comment);
                 }
             }
         } catch (SQLException e) {
@@ -217,13 +220,14 @@ public class EmployeeDaoImpl implements EmployeeDao {
     @Override
     public Map<Employee, List<Comment>> getEmployeeCommentsByDepartmentId(Long departmentId) {
         Map<Employee, List<Comment>> employeeCommentsMap = new HashMap<>();
-        try (var statement = connection.prepareStatement(SELECT_EMPLOYEE_WITH_COMMENT_BY_DEPARTMENT_ID)) {
+        try (var connection = ConnectionHolder.getConnection();
+             var statement = connection.prepareStatement(SELECT_EMPLOYEE_WITH_COMMENT_BY_DEPARTMENT_ID)) {
             statement.setLong(1, departmentId);
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     var employee = EmployeeMapper.mapRowWithoutPassword(resultSet);
                     var comment = CommentMapper.mapRowWithoutEmployeeId(resultSet);
-                    employeeCommentsMap.computeIfAbsent(employee, k -> new ArrayList<>()).add(comment);
+                    employeeCommentsMap.computeIfAbsent(employee, comments -> new ArrayList<>()).add(comment);
                 }
             }
         } catch (SQLException e) {

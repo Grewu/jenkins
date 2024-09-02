@@ -48,12 +48,6 @@ public class EmployeeMapper {
         );
     }
 
-    public List<EmployeeResponse> toListOfEmployeeResponse(List<Employee> employees) {
-        return employees.stream()
-                .map(this::toEmployeeResponse)
-                .collect(Collectors.toList());
-    }
-
     public static Employee mapRow(ResultSet resultSet) throws SQLException {
         return new Employee.Builder()
                 .setId(resultSet.getLong("id"))
