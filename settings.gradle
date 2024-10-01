@@ -1,4 +1,1 @@
 rootProject.name = 'Senla-Course'
-include 'main'
-include 'di'
-
