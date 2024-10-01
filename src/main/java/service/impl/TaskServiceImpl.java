@@ -47,7 +47,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void delete(Long id) {
-        taskDao.delete(id);
+    public boolean delete(Long id) {
+        return taskDao.delete(id);
+
     }
 }

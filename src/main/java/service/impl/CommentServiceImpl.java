@@ -48,8 +48,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void delete(Long id) {
-        commentDao.delete(id);
-    }
+    public boolean delete(Long id) {
+        return commentDao.delete(id);
+}
 
 }

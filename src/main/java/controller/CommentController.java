@@ -36,8 +36,8 @@ public class CommentController {
         return objectMapper.writeValueAsString(commentService.update(commentRequest));
     }
 
-    public void delete(Long id) {
-        commentService.delete(id);
+    public boolean delete(Long id) {
+        return commentService.delete(id);
     }
 
 }
