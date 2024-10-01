@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Component
 public class CommentMapper {
@@ -37,6 +36,7 @@ public class CommentMapper {
                 .collect(Collectors.toList());
     }
 
+
     public static Comment mapRowWithoutEmployeeId(ResultSet resultSet) throws SQLException {
         return new Comment.Builder()
                 .setId(resultSet.getLong("id"))
@@ -52,5 +52,6 @@ public class CommentMapper {
                 .setCommentText(resultSet.getString("comment_text"))
                 .build();
     }
+
 
 }

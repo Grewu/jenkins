@@ -15,6 +15,6 @@ public interface AbstractService<K, Q,S> {
 
     S update(Q t);
 
-
     boolean delete(K id);
+
 }

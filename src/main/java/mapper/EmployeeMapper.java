@@ -13,6 +13,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import model.dto.response.EmployeeResponse;
+import model.entity.Employee;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,6 +29,7 @@ public class EmployeeMapper {
     public EmployeeMapper(CommentMapper commentMapper) {
         this.commentMapper = commentMapper;
     }
+
 
     public Employee toEmployee(EmployeeRequest employeeRequest) {
         return new Employee.Builder()
@@ -91,5 +97,11 @@ public class EmployeeMapper {
                                 .map(commentMapper::toCommentResponse)
                                 .collect(Collectors.toList())
                 ));
+      
+    public List<EmployeeResponse> toListOfEmployeeResponse(List<Employee> employees) {
+        return employees.stream()
+                .map(this::toEmployeeResponse)
+                .collect(Collectors.toList());
+
     }
 }

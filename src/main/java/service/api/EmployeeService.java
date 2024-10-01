@@ -17,5 +17,5 @@ public interface EmployeeService extends AbstractService<Long, EmployeeRequest, 
                                                                                 LocalDateTime endDate);
 
     Map<EmployeeResponse, List<CommentResponse>> getEmployeeCommentsByDepartmentId(Long departmentId);
-
 }
+

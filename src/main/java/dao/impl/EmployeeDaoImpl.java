@@ -12,6 +12,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import model.entity.Employee;
+import model.entity.enums.Position;
+import org.springframework.stereotype.Repository;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +109,68 @@ public class EmployeeDaoImpl implements EmployeeDao {
             throw new RuntimeException(e);
         }
         return employee;
+
+    private static final Map<Long, Employee> database = new HashMap<>();
+
+    static {
+        database.put(1L, new Employee.Builder()
+                .setId(1L)
+                .setFirstName("Alice")
+                .setLastName("Smith")
+                .setDepartmentId(1L)
+                .setEmail("alice.smith@example.com")
+                .setPassword("password_hash")
+                .setPosition(Position.MANAGER)
+                .build());
+
+        database.put(2L, new Employee.Builder()
+                .setId(2L)
+                .setFirstName("Bob")
+                .setLastName("Johnson")
+                .setDepartmentId(2L)
+                .setEmail("bob.johnson@example.com")
+                .setPassword("password_hash")
+                .setPosition(Position.DEVELOPER)
+                .build());
+
+        database.put(3L, new Employee.Builder()
+                .setId(3L)
+                .setFirstName("Charlie")
+                .setLastName("Williams")
+                .setDepartmentId(3L)
+                .setEmail("charlie.williams@example.com")
+                .setPassword("password_hash")
+                .setPosition(Position.SALESPERSON)
+                .build());
+
+        database.put(4L, new Employee.Builder()
+                .setId(4L)
+                .setFirstName("David")
+                .setLastName("Brown")
+                .setDepartmentId(4L)
+                .setEmail("david.brown@example.com")
+                .setPassword("password_hash")
+                .setPosition(Position.MARKETING_SPECIALIST)
+                .build());
+    }
+
+    @Override
+    public Employee create(Employee employee) {
+        if (database.containsKey(employee.getId())) {
+            throw new IllegalArgumentException("Key is already taken");
+        }
+        var newEmployee = new Employee.Builder()
+                .setId(employee.getId())
+                .setFirstName(employee.getFirstName())
+                .setLastName(employee.getLastName())
+                .setDepartmentId(employee.getDepartmentId())
+                .setEmail(employee.getEmail())
+                .setPassword(employee.getPassword())
+                .setPosition(employee.getPosition())
+                .build();
+        database.put(employee.getId(), newEmployee);
+        return newEmployee;
+
     }
 
     @Override
@@ -142,10 +208,19 @@ public class EmployeeDaoImpl implements EmployeeDao {
             throw new RuntimeException(e);
         }
         return Optional.empty();
+
+        return List.copyOf(database.values());
+    }
+
+    @Override
+    public Optional<Employee> findById(Long id) {
+        return Optional.ofNullable(database.get(id));
+
     }
 
     @Override
     public Employee update(Employee employee) {
+
         var existingEmployee = findById(employee.getId()).isPresent();
         if (existingEmployee) {
             try (var connection = ConnectionHolder.getConnection();
@@ -166,10 +241,28 @@ public class EmployeeDaoImpl implements EmployeeDao {
             throw new IllegalArgumentException("Not found employee " + employee.getId());
         }
 
+
+        var existingEmployee = database.get(employee.getId());
+        if (existingEmployee != null) {
+            var updateEmployee = new Employee.Builder()
+                    .setId(existingEmployee.getId())
+                    .setFirstName(employee.getFirstName())
+                    .setLastName(employee.getLastName())
+                    .setDepartmentId(employee.getDepartmentId())
+                    .setEmail(employee.getEmail())
+                    .setPassword(employee.getPassword())
+                    .setPosition(employee.getPosition())
+                    .build();
+            database.put(existingEmployee.getId(), existingEmployee);
+            return updateEmployee;
+        }
+        throw new IllegalArgumentException("Not found employee " + employee.getId());
+
     }
 
     @Override
     public boolean delete(Long id) {
+
         try (var connection = ConnectionHolder.getConnection();
              var statement = connection.prepareStatement(DELETE_EMPLOYEE_BY_ID)) {
             statement.setLong(1, id);
@@ -234,6 +327,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
             throw new RuntimeException(e);
         }
         return employeeCommentsMap;
+
     }
 
 }

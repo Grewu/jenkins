@@ -5,6 +5,6 @@ CREATE TABLE comments
     employee_id  BIGINT,
     comment_text TEXT NOT NULL,
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (task_id) REFERENCES tasks (id),
-    FOREIGN KEY (employee_id) REFERENCES employees (id)
+    FOREIGN KEY (task_id) REFERENCES tasks (task_id),
+    FOREIGN KEY (employee_id) REFERENCES employees (employee_id)
 );

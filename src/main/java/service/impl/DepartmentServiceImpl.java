@@ -50,5 +50,5 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public boolean delete(Long id) {
         return departmentDao.delete(id);
-    }
+}
 }
