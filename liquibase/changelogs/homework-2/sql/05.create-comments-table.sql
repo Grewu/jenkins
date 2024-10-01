@@ -8,3 +8,4 @@ CREATE TABLE comments
     FOREIGN KEY (task_id) REFERENCES tasks (task_id),
     FOREIGN KEY (employee_id) REFERENCES employees (employee_id)
 );
+
