@@ -3,9 +3,8 @@ package model.dto.request;
 import java.time.LocalDateTime;
 
 public record CommentRequest(
-        Long id,
-        Long taskId,
-        Long employeeId,
+        Long task,
+        Long usersProfile,
         String commentText,
         LocalDateTime createdAt
 ) {

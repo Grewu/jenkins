@@ -3,10 +3,11 @@ package model.dto.request;
 import java.time.LocalDateTime;
 
 public record ProjectRequest(
-        Long id,
-        String projectName,
+        String name,
+        String projectCode,
         String description,
         LocalDateTime startDate,
-        LocalDateTime endDate
+        LocalDateTime endDate,
+        Long owner
 ) {
 }

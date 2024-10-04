@@ -1,7 +1,8 @@
 package model.dto.request;
 
+import model.entity.enums.DepartmentType;
+
 public record DepartmentRequest(
-        Long id,
-        String name
+        DepartmentType name
 ) {
 }

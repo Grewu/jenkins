@@ -1,43 +1,70 @@
 package controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import model.dto.request.CommentRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import model.dto.response.CommentResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import service.api.CommentService;
 
-import java.io.IOException;
+import java.util.List;
 
-@Controller
+@Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping(value = CommentController.COMMENT_API_PATH)
 public class CommentController {
 
     private final CommentService commentService;
-    private final ObjectMapper objectMapper;
+    public static final String COMMENT_API_PATH = "/api/v0/comments";
 
-    @Autowired
-    public CommentController(CommentService commentService, ObjectMapper objectMapper) {
-        this.commentService = commentService;
-        this.objectMapper = objectMapper;
+
+    @PostMapping
+    //TODO:DTO taskID?
+    public ResponseEntity<CommentResponse> create(@RequestBody CommentRequest commentRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(commentService.create(commentRequest));
     }
 
-    public String create(CommentRequest commentRequest) throws IOException {
-        return objectMapper.writeValueAsString(commentService.create(commentRequest));
+    @GetMapping
+    public ResponseEntity<List<CommentResponse>> getAll() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(commentService.getAll());
     }
 
-    public String getAll() throws IOException {
-        return objectMapper.writeValueAsString(commentService.getAll());
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CommentResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(commentService.getById(id));
     }
 
-    public String getById(Long id) throws IOException {
-        return objectMapper.writeValueAsString(commentService.getById(id));
+    @PutMapping("/{id}")
+    public ResponseEntity<CommentResponse> update(@PathVariable Long id,
+                                                  @RequestBody CommentRequest commentRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(commentService.update(id, commentRequest));
     }
 
-    public String update(CommentRequest commentRequest) throws IOException {
-        return objectMapper.writeValueAsString(commentService.update(commentRequest));
-    }
 
-    public boolean delete(Long id) {
-        return commentService.delete(id);
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestBody CommentRequest commentRequest) {
+        commentService.delete(commentRequest);
+        return ResponseEntity.noContent().build();
     }
 
 }

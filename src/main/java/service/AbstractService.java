@@ -2,7 +2,7 @@ package service;
 
 import java.util.List;
 
-public interface AbstractService<K, Q,S> {
+public interface AbstractService<K, Q, S> {
 
     S create(Q t);
 
@@ -13,8 +13,8 @@ public interface AbstractService<K, Q,S> {
     S getById(K id);
 
 
-    S update(Q t);
+    S update(K id, Q t);
 
-    boolean delete(K id);
 
+    void delete(Q t);
 }

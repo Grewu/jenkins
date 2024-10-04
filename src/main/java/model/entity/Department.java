@@ -1,43 +1,39 @@
 package model.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import model.entity.enums.DepartmentType;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+
+@Getter
+@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "departments")
 public class Department {
-    private final Long id;
-    private final String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private Department(Builder builder) {
-        this.id = builder.id;
-        this.name = builder.name;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name", nullable = false)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private DepartmentType name;
 
-    public static class Builder {
-        private Long id;
-        private String name;
-
-        public Builder() {
-        }
-
-        public Builder setId(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-
-        public Department build() {
-            return new Department(this);
-        }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    public Department(Long departmentId) {
+        this.id = departmentId;
     }
 
 }

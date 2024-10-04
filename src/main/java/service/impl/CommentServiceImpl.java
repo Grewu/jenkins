@@ -1,14 +1,18 @@
 package service.impl;
 
 import dao.api.CommentDao;
+import exception.EntityNotFoundException;
 import mapper.CommentMapper;
 import model.dto.request.CommentRequest;
 import model.dto.response.CommentResponse;
+import model.entity.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import service.api.CommentService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -23,6 +27,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public CommentResponse create(CommentRequest commentRequest) {
         var comment = commentMapper.toComment(commentRequest);
         return commentMapper.toCommentResponse(commentDao.create(comment));
@@ -30,26 +35,30 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentResponse> getAll() {
-        var comments = commentDao.findAll();
-        return commentMapper.toListOfCommentResponse(comments);
+        return commentDao.findAll().stream()
+                .map(commentMapper::toCommentResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     public CommentResponse getById(Long id) {
         return commentDao.findById(id)
                 .map(commentMapper::toCommentResponse)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found with id " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Comment.class, id));
     }
 
     @Override
-    public CommentResponse update(CommentRequest commentRequest) {
+    @Transactional
+    public CommentResponse update(Long id, CommentRequest commentRequest) {
         var comment = commentMapper.toComment(commentRequest);
         return commentMapper.toCommentResponse(commentDao.update(comment));
     }
 
     @Override
-    public boolean delete(Long id) {
-        return commentDao.delete(id);
-}
+    @Transactional
+    public void delete(CommentRequest commentRequest) {
+        var comment = commentMapper.toComment(commentRequest);
+        commentDao.delete(comment);
+    }
 
 }
