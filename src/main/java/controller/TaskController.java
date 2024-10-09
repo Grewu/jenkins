@@ -35,6 +35,11 @@ public class TaskController {
                 .body(taskService.create(taskRequest));
     }
 
+//    "Assigns the task to a specific user."
+//    @PostMapping("/{id}/assign/{userId}")
+
+    //GET /TASKS/{id}/history: "Displays the history of task changes."
+
     @GetMapping
     public ResponseEntity<List<TaskResponse>> getAll() {
         return ResponseEntity.status(HttpStatus.OK)

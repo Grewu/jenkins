@@ -36,6 +36,8 @@ public class DepartmentController {
                 .body(departmentService.create(departmentRequest));
     }
 
+    //GET /departments/{departmentId}/users: "Returns all users working in this department."
+
     @GetMapping
     public ResponseEntity<List<DepartmentResponse>> getAll() {
         return ResponseEntity.status(HttpStatus.OK)

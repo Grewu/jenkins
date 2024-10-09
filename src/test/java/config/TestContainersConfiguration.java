@@ -3,6 +3,9 @@ package config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import controller.CommentController;
+import controller.filter.JwtFilter;
+import handler.GlobalExceptionHandler;
 import jakarta.persistence.EntityManagerFactory;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +20,9 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import service.api.CommentService;
+import service.api.UserService;
+import service.impl.JwtTokenServiceImpl;
 
 import javax.sql.DataSource;
 
@@ -28,6 +34,7 @@ import javax.sql.DataSource;
         "controller",
         "service.impl",
         "dao.impl",
+        "handler",
         "mapper"
 })
 public class TestContainersConfiguration {
@@ -67,7 +74,7 @@ public class TestContainersConfiguration {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+        var em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
         em.setPackagesToScan("model.entity");
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
@@ -76,9 +83,19 @@ public class TestContainersConfiguration {
 
     @Bean
     public SpringLiquibase liquibase(DataSource dataSource) {
-        SpringLiquibase liquibase = new SpringLiquibase();
+        var liquibase = new SpringLiquibase();
         liquibase.setChangeLog("classpath:liquibase/changelog-master.xml");
         liquibase.setDataSource(dataSource);
         return liquibase;
+    }
+
+    @Bean
+    public CommentController commentController(CommentService commentService) {
+        return new CommentController(commentService);
+    }
+
+    @Bean
+    public JwtFilter jwtFilter(JwtTokenServiceImpl jwtTokenService, UserService userService) {
+        return new JwtFilter(jwtTokenService, userService);
     }
 }

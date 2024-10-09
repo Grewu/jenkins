@@ -6,6 +6,7 @@ import model.dto.response.CommentResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,6 @@ public class CommentController {
 
 
     @PostMapping
-    //TODO:DTO taskID?
     public ResponseEntity<CommentResponse> create(@RequestBody CommentRequest commentRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -38,6 +38,7 @@ public class CommentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('privilege:read')")
     public ResponseEntity<List<CommentResponse>> getAll() {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)

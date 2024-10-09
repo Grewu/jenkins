@@ -39,6 +39,8 @@ public class UserProfileController {
                 .body(userProfileService.create(userProfileRequest));
     }
 
+    //GET /user-profiles/{profileId}/comments
+
     @GetMapping
     public ResponseEntity<List<UserProfileResponse>> getAll() {
         return ResponseEntity.status(HttpStatus.OK)

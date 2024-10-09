@@ -13,7 +13,7 @@ public class MyWebAppInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext container) {
         var context = new AnnotationConfigWebApplicationContext();
-        context.register(AppConfig.class);
+        context.register(AppConfig.class, SecurityConfig.class);
 
         container.addListener(new ContextLoaderListener(context));
 

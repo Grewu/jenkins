@@ -2,6 +2,7 @@ package controller;
 
 import config.TestContainersConfiguration;
 import data.DepartmentTestData;
+import model.entity.enums.DepartmentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import service.api.DepartmentService;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @IntegrationTest
+@WebAppConfiguration
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = TestContainersConfiguration.class)
 class DepartmentControllerTestIT extends PostgresqlTestContainer {
@@ -134,41 +137,41 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
                 );
     }
 
-//    @Test
-//    void updateShouldReturnUpdatedDepartmentResponse() throws Exception {
-//        // given
-//        var departmentRequest = DepartmentTestData.builder()
-//                .withName(DepartmentType.DEVELOPERS)
-//                .build().buildDepartmentRequest();
-//
-//        var updatedResponse = DepartmentTestData.builder()
-//                .withName(DepartmentType.DEVELOPERS)
-//                .build().buildDepartmentResponse();
-//
-//        doReturn(updatedResponse).when(departmentService).update(1L, departmentRequest);
-//
-//        var requestBuilder = put(URL_WITH_PARAMETER_ID, 1L)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content("""
-//                        {
-//                            "name": "DEVELOPERS"
-//                        }
-//                        """);
-//
-//        // when
-//        mockMvc.perform(requestBuilder)
-//                // then
-//                .andExpectAll(
-//                        status().isOk(),
-//                        content().contentType(MediaType.APPLICATION_JSON),
-//                        content().json("""
-//                                {
-//                                    "id": 1,
-//                                    "name": "DEVELOPERS"
-//                                }
-//                                """)
-//                );
-//    }
+    @Test
+    void updateShouldReturnUpdatedDepartmentResponse() throws Exception {
+        // given
+        var departmentRequest = DepartmentTestData.builder()
+                .withName(DepartmentType.DEVELOPERS)
+                .build().buildDepartmentRequest();
+
+        var updatedResponse = DepartmentTestData.builder()
+                .withName(DepartmentType.DEVELOPERS)
+                .build().buildDepartmentResponse();
+
+        doReturn(updatedResponse).when(departmentService).update(1L, departmentRequest);
+
+        var requestBuilder = put(URL_WITH_PARAMETER_ID, 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "name": "DEVELOPERS"
+                        }
+                        """);
+
+        // when
+        mockMvc.perform(requestBuilder)
+                // then
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        content().json("""
+                                {
+                                    "id": 1,
+                                    "name": "DEVELOPERS"
+                                }
+                                """)
+                );
+    }
 
     @Test
     void deleteShouldReturnNoContent() throws Exception {

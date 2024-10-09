@@ -35,6 +35,9 @@ public class ProjectController {
                 .body(projectService.create(projectRequest));
     }
 
+
+    //GET /projects/{projectId}/tasks   "Returns all tasks related to the project."
+
     @GetMapping
     public ResponseEntity<List<ProjectResponse>> getAll() {
         return ResponseEntity.status(HttpStatus.OK)

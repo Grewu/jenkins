@@ -288,7 +288,35 @@ Content-Type: application/json
   "priority": "HIGH"
 }
 
-###
-POST http://localhost:8080/api/v0/departments
+### ADMIN TOKEN
+POST http://localhost:8080/senla/api/v0/auth/register
+Content-Type: application/json
 
-###
+{
+  "email": "admin@example.com",
+  "password": "securepassword123",
+  "role": 1
+}
+
+### USER TOKEN
+POST http://localhost:8080/senla/api/v0/auth/register
+Content-Type: application/json
+
+{
+  "email": "guest@example.com",
+  "password": "securepassword123",
+  "role": 2
+}
+
+### GUEST TOKEN
+POST http://localhost:8080/senla/api/v0/auth/register
+Content-Type: application/json
+
+{
+  "email": "guest@example.com",
+  "password": "guestpassword789",
+  "role": 3
+}
+
+
+

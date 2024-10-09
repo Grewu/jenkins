@@ -1,6 +1,9 @@
 package controller;
 
+import config.SecurityConfig;
+import config.SecurityWebApplicationInitializer;
 import config.TestContainersConfiguration;
+import controller.filter.JwtFilter;
 import data.CommentTestData;
 import model.dto.response.CommentResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +14,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import service.api.CommentService;
+import service.api.UserService;
+import service.impl.JwtTokenServiceImpl;
 import util.IntegrationTest;
 import util.PostgresqlTestContainer;
 
@@ -26,8 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @IntegrationTest
+@WebAppConfiguration
 @ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = TestContainersConfiguration.class)
+@ContextConfiguration(classes = {TestContainersConfiguration.class, SecurityConfig.class, SecurityWebApplicationInitializer.class})
 class CommentControllerTestIT extends PostgresqlTestContainer {
 
     private MockMvc mockMvc;
@@ -38,6 +45,15 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     @InjectMocks
     private CommentController commentController;
 
+    @Mock
+    private JwtTokenServiceImpl jwtTokenService;
+    @Mock
+    private UserService userService;
+
+    @InjectMocks
+    private JwtFilter jwtFilter;
+
+
     private static final String URL = "/api/v0/comments";
     private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
 
@@ -45,6 +61,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     public void setup() {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(commentController)
+                .addFilter(jwtFilter)
                 .build();
     }
 
