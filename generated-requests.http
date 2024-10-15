@@ -289,7 +289,7 @@ Content-Type: application/json
 }
 
 ### ADMIN TOKEN
-POST http://localhost:8080/senla/api/v0/auth/register
+POST http://localhost:8080/api/v0/auth/register
 Content-Type: application/json
 
 {

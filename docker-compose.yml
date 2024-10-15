@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  senla-course:
+    build:
+      dockerfile: Dockerfile
+      context: ./
+    image: senla-course
+    depends_on:
+      db-tasks:
+        condition: service_healthy
+    restart: always
+    networks:
+      - news_ntwrk
+    ports:
+      - "8080:8080"
+
+  db-tasks:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      interval: 10s
+      timeout: 3s
+    volumes:
+      - db_tasks_data:/var/lib/postgresql/data
+    networks:
+      - news_ntwrk
+    ports:
+      - "5433:5432"
+
+networks:
+  news_ntwrk:
+
+volumes:
+  db_tasks_data:
