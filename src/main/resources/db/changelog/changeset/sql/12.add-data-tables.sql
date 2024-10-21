@@ -29,7 +29,7 @@ VALUES (1, 'MANAGER'),
 
 INSERT INTO users (email, password, role_id)
 VALUES ('admin@example.com', '$2a$10$BS7udr3QYwyUkX4w3p2V.Ovjc/kWnjMJMrSTu9.XFzrHbWuDLasjK', 1),
-       ('user@example.com', '$2a$10$PuhG.KXSWyD0CAPJf1abgu8EyCdCa0/Q0EZYdUdN9PaCOFzydgCAW', 2),
+       ('user@example.com', '$2b$12$QQMT.3IZJEK2SDCnnWlz8erjeUABxfQ45/OYd4hE6ErxOf6lC2efe', 2),
        ('guest@example.com', '$2a$10$lpvBiZ9Vp/caYDQBSpeItuxglzf/Ukx4LRnTTEjw4mmR.iG0.Y67u', 3),
        ('anotheruser@example.com', '$2a$10$kSsePSg1z1uGyt14p97Bp.VmN1mkCpuV2Yykiv4IUI6RJqVIt4que', 4);
 

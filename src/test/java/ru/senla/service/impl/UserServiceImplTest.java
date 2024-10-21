@@ -3,8 +3,6 @@ package ru.senla.service.impl;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.senla.data.UserTestData;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.exception.InvalidEmailException;
-import ru.senla.exception.InvalidPasswordException;
 import ru.senla.mapper.UserMapper;
 import ru.senla.model.entity.User;
 import ru.senla.repository.api.UserRepository;
@@ -21,7 +18,6 @@ import ru.senla.service.api.TokenService;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

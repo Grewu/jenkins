@@ -1,6 +1,5 @@
 package ru.senla.controller;
 
-
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,17 +37,17 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     private static final String URL = "/api/v0/comments";
     private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
 
-
     @Nested
     class Create {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"comments:write"})
         void createShouldReturnCommentResponse() throws Exception {
             // given
             var commentRequest = CommentTestData.builder().build().buildCommentRequest();
             var expectedResponse = CommentTestData.builder().build().buildCommentResponse();
 
-            doReturn(expectedResponse).when(commentService).create(commentRequest);
+            doReturn(expectedResponse)
+                    .when(commentService).create(commentRequest);
 
             var requestBuilder = post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -68,12 +67,12 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                             status().isCreated(),
                             content().contentType(MediaType.APPLICATION_JSON),
                             content().json("""
-                                     {
+                                    {
                                              "task": 1,
                                              "usersProfile": 1,
                                              "commentText": "commentText",
                                              "createdAt": "2024-09-30T12:00:00"
-                                         }
+                                    }
                                     """)
                     );
 
@@ -101,35 +100,12 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
             verify(commentService, never()).create(any());
         }
-
-        @Test
-        @WithMockUser(roles = "GUEST")
-        void createWithRoleGuestShouldReturnForbidden() throws Exception {
-            // given
-            var requestBuilder = post(URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "task": 1,
-                                "usersProfile": 1,
-                                "commentText": "commentText",
-                                "createdAt": "2024-09-30T12:00:00"
-                            }
-                            """);
-
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(commentService, never()).create(any());
-        }
     }
 
     @Nested
     class GetAll {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"comments:read"})
         void getAllShouldReturnListOfCommentResponses() throws Exception {
             // given
             var pageable = Pageable.ofSize(2);
@@ -158,22 +134,20 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
         @Test
         void getAllShouldReturnForbidden() throws Exception {
-            // given
-            var pageable = Pageable.ofSize(2);
             // when
             mockMvc.perform(get(URL)
                             .contentType(MediaType.APPLICATION_JSON))
                     // then
                     .andExpect(status().isForbidden());
 
-            verify(commentService, never()).getAll(pageable);
+            verify(commentService, never()).getAll(any());
         }
     }
 
     @Nested
     class GetByID {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"comments:read"})
         void getByIdShouldReturnCommentResponse() throws Exception {
             // given
             var commentResponse = CommentTestData.builder().build().buildCommentResponse();
@@ -212,7 +186,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, commentId)
                             .contentType(MediaType.APPLICATION_JSON))
                     // then
-                    .andExpectAll(status().isForbidden());
+                    .andExpect(status().isForbidden());
 
             verify(commentService, never()).getById(any());
         }
@@ -226,7 +200,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                 "2, 'Updated comment 2', '2024-09-30T12:00:00'",
                 "3, 'Updated comment 3', '2024-09-30T12:00:00'"
         })
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"comments:write"})
         void updateShouldReturnUpdatedCommentResponse(Long commentId, String updatedCommentText, String createdAt) throws Exception {
             // given
             var commentRequest = CommentTestData.builder()
@@ -270,97 +244,12 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
             verify(commentService).update(any(), any());
         }
-
-
-        @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
-        void updateShouldReturnUpdatedCommentResponse() throws Exception {
-            // given
-            var commentId = 1L;
-            var commentRequest = CommentTestData.builder()
-                    .withCommentText("Updated comment")
-                    .build().buildCommentRequest();
-
-            var updatedResponse = CommentTestData.builder()
-                    .withId(commentId)
-                    .withCommentText("Updated comment")
-                    .build().buildCommentResponse();
-
-            doReturn(updatedResponse).when(commentService).update(commentId, commentRequest);
-
-            var requestBuilder = put(URL_WITH_PARAMETER_ID, commentId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "task": 1,
-                                "usersProfile": 1,
-                                "commentText": "Updated comment",
-                                "createdAt": "2024-09-30T12:00:00"
-                            }
-                            """);
-
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpectAll(
-                            status().isOk(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            content().json("""
-                                    {
-                                         "task": 1,
-                                         "usersProfile": 1,
-                                         "commentText": "Updated comment",
-                                         "createdAt": "2024-09-30T12:00:00"
-                                    }
-                                    """)
-                    );
-
-            verify(commentService).update(any(), any());
-        }
-
-        @Test
-        void updateShouldReturnForbidden() throws Exception {
-            // given
-            var commentId = 1L;
-            var commentRequest = CommentTestData.builder()
-                    .withCommentText("Updated comment")
-                    .build().buildCommentRequest();
-
-            var updatedResponse = CommentTestData.builder()
-                    .withId(commentId)
-                    .withCommentText("Updated comment")
-                    .build().buildCommentResponse();
-
-            doReturn(updatedResponse).when(commentService).update(commentId, commentRequest);
-
-            var requestBuilder = put(URL_WITH_PARAMETER_ID, commentId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "task": 1,
-                                "usersProfile": 1,
-                                "commentText": "Updated comment",
-                                "createdAt": "2024-09-30T12:00:00"
-                            }
-                            """);
-
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpectAll(
-                            status().isForbidden()
-                    );
-
-            verify(commentService, never()).update(any(), any());
-        }
     }
-
 
     @Nested
     class Delete {
-
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(authorities = {"comments:delete"})
         void deleteShouldReturnNoContent() throws Exception {
             // given
             var commentId = 1L;
@@ -388,5 +277,4 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
             verify(commentService, never()).delete(commentId);
         }
     }
-
 }

@@ -51,7 +51,7 @@ public class JwtTokenServiceImpl implements TokenService {
     @Override
     public List<String> getAuthorities(String token) {
         checkToken(token);
-        return getClaims(token).get("authorities",List.class);
+        return getClaims(token).get("authorities", List.class);
     }
 
     private void checkToken(String token) {
@@ -62,7 +62,7 @@ public class JwtTokenServiceImpl implements TokenService {
             isValid = false;
         }
         if (!isValid) {
-            throw new InvalidTokenException(token);
+            throw new InvalidTokenException();
         }
     }
 

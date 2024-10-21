@@ -20,8 +20,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@AllArgsConstructor()
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users_profiles")
 @NamedEntityGraph(name = "userProfile_entity-graph",
         attributeNodes = {
@@ -47,7 +47,7 @@ public class UserProfile {
     private Position position;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "department_id", referencedColumnName = "id")
     private Department department;
 
     @OneToOne(fetch = FetchType.LAZY)

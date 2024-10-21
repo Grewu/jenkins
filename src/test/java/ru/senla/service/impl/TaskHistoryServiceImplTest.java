@@ -1,5 +1,6 @@
 package ru.senla.service.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,9 +9,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import ru.senla.data.TaskHistoryTestData;
+import ru.senla.data.TaskTestData;
+import ru.senla.data.UserTestData;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.TaskHistoryMapper;
+import ru.senla.model.dto.request.TaskHistoryRequest;
 import ru.senla.repository.api.TaskHistoryRepository;
 
 import java.util.List;
@@ -143,13 +150,62 @@ class TaskHistoryServiceImplTest {
         void deleteShouldCallDaoDeleteMethod() {
             // given
             var id = 1L;
-
+            //when
             doNothing()
                     .when(taskHistoryRepository).deleteById(id);
-
+            //then
             assertThatNoException()
                     .isThrownBy(() -> taskHistoryService.delete(id));
         }
     }
+
+    @Nested
+    class RecordTaskWithSecurityContext {
+        @BeforeEach
+        void setUpSecurityContext() {
+            var mockAuthentication = mock(Authentication.class);
+            var mockSecurityContext = mock(SecurityContext.class);
+
+            SecurityContextHolder.setContext(mockSecurityContext);
+            var currentUser = UserTestData.builder().build().buildUser();
+
+            when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
+            when(mockAuthentication.getPrincipal()).thenReturn(currentUser);
+        }
+
+        @Test
+        void shouldSaveTaskUpdateHistory() {
+            //given
+            var taskHistory = TaskHistoryTestData.builder().build().buildTaskHistory();
+            var taskToSave = TaskTestData.builder().build().buildTask();
+            var taskToCurrent = TaskTestData.builder().build().buildTask();
+            //then
+            when(taskHistoryMapper.toTaskHistory(any(TaskHistoryRequest.class))).thenReturn(taskHistory);
+
+            //then
+            taskHistoryService.recordTaskUpdateHistory(taskToSave, taskToCurrent);
+
+            verify(taskHistoryRepository).save(taskHistory);
+        }
+
+    }
+
+    @Nested
+    class RecordTask {
+        @Test
+        void shouldSaveTaskCreationHistory() {
+            //given
+            var task = TaskTestData.builder().build().buildTask();
+            var taskHistory = TaskHistoryTestData.builder().build().buildTaskHistory();
+
+            when(taskHistoryMapper.toTaskHistory(any(TaskHistoryRequest.class))).thenReturn(taskHistory);
+
+            //then
+            taskHistoryService.recordTaskCreationHistory(task);
+
+            verify(taskHistoryRepository).save(taskHistory);
+        }
+    }
+
 
 }

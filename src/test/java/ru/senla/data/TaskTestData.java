@@ -42,7 +42,7 @@ public class TaskTestData {
     private PriorityType priority = PriorityType.MEDIUM;
 
     public Task buildTask() {
-        return new Task(id, name, project, assignedTo, createdBy, dueDate, status, priority, null);
+        return new Task(id, name, project, assignedTo, createdBy, dueDate, status, priority);
     }
 
     public TaskRequest buildTaskRequest() {

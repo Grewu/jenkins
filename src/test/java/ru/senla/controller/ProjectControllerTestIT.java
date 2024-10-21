@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.senla.data.ProjectTestData;
+import ru.senla.data.TaskTestData;
 import ru.senla.service.api.ProjectService;
 import ru.senla.util.IntegrationTest;
 import ru.senla.util.PostgresqlTestContainer;
@@ -33,17 +34,19 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
 
     private static final String URL = "/api/v0/projects";
     private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
+    private static final String URL_WITH_PROJECT_ID_TASKS = URL + "/{projectId}/tasks";
 
     @Nested
     class Create {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"project:write"})
         void createShouldReturnProjectResponse() throws Exception {
             // given
             var projectRequest = ProjectTestData.builder().build().buildProjectRequest();
             var expectedResponse = ProjectTestData.builder().build().buildProjectResponse();
 
-            doReturn(expectedResponse).when(projectService).create(projectRequest);
+            doReturn(expectedResponse)
+                    .when(projectService).create(projectRequest);
 
             var requestBuilder = post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +111,48 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class GetAll {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"project:read", "task:read"})
+        void getAllShouldReturnTaskResponseRelatedToProject() throws Exception {
+            // given
+            var pageable = Pageable.ofSize(2);
+            var projectId = ProjectTestData.builder().build().buildProject().getId();
+
+            var expectedResponses = List.of(
+                    TaskTestData.builder().build().buildTaskResponse(),
+                    TaskTestData.builder().withId(2L).build().buildTaskResponse()
+            );
+
+            when(projectService.getAllTaskRelatedToProjectByProjectId(anyLong(), any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(expectedResponses, pageable, 2));
+            // when
+            mockMvc.perform(get(URL_WITH_PROJECT_ID_TASKS, projectId)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    // then
+                    .andExpectAll(
+                            status().isOk(),
+                            content().contentType(MediaType.APPLICATION_JSON)
+                    ).andExpect(jsonPath("$.content").isNotEmpty())
+                    .andExpect(jsonPath("$.content.size()").value(2))
+                    .andExpect(jsonPath("$.content[0].id").value(1))
+                    .andExpect(jsonPath("$.content[0].name").value("name"))
+                    .andExpect(jsonPath("$.content[0].project").value(1))
+                    .andExpect(jsonPath("$.content[0].assignedTo").value(1))
+                    .andExpect(jsonPath("$.content[0].createdBy").value(1))
+                    .andExpect(jsonPath("$.content[0].dueDate").value("2024-09-30T12:00:00"))
+                    .andExpect(jsonPath("$.content[0].status").value("IN_PROGRESS"))
+                    .andExpect(jsonPath("$.content[0].priority").value("MEDIUM"))
+                    .andExpect(jsonPath("$.content[1].id").value(2))
+                    .andExpect(jsonPath("$.content[1].name").value("name"))
+                    .andExpect(jsonPath("$.content[1].project").value(1))
+                    .andExpect(jsonPath("$.content[1].assignedTo").value(1))
+                    .andExpect(jsonPath("$.content[1].createdBy").value(1))
+                    .andExpect(jsonPath("$.content[1].dueDate").value("2024-09-30T12:00:00"))
+                    .andExpect(jsonPath("$.content[1].status").value("IN_PROGRESS"))
+                    .andExpect(jsonPath("$.content[1].priority").value("MEDIUM"));
+        }
+
+        @Test
+        @WithMockUser(authorities = {"project:read"})
         void getAllShouldReturnListOfProjectResponses() throws Exception {
             // given
             var pageable = Pageable.ofSize(2);
@@ -164,13 +208,14 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class GetByID {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"project:read"})
         void getByIdShouldReturnProjectResponse() throws Exception {
             // given
             var projectResponse = ProjectTestData.builder().build().buildProjectResponse();
             var projectId = projectResponse.id();
 
-            doReturn(projectResponse).when(projectService).getById(projectId);
+            doReturn(projectResponse)
+                    .when(projectService).getById(projectId);
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, projectId)
@@ -181,13 +226,13 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
                             content().contentType(MediaType.APPLICATION_JSON),
                             content().json("""
                                       {
-                                                                        "id": 1,
-                                                                        "name": "name",
-                                                                        "projectCode": "projectCode",
-                                                                        "description": "description",
-                                                                        "startDate": "2024-09-30T12:00:00",
-                                                                        "endDate": "2024-09-30T12:00:00",
-                                                                        "owner": 1
+                                        "id": 1,
+                                        "name": "name",
+                                        "projectCode": "projectCode",
+                                        "description": "description",
+                                        "startDate": "2024-09-30T12:00:00",
+                                        "endDate": "2024-09-30T12:00:00",
+                                        "owner": 1
                                       }
                                     """)
                     );
@@ -200,7 +245,8 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
             var projectResponse = ProjectTestData.builder().build().buildProjectResponse();
             var projectId = projectResponse.id();
 
-            doReturn(projectResponse).when(projectService).getById(projectId);
+            doReturn(projectResponse)
+                    .when(projectService).getById(projectId);
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, projectId)
@@ -215,7 +261,7 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Update {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"project:write"})
         void updateShouldReturnUpdatedProjectResponse() throws Exception {
             // given
             var projectId = 1L;
@@ -228,7 +274,8 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
                     .withName("Updated Project")
                     .build().buildProjectResponse();
 
-            doReturn(updatedResponse).when(projectService).update(projectId, projectRequest);
+            doReturn(updatedResponse).
+                    when(projectService).update(projectId, projectRequest);
 
             var requestBuilder = put(URL_WITH_PARAMETER_ID, projectId)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -293,7 +340,7 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Delete {
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(authorities = {"project:delete"})
         void deleteShouldReturnNoContent() throws Exception {
             // given
             var projectId = 1L;

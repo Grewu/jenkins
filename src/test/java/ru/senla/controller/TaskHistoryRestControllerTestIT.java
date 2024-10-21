@@ -39,7 +39,7 @@ class TaskHistoryRestControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class GetAll {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"task_history:read"})
         void getAllShouldReturnListOfTaskHistoryResponses() throws Exception {
             // given
             var pageable = Pageable.ofSize(2);
@@ -102,7 +102,7 @@ class TaskHistoryRestControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class GetByID {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"task_history:read"})
         void getByIdShouldReturnTaskResponse() throws Exception {
             // given
             var taskHistoryResponse = TaskHistoryTestData.builder()
@@ -161,7 +161,7 @@ class TaskHistoryRestControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Update {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"task_history:write"})
         void updateShouldReturnUpdatedTaskResponse() throws Exception {
             // given
             var taskId = 1L;
@@ -239,7 +239,7 @@ class TaskHistoryRestControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Delete {
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(authorities = {"task_history:delete"})
         void deleteShouldReturnNoContent() throws Exception {
             // given
             var taskId = 1L;
@@ -254,7 +254,7 @@ class TaskHistoryRestControllerTestIT extends PostgresqlTestContainer {
         }
 
         @Test
-        @WithMockUser(roles = "USER")
+        @WithMockUser(authorities = {"task_history:read"})
         void deleteShouldReturnForbiddenForUser() throws Exception {
             // given
             var taskId = 1L;

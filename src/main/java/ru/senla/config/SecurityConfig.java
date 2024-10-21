@@ -27,11 +27,20 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling(handling ->
+                        handling.authenticationEntryPoint(
+                                (req, resp, exception) ->
+                                        exceptionFilter.sendException(resp, exception)))
                 .sessionManagement(session ->
                         session
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v0/auth/**").permitAll().anyRequest().authenticated()
+                        auth.requestMatchers("/api/v0/auth/**", "/swagger-ui/**", "/v3/api-docs/**",
+                                        "/swagger-resources/**",
+                                        "/webjars/**")
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionFilter, JwtFilter.class)

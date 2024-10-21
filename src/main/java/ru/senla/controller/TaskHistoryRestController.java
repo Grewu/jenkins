@@ -33,7 +33,7 @@ public class TaskHistoryRestController {
     protected static final String TASK_API_PATH = "/api/v0/task_history";
 
     @GetMapping
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('task_history:read')")
     public ResponseEntity<Page<TaskHistoryResponse>> getAll(@PageableDefault(20) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -41,7 +41,7 @@ public class TaskHistoryRestController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('task_history:read')")
     public ResponseEntity<TaskHistoryResponse> getById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -49,7 +49,7 @@ public class TaskHistoryRestController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
+    @PreAuthorize("hasAuthority('task_history:write')")
     public ResponseEntity<TaskHistoryResponse> update(@PathVariable Long id,
                                                       @Valid @RequestBody TaskHistoryRequest taskHistoryRequest) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -58,7 +58,7 @@ public class TaskHistoryRestController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('task_history:delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         taskHistoryService.delete(id);
         return ResponseEntity.noContent().build();

@@ -29,11 +29,11 @@ public class Comment {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "task_id", referencedColumnName = "id")
     private Task task;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_profile_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "user_profile_id", referencedColumnName = "id")
     private UserProfile usersProfile;
 
     @Column(name = "comment_text", nullable = false)

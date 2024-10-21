@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.senla.annotation.Logging;
 import ru.senla.model.dto.request.UserProfileRequest;
+import ru.senla.model.dto.response.CommentResponse;
 import ru.senla.model.dto.response.UserProfileResponse;
 import ru.senla.service.api.UserProfileService;
 
@@ -33,17 +34,24 @@ public class UserProfileRestController {
     protected static final String USER_PROFILE_API_PATH = "/api/v0/user_profiles";
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
+    @PreAuthorize("hasAuthority('user_profile:write')")
     public ResponseEntity<UserProfileResponse> create(@RequestBody UserProfileRequest userProfileRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(userProfileService.create(userProfileRequest));
     }
 
-    //GET /user-profiles/{profileId}/comments
+    @GetMapping("/{userProfileId}/comments")
+    @PreAuthorize("hasAuthority('user_profile:read') && hasAuthority('comments:read')")
+    public ResponseEntity<Page<CommentResponse>> getCommentsByProfileId(@PathVariable Long userProfileId,
+                                                                        @PageableDefault(20) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userProfileService.getAllCommentsByProfileId(userProfileId, pageable));
+    }
 
     @GetMapping
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('user_profile:read')")
     public ResponseEntity<Page<UserProfileResponse>> getAll(@PageableDefault(20) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -51,7 +59,7 @@ public class UserProfileRestController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('user_profile:read')")
     public ResponseEntity<UserProfileResponse> getById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -59,7 +67,7 @@ public class UserProfileRestController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
+    @PreAuthorize("hasAuthority('user_profile:write')")
     public ResponseEntity<UserProfileResponse> update(@PathVariable Long id,
                                                       @RequestBody UserProfileRequest userProfileRequest) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -68,7 +76,7 @@ public class UserProfileRestController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('user_profile:delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userProfileService.delete(id);
         return ResponseEntity.noContent().build();

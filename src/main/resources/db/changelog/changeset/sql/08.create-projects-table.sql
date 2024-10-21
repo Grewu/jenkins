@@ -6,6 +6,6 @@ CREATE TABLE projects
     description  TEXT         NOT NULL,
     start_date   DATE         NOT NULL,
     end_date     DATE         NOT NULL,
-    owner_id     BIGINT       NOT NULL,
-    FOREIGN KEY (owner_id) REFERENCES users_profiles (id)
+    owner_id     BIGINT,
+    FOREIGN KEY (owner_id) REFERENCES users_profiles (id) ON DELETE SET NULL
 );

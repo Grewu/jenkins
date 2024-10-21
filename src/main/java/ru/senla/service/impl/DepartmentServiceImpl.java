@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.DepartmentMapper;
+import ru.senla.mapper.UserProfileMapper;
 import ru.senla.model.dto.request.DepartmentRequest;
 import ru.senla.model.dto.response.DepartmentResponse;
+import ru.senla.model.dto.response.UserProfileResponse;
 import ru.senla.model.entity.Department;
-import ru.senla.model.entity.UserProfile;
 import ru.senla.repository.api.DepartmentRepository;
+import ru.senla.repository.api.UserProfileRepository;
 import ru.senla.service.api.DepartmentService;
 
 @Service
@@ -21,7 +23,9 @@ import ru.senla.service.api.DepartmentService;
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
+    private final UserProfileRepository userProfileRepository;
     private final DepartmentMapper departmentMapper;
+    private final UserProfileMapper userProfileMapper;
 
     @Override
     @Transactional
@@ -50,12 +54,18 @@ public class DepartmentServiceImpl implements DepartmentService {
                 .map(current -> departmentMapper.update(departmentRequest, current))
                 .map(departmentRepository::save)
                 .map(departmentMapper::toDepartmentResponse)
-                .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
+                .orElseThrow(() -> new EntityNotFoundException(Department.class, id));
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
         departmentRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<UserProfileResponse> getAllUsersProfileByDepartmentId(Long departmentId, Pageable pageable) {
+        return userProfileRepository.findByDepartmentId(departmentId, pageable)
+                .map(userProfileMapper::toUserProfileResponse);
     }
 }

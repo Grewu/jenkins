@@ -14,12 +14,25 @@ public enum RoleType {
             .toList()),
 
     USER(List.of(
-            PrivilegeType.READ.getGrantedAuthority(),
-            PrivilegeType.WRITE.getGrantedAuthority()
+            PrivilegeType.TASK_READ.getGrantedAuthority(),
+            PrivilegeType.TASK_WRITE.getGrantedAuthority(),
+            PrivilegeType.TASK_HISTORY_READ.getGrantedAuthority(),
+            PrivilegeType.TASK_HISTORY_WRITE.getGrantedAuthority(),
+            PrivilegeType.COMMENTS_READ.getGrantedAuthority(),
+            PrivilegeType.COMMENTS_WRITE.getGrantedAuthority(),
+            PrivilegeType.USER_PROFILE_READ.getGrantedAuthority(),
+            PrivilegeType.USER_PROFILE_WRITE.getGrantedAuthority(),
+            PrivilegeType.PROJECT_READ.getGrantedAuthority(),
+            PrivilegeType.DEPARTMENT_READ.getGrantedAuthority()
     )),
 
     GUEST(List.of(
-            PrivilegeType.READ.getGrantedAuthority()
+            PrivilegeType.TASK_READ.getGrantedAuthority(),
+            PrivilegeType.TASK_HISTORY_READ.getGrantedAuthority(),
+            PrivilegeType.COMMENTS_READ.getGrantedAuthority(),
+            PrivilegeType.USER_PROFILE_READ.getGrantedAuthority(),
+            PrivilegeType.PROJECT_READ.getGrantedAuthority(),
+            PrivilegeType.DEPARTMENT_READ.getGrantedAuthority()
     ));
 
     private final List<GrantedAuthority> authorities;

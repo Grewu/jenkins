@@ -15,7 +15,6 @@ public interface TaskMapper {
     @Mapping(target = "assignedTo", expression = "java(new UserProfile(taskRequest.assignedTo()))")
     @Mapping(target = "project", expression = "java(new Project(taskRequest.project()))")
     @Mapping(target = "createdBy", expression = "java(new UserProfile(taskRequest.createdBy()))")
-    @Mapping(target = "taskHistory", ignore = true)
     Task toTask(TaskRequest taskRequest);
 
     @Mapping(target = "project", source = "project.id")
@@ -27,6 +26,5 @@ public interface TaskMapper {
     @Mapping(target = "project.id", source = "project")
     @Mapping(target = "createdBy.id", source = "createdBy")
     @Mapping(target = "assignedTo.id", source = "assignedTo")
-    @Mapping(target = "taskHistory", ignore = true)
     Task update(TaskRequest taskRequest, @MappingTarget Task current);
 }

@@ -6,11 +6,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.senla.exception.EntityNotFoundException;
+import ru.senla.mapper.CommentMapper;
 import ru.senla.mapper.UserProfileMapper;
 import ru.senla.model.dto.request.UserProfileRequest;
+import ru.senla.model.dto.response.CommentResponse;
 import ru.senla.model.dto.response.UserProfileResponse;
+import ru.senla.model.entity.Department;
+import ru.senla.model.entity.Position;
+import ru.senla.model.entity.User;
 import ru.senla.model.entity.UserProfile;
+import ru.senla.repository.api.CommentRepository;
+import ru.senla.repository.api.DepartmentRepository;
+import ru.senla.repository.api.PositionRepository;
 import ru.senla.repository.api.UserProfileRepository;
+import ru.senla.repository.api.UserRepository;
 import ru.senla.service.api.UserProfileService;
 
 @Service
@@ -18,8 +27,14 @@ import ru.senla.service.api.UserProfileService;
 @Transactional(readOnly = true)
 public class UserProfileServiceImpl implements UserProfileService {
 
-    private final UserProfileRepository userProfileRepository;
     private final UserProfileMapper userProfileMapper;
+    private final CommentMapper commentMapper;
+    private final UserProfileRepository userProfileRepository;
+    private final UserRepository userRepository;
+    private final DepartmentRepository departmentRepository;
+    private final CommentRepository commentRepository;
+    private final PositionRepository positionRepository;
+
 
     @Override
     @Transactional
@@ -44,11 +59,24 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     @Transactional
     public UserProfileResponse update(Long id, UserProfileRequest userProfileRequest) {
-        return userProfileRepository.findById(id)
-                .map(current -> userProfileMapper.update(userProfileRequest, current))
-                .map(userProfileRepository::save)
-                .map(userProfileMapper::toUserProfileResponse)
+        var currentUserProfile = userProfileRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
+
+
+        var user = userRepository.findById(userProfileRequest.user())
+                .orElseThrow(() -> new EntityNotFoundException(User.class, id));
+
+        var department = departmentRepository.findById(userProfileRequest.department())
+                .orElseThrow(() -> new EntityNotFoundException(Department.class, id));
+
+        var position = positionRepository.findById(userProfileRequest.position())
+                .orElseThrow(() -> new EntityNotFoundException(Position.class, id));
+
+        currentUserProfile.setDepartment(department);
+        currentUserProfile.setUser(user);
+        currentUserProfile.setPosition(position);
+
+        return userProfileMapper.toUserProfileResponse(userProfileRepository.save(currentUserProfile));
     }
 
     @Override
@@ -58,4 +86,9 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
 
+    @Override
+    public Page<CommentResponse> getAllCommentsByProfileId(Long userProfileId, Pageable pageable) {
+        return commentRepository.findCommentsByProfileId(userProfileId,pageable)
+                .map(commentMapper::toCommentResponse);
+    }
 }

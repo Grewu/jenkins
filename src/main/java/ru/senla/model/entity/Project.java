@@ -43,7 +43,7 @@ public class Project {
     private LocalDateTime endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private UserProfile owner;
 
     public Project(Long project) {

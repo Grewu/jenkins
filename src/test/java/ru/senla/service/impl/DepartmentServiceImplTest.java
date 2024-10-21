@@ -9,9 +9,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.senla.data.DepartmentTestData;
+import ru.senla.data.UserProfileTestData;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.DepartmentMapper;
+import ru.senla.mapper.UserProfileMapper;
 import ru.senla.repository.api.DepartmentRepository;
+import ru.senla.repository.api.UserProfileRepository;
+import ru.senla.repository.api.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +31,14 @@ class DepartmentServiceImplTest {
 
     @Mock
     private DepartmentMapper departmentMapper;
+    @Mock
+    private  UserProfileMapper userProfileMapper;
 
     @Mock
     private DepartmentRepository departmentRepository;
+
+    @Mock
+    private UserProfileRepository userProfileRepository;
 
     @InjectMocks
     private DepartmentServiceImpl departmentService;
@@ -61,13 +70,39 @@ class DepartmentServiceImplTest {
     @Nested
     class GetAll {
         @Test
+        void getAllShouldReturnUsersProfileByDepartmentId() {
+            //given
+            var pageable = Pageable.ofSize(2);
+            var departmentId = DepartmentTestData.builder().build().buildDepartment().getId();
+            var userProfiles = List.of(UserProfileTestData.builder().build().buildUserProfile());
+            var expectedResponses = List.of(UserProfileTestData.builder().build()
+                    .buildUserProfileResponse());
+
+            var userProfilePage = new PageImpl<>(userProfiles, pageable, 2);
+
+            doReturn(userProfilePage)
+                    .when(userProfileRepository).findByDepartmentId(departmentId,pageable);
+
+            IntStream.range(0, userProfiles.size())
+                    .forEach(i -> doReturn(expectedResponses.get(i))
+                            .when(userProfileMapper).toUserProfileResponse(userProfiles.get(i)));
+
+            // when
+            var actualResponses = departmentService
+                    .getAllUsersProfileByDepartmentId(departmentId,pageable).getContent();
+
+            // then
+            assertEquals(expectedResponses, actualResponses);
+        }
+
+        @Test
         void getAllShouldReturnListOfDepartmentResponses() {
             // given
             var pageable = Pageable.ofSize(2);
             var departments = List.of(DepartmentTestData.builder().build().buildDepartment());
             var expectedResponses = List.of(DepartmentTestData.builder().build().buildDepartmentResponse());
 
-            var departmentPage = new PageImpl<>(departments,pageable,2);
+            var departmentPage = new PageImpl<>(departments, pageable, 2);
 
             doReturn(departmentPage)
                     .when(departmentRepository).findAll(pageable);
@@ -111,7 +146,7 @@ class DepartmentServiceImplTest {
                     () -> departmentService.getById(id));
 
             // then
-            assertEquals( "Department with ID -1 was not found", exception.getMessage());
+            assertEquals("Department with ID -1 was not found", exception.getMessage());
         }
     }
 

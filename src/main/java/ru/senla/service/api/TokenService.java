@@ -1,6 +1,5 @@
 package ru.senla.service.api;
 
-import org.springframework.security.core.GrantedAuthority;
 import ru.senla.model.entity.User;
 
 import java.util.List;

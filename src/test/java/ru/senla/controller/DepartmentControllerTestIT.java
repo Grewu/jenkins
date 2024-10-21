@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.senla.data.DepartmentTestData;
+import ru.senla.data.UserProfileTestData;
 import ru.senla.model.entity.enums.DepartmentType;
 import ru.senla.service.api.DepartmentService;
 import ru.senla.util.IntegrationTest;
@@ -35,6 +36,7 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
 
     private static final String URL = "/api/v0/departments";
     private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
+    private static final String URL_WITH_DEPARTMENT_ID_USERS = URL + "/{departmentId}/users";
 
     @Nested
     class Create {
@@ -44,7 +46,7 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
                 "DESIGN, 2",
                 "FINANCE, 3"
         })
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"department:write"})
         void createShouldReturnDepartmentResponse(String name, Long id) throws Exception {
             // given
             var departmentRequest = DepartmentTestData.builder()
@@ -55,7 +57,8 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
                     .withName(DepartmentType.valueOf(name))
                     .build().buildDepartmentResponse();
 
-            doReturn(expectedResponse).when(departmentService).create(departmentRequest);
+            doReturn(expectedResponse)
+                    .when(departmentService).create(departmentRequest);
 
             var requestBuilder = post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -75,13 +78,14 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
 
 
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"department:write"})
         void createShouldReturnDepartmentResponse() throws Exception {
             // given
             var departmentRequest = DepartmentTestData.builder().build().buildDepartmentRequest();
             var expectedResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
 
-            doReturn(expectedResponse).when(departmentService).create(departmentRequest);
+            doReturn(expectedResponse)
+                    .when(departmentService).create(departmentRequest);
 
             var requestBuilder = post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +135,46 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class GetAll {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"department:read", "user_profile:read"})
+        void getAllShouldReturnListOfUsersProfilesResponseByDepartmentId() throws Exception {
+            // given
+            var pageable = Pageable.ofSize(2);
+            var departmentId = DepartmentTestData.builder().build().buildDepartment().getId();
+
+            var expectedResponses = List.of(
+                    UserProfileTestData.builder().build().buildUserProfileResponse(),
+                    UserProfileTestData.builder().withId(2L).build().buildUserProfileResponse()
+            );
+
+            when(departmentService.getAllUsersProfileByDepartmentId(anyLong(), any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(expectedResponses, pageable, 2));
+
+            // when
+            mockMvc.perform(get(URL_WITH_DEPARTMENT_ID_USERS, departmentId)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    // then
+                    .andExpectAll(
+                            status().isOk(),
+                            content().contentType(MediaType.APPLICATION_JSON)
+                    ).andExpect(jsonPath("$.content").isNotEmpty())
+                    .andExpect(jsonPath("$.content.size()").value(2))
+                    .andExpect(jsonPath("$.content[0].id").value(1))
+                    .andExpect(jsonPath("$.content[0].firstName").value("firstName"))
+                    .andExpect(jsonPath("$.content[0].lastName").value("lastName"))
+                    .andExpect(jsonPath("$.content[0].position").value(1))
+                    .andExpect(jsonPath("$.content[0].department").value(1))
+                    .andExpect(jsonPath("$.content[0].user").value(1))
+                    .andExpect(jsonPath("$.content[1].id").value(2))
+                    .andExpect(jsonPath("$.content[1].firstName").value("firstName"))
+                    .andExpect(jsonPath("$.content[1].lastName").value("lastName"))
+                    .andExpect(jsonPath("$.content[1].position").value(1))
+                    .andExpect(jsonPath("$.content[1].department").value(1))
+                    .andExpect(jsonPath("$.content[1].user").value(1));
+        }
+
+
+        @Test
+        @WithMockUser(authorities = {"department:read"})
         void getAllShouldReturnListOfDepartmentResponses() throws Exception {
             // given
             var pageable = Pageable.ofSize(2);
@@ -181,7 +224,7 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
                 "2, MANAGERS",
                 "3, MARKETING"
         })
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"department:read"})
         void getByIdShouldReturnDepartmentResponse(Long id, String expectedName) throws Exception {
             // given
             var expectedResponse = DepartmentTestData.builder()
@@ -189,7 +232,8 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
                     .withName(DepartmentType.valueOf(expectedName))
                     .build().buildDepartmentResponse();
 
-            doReturn(expectedResponse).when(departmentService).getById(id);
+            doReturn(expectedResponse)
+                    .when(departmentService).getById(id);
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, id)
@@ -201,13 +245,14 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
         }
 
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"department:read"})
         void getByIdShouldReturnDepartmentResponse() throws Exception {
             // given
             var departmentResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
             var departmentId = departmentResponse.id();
 
-            doReturn(departmentResponse).when(departmentService).getById(departmentId);
+            doReturn(departmentResponse)
+                    .when(departmentService).getById(departmentId);
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, departmentId)
@@ -232,7 +277,8 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
             var departmentResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
             var departmentId = departmentResponse.id();
 
-            doReturn(departmentResponse).when(departmentService).getById(departmentId);
+            doReturn(departmentResponse)
+                    .when(departmentService).getById(departmentId);
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, departmentId)
@@ -247,7 +293,7 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Update {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"department:write"})
         void updateShouldReturnUpdatedDepartmentResponse() throws Exception {
             // given
             var departmentId = 1L;
@@ -260,7 +306,8 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
                     .withName(DepartmentType.DEVELOPERS)
                     .build().buildDepartmentResponse();
 
-            doReturn(updatedResponse).when(departmentService).update(departmentId, departmentRequest);
+            doReturn(updatedResponse)
+                    .when(departmentService).update(departmentId, departmentRequest);
 
             var requestBuilder = put(URL_WITH_PARAMETER_ID, departmentId)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -310,7 +357,7 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Delete {
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(authorities = {"department:delete"})
         void deleteShouldReturnNoContent() throws Exception {
             // given
             var departmentId = 1L;

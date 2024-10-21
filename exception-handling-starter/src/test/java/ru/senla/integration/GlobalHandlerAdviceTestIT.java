@@ -34,7 +34,7 @@ public class GlobalHandlerAdviceTestIT {
 
     private static final String NOT_FOUND_MESSAGE = "DtoFake with ID %d was not found";
     private static final String INVALID_EMAIL_MESSAGE = "Invalid email: %s";
-    private static final String INVALID_TOKEN_MESSAGE = "Invalid token: %s";
+    private static final String INVALID_TOKEN_MESSAGE = "Invalid token";
     private static final String INVALID_PASSWORD_MESSAGE = "Invalid password: %s";
     private static final String BAD_REQUEST_MESSAGE = "id = must be greater than 0";
 
@@ -67,10 +67,9 @@ public class GlobalHandlerAdviceTestIT {
 
     @Test
     void handleInvalidTokenException() throws Exception {
-        var invalidToken = "invalidToken";
-        var exceptionMessage = new ExceptionMessage(HttpStatus.UNAUTHORIZED, String.format(INVALID_TOKEN_MESSAGE, invalidToken));
+        var exceptionMessage = new ExceptionMessage(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
 
-        mockMvc.perform(post(URL + "/token/{token}", invalidToken))
+        mockMvc.perform(post(URL + "/token"))
                 .andExpectAll(
                         status().isUnauthorized(),
                         content().contentType(MediaType.APPLICATION_JSON),

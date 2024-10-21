@@ -9,10 +9,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.senla.data.CommentTestData;
+import ru.senla.data.TaskTestData;
+import ru.senla.data.UserProfileTestData;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.CommentMapper;
 import ru.senla.repository.api.CommentRepository;
-
+import ru.senla.repository.api.TaskRepository;
+import ru.senla.repository.api.UserProfileRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,12 @@ class CommentServiceImplTest {
 
     @Mock
     private CommentRepository commentRepository;
+
+    @Mock
+    private UserProfileRepository userProfileRepository;
+
+    @Mock
+    private TaskRepository taskRepository;
 
     @InjectMocks
     private CommentServiceImpl commentService;
@@ -68,7 +77,7 @@ class CommentServiceImplTest {
             var comments = List.of(CommentTestData.builder().build().buildComment());
             var expectedResponses = List.of(CommentTestData.builder().build().buildCommentResponse());
 
-            var commentPage = new PageImpl<>(comments,pageable,2);
+            var commentPage = new PageImpl<>(comments, pageable, 2);
 
             doReturn(commentPage)
                     .when(commentRepository).findAll(pageable);
@@ -124,9 +133,13 @@ class CommentServiceImplTest {
             var commentRequest = CommentTestData.builder().build().buildCommentRequest();
             var expectedResponse = CommentTestData.builder().build().buildCommentResponse();
             var comment = CommentTestData.builder().build().buildComment();
+            var userProfile = UserProfileTestData.builder().build().buildUserProfile();
+            var task = TaskTestData.builder().build().buildTask();
 
             when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
-            when(commentMapper.update(commentRequest, comment)).thenReturn(comment);
+            when(userProfileRepository.findById(commentRequest.usersProfile())).thenReturn(Optional.of(userProfile));
+            when(taskRepository.findById(commentRequest.task())).thenReturn(Optional.of(task));
+
             when(commentRepository.save(comment)).thenReturn(comment);
             when(commentMapper.toCommentResponse(comment)).thenReturn(expectedResponse);
             // when

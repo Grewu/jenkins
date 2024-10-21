@@ -11,8 +11,11 @@ import ru.senla.mapper.CommentMapper;
 import ru.senla.model.dto.request.CommentRequest;
 import ru.senla.model.dto.response.CommentResponse;
 import ru.senla.model.entity.Comment;
+import ru.senla.model.entity.Task;
 import ru.senla.model.entity.UserProfile;
 import ru.senla.repository.api.CommentRepository;
+import ru.senla.repository.api.TaskRepository;
+import ru.senla.repository.api.UserProfileRepository;
 import ru.senla.service.api.CommentService;
 
 @Service
@@ -21,6 +24,8 @@ import ru.senla.service.api.CommentService;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final TaskRepository taskRepository;
     private final CommentMapper commentMapper;
 
 
@@ -47,11 +52,21 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentResponse update(Long id, CommentRequest commentRequest) {
-        return commentRepository.findById(id)
-                .map(current -> commentMapper.update(commentRequest, current))
-                .map(commentRepository::save)
-                .map(commentMapper::toCommentResponse)
+        var currentComment = commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Comment.class, id));
+
+        var userProfile = userProfileRepository.findById(commentRequest.usersProfile())
                 .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
+
+        var task = taskRepository.findById(commentRequest.task())
+                .orElseThrow(() -> new EntityNotFoundException(Task.class, id));
+
+        currentComment.setCommentText(commentRequest.commentText());
+        currentComment.setCreatedAt(commentRequest.createdAt());
+        currentComment.setUsersProfile(userProfile);
+        currentComment.setTask(task);
+
+        return commentMapper.toCommentResponse(commentRepository.save(currentComment));
     }
 
     @Override

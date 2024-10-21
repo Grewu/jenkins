@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.senla.annotation.Logging;
 import ru.senla.model.dto.request.TaskRequest;
+import ru.senla.model.dto.response.TaskHistoryResponse;
 import ru.senla.model.dto.response.TaskResponse;
+import ru.senla.model.filter.TaskFilter;
 import ru.senla.service.api.TaskService;
 
 @Logging
@@ -34,30 +36,42 @@ public class TaskRestController {
     protected static final String TASK_API_PATH = "/api/v0/tasks";
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
+    @PreAuthorize("hasAuthority('task:write')")
     public ResponseEntity<TaskResponse> create(@Valid @RequestBody TaskRequest taskRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(taskService.create(taskRequest));
     }
 
-//    "Assigns the task to a specific user."
-//    @PostMapping("/{id}/assign/{userId}")
-
-    //GET /TASKS/{id}/history: "Displays the history of task changes."
-
     @GetMapping
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('task:read')")
     public ResponseEntity<Page<TaskResponse>> getAll(@PageableDefault(20) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(taskService.getAll(pageable));
     }
 
-//    @GetMapping("/{taskId}/history")
+    @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('task:read')")
+    public ResponseEntity<Page<TaskResponse>> getAllByFilter(@Valid TaskFilter taskFilter,
+                                                             @PageableDefault(20) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(taskService.getAllByFilter(taskFilter, pageable));
+    }
+
+
+    @GetMapping("/{taskId}/history")
+    @PreAuthorize("hasAuthority('task:read') && hasAuthority('task_history:read')")
+    public ResponseEntity<Page<TaskHistoryResponse>> getAllTaskHistoryByTaskId(@PathVariable Long taskId,
+                                                                               @PageableDefault(20) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(taskService.getAllTaskHistory(taskId, pageable));
+    }
 
     @GetMapping("/{id}")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('task:read')")
     public ResponseEntity<TaskResponse> getById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +79,7 @@ public class TaskRestController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
+    @PreAuthorize("hasAuthority('task:write')")
     public ResponseEntity<TaskResponse> update(@PathVariable Long id,
                                                @Valid @RequestBody TaskRequest taskRequest) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -74,7 +88,7 @@ public class TaskRestController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('task:delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         taskService.delete(id);
         return ResponseEntity.noContent().build();

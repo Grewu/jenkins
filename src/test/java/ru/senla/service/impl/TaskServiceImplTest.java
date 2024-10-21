@@ -8,17 +8,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import ru.senla.data.ProjectTestData;
+import ru.senla.data.TaskFilterTestData;
 import ru.senla.data.TaskTestData;
+import ru.senla.data.UserProfileTestData;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.TaskMapper;
-import ru.senla.repository.api.TaskHistoryRepository;
+import ru.senla.repository.api.ProjectRepository;
 import ru.senla.repository.api.TaskRepository;
-import ru.senla.service.api.TaskHistoryService;
+import ru.senla.repository.api.UserProfileRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,6 +37,12 @@ class TaskServiceImplTest {
 
     @Mock
     private TaskRepository taskRepository;
+
+    @Mock
+    private UserProfileRepository userProfileRepository;
+
+    @Mock
+    private ProjectRepository projectRepository;
 
     @Mock
     private TaskHistoryServiceImpl taskHistoryService;
@@ -66,6 +77,28 @@ class TaskServiceImplTest {
 
     @Nested
     class GetAll {
+        @Test
+        void getAllByFilter() {
+            var pageable = Pageable.ofSize(2);
+            var taskFilter = TaskFilterTestData.builder().build().buildTaskFilter();
+            var tasks = List.of(TaskTestData.builder().build().buildTask());
+            var taskPage = new PageImpl<>(tasks, pageable, 2);
+            var expectedResponses = List.of(TaskTestData.builder().build().buildTaskResponse());
+
+            doReturn(taskPage)
+                    .when(taskRepository).findAll(any(Specification.class), eq(pageable));
+
+            IntStream.range(0, tasks.size())
+                    .forEach(i -> doReturn(expectedResponses.get(i))
+                            .when(taskMapper).toTaskResponse(tasks.get(i)));
+
+            var actualResponse =
+                    taskService.getAllByFilter(taskFilter, pageable).getContent();
+
+            assertThat(actualResponse).isEqualTo(expectedResponses);
+        }
+
+
         @Test
         void getAllShouldReturnListOfTaskResponses() {
             // given
@@ -129,8 +162,13 @@ class TaskServiceImplTest {
             var taskRequest = TaskTestData.builder().build().buildTaskRequest();
             var expected = TaskTestData.builder().build().buildTaskResponse();
             var task = TaskTestData.builder().build().buildTask();
+            var userProfile = UserProfileTestData.builder().build().buildUserProfile();
+            var project = ProjectTestData.builder().build().buildProject();
 
             when(taskRepository.findById(task.getId())).thenReturn(Optional.of(task));
+            when(userProfileRepository.findById(taskRequest.project())).thenReturn(Optional.of(userProfile));
+            when(projectRepository.findById(taskRequest.project())).thenReturn(Optional.of(project));
+
             when(taskMapper.update(taskRequest, task)).thenReturn(task);
             when(taskRepository.save(task)).thenReturn(task);
             when(taskMapper.toTaskResponse(task)).thenReturn(expected);

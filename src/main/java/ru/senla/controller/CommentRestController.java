@@ -28,6 +28,7 @@ import ru.senla.service.api.CommentService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = CommentRestController.COMMENT_API_PATH)
+//TODO: OPEN API
 public class CommentRestController {
 
     private final CommentService commentService;
@@ -35,7 +36,7 @@ public class CommentRestController {
 
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
+    @PreAuthorize("hasAuthority('comments:write')")
     public ResponseEntity<CommentResponse> create(@Valid @RequestBody CommentRequest commentRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -43,7 +44,7 @@ public class CommentRestController {
     }
 
     @GetMapping
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('comments:read')")
     public ResponseEntity<Page<CommentResponse>> getAll(@PageableDefault(20) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -52,7 +53,7 @@ public class CommentRestController {
 
 
     @GetMapping("/{id}")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('comments:read')")
     public ResponseEntity<CommentResponse> getById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -60,7 +61,7 @@ public class CommentRestController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
+    @PreAuthorize("hasAuthority('comments:write')")
     public ResponseEntity<CommentResponse> update(@PathVariable Long id,
                                                   @Valid @RequestBody CommentRequest commentRequest) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -70,7 +71,7 @@ public class CommentRestController {
 
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('comments:delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         commentService.delete(id);
         return ResponseEntity.noContent().build();

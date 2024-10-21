@@ -28,9 +28,9 @@ public class ControllerFake {
         throw new InvalidEmailException(email);
     }
 
-    @PostMapping("/token/{token}")
-    ResponseEntity<Void> InvalidTokenException(@PathVariable String token) {
-        throw new InvalidTokenException(token);
+    @PostMapping("/token")
+    ResponseEntity<Void> InvalidTokenException() {
+        throw new InvalidTokenException();
     }
 
     @PostMapping("/password/{password}")
@@ -39,7 +39,7 @@ public class ControllerFake {
     }
 
     @PostMapping("/valid")
-    ResponseEntity<Void> throwNewsException(@Valid @RequestBody DtoFake dto) {
+    ResponseEntity<Void> throwValidationException(@Valid @RequestBody DtoFake dto) {
         return ResponseEntity.ok().build();
     }
 }

@@ -42,7 +42,6 @@ class GlobalHandlerAdviceTest {
 
         var handle = globalHandlerAdvice.handle(invalidEmailException);
 
-
         assertThat(handle)
                 .hasFieldOrPropertyWithValue("statusCode", HttpStatus.UNAUTHORIZED)
                 .extracting("body")
@@ -52,17 +51,15 @@ class GlobalHandlerAdviceTest {
 
     @Test
     void handleInvalidTokenException() {
-        var invalidToken = "invalidToken";
-        var invalidTokenException = new InvalidTokenException(invalidToken);
+        var invalidTokenException = new InvalidTokenException();
 
         var handle = globalHandlerAdvice.handle(invalidTokenException);
-
 
         assertThat(handle)
                 .hasFieldOrPropertyWithValue("statusCode", HttpStatus.UNAUTHORIZED)
                 .extracting("body")
                 .hasFieldOrPropertyWithValue("status", HttpStatus.UNAUTHORIZED)
-                .hasFieldOrPropertyWithValue("message", "Invalid token: invalidToken");
+                .hasFieldOrPropertyWithValue("message", "Invalid token");
     }
 
 

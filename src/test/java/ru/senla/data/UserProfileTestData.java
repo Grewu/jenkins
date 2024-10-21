@@ -25,13 +25,13 @@ public class UserProfileTestData {
     private String lastName = "lastName";
 
     @Builder.Default
-    private Position position = new Position(1L, PositionType.DEVELOPER);
+    private Position position = PositionTestData.builder().build().buildPosition();
 
     @Builder.Default
-    private Department department = new Department(1L, DepartmentType.DEVELOPERS);
+    private Department department = DepartmentTestData.builder().build().buildDepartment();
 
     @Builder.Default
-    private User user = new User(1L, "user@example.com", "password", new Role(1L, RoleType.ADMIN));
+    private User user = UserTestData.builder().build().buildUser();
 
 
     public UserProfile buildUserProfile() {

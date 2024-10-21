@@ -6,8 +6,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.senla.exception.AbstractExceptionMessageException;
@@ -32,6 +34,9 @@ public class ExceptionFilter extends OncePerRequestFilter {
         }
     }
 
+    public void sendException(HttpServletResponse response, AuthenticationException e) throws IOException {
+        sendException(response, new ExceptionMessage(HttpStatus.FORBIDDEN, e.getMessage()));
+    }
 
     private void sendException(HttpServletResponse response,
                                ExceptionMessage exceptionMessage) throws IOException {

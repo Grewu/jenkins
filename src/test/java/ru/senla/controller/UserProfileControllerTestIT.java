@@ -37,13 +37,14 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Create {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"user_profile:write"})
         void createShouldReturnUserProfileResponse() throws Exception {
             // given
             var userProfileRequest = UserProfileTestData.builder().build().buildUserProfileRequest();
             var expectedResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
 
-            doReturn(expectedResponse).when(userProfileService).create(userProfileRequest);
+            doReturn(expectedResponse)
+                    .when(userProfileService).create(userProfileRequest);
 
             var requestBuilder = post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -104,7 +105,7 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class GetAll {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"user_profile:read"})
         void getAllShouldReturnListOfUserProfileResponses() throws Exception {
             // given
             var pageable = Pageable.ofSize(2);
@@ -156,13 +157,14 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class GetByID {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER", "GUEST"})
+        @WithMockUser(authorities = {"user_profile:read"})
         void getByIdShouldReturnUserProfileResponse() throws Exception {
             // given
             var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
             var userProfileId = userProfileResponse.id();
 
-            doReturn(userProfileResponse).when(userProfileService).getById(userProfileId);
+            doReturn(userProfileResponse)
+                    .when(userProfileService).getById(userProfileId);
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, userProfileId)
@@ -191,7 +193,8 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
             var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
             var userProfileId = userProfileResponse.id();
 
-            doReturn(userProfileResponse).when(userProfileService).getById(userProfileId);
+            doReturn(userProfileResponse)
+                    .when(userProfileService).getById(userProfileId);
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, userProfileId)
@@ -206,7 +209,7 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Update {
         @Test
-        @WithMockUser(roles = {"ADMIN", "USER"})
+        @WithMockUser(authorities = {"user_profile:write"})
         void updateShouldReturnUpdatedUserProfileResponse() throws Exception {
             // given
             var userProfileId = 1L;
@@ -272,7 +275,7 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @Nested
     class Delete {
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(authorities = {"user_profile:delete"})
         void deleteShouldReturnNoContent() throws Exception {
             // given
             var userProfileId = 1L;

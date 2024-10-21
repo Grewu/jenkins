@@ -9,9 +9,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.senla.data.ProjectTestData;
+import ru.senla.data.TaskTestData;
+import ru.senla.data.UserProfileTestData;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.ProjectMapper;
+import ru.senla.mapper.TaskMapper;
 import ru.senla.repository.api.ProjectRepository;
+import ru.senla.repository.api.TaskRepository;
+import ru.senla.repository.api.UserProfileRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +32,16 @@ class ProjectServiceImplTest {
 
     @Mock
     private ProjectMapper projectMapper;
-
+    @Mock
+    private TaskMapper taskMapper;
     @Mock
     private ProjectRepository projectRepository;
+
+    @Mock
+    private UserProfileRepository userProfileRepository;
+
+    @Mock
+    private TaskRepository taskRepository;
 
     @InjectMocks
     private ProjectServiceImpl projectService;
@@ -60,13 +72,39 @@ class ProjectServiceImplTest {
 
     @Nested
     class GetAll {
+
+        @Test
+        void getAllTaskRelatedToProjectByProjectId() {
+            //given
+            var pageable = Pageable.ofSize(2);
+            var projectId = ProjectTestData.builder().build().buildProject().getId();
+            var tasks = List.of(TaskTestData.builder().build().buildTask());
+            var expectedResponses = List.of(TaskTestData.builder().build().buildTaskResponse());
+
+            var taskPage = new PageImpl<>(tasks, pageable, 2);
+
+            doReturn(taskPage)
+                    .when(taskRepository).findTasksByProjectId(projectId, pageable);
+
+            IntStream.range(0, tasks.size())
+                    .forEach(i -> doReturn(expectedResponses.get(i))
+                            .when(taskMapper).toTaskResponse(tasks.get(i)));
+
+            // when
+            var actualResponses = projectService
+                    .getAllTaskRelatedToProjectByProjectId(projectId, pageable).getContent();
+
+            // then
+            assertEquals(expectedResponses, actualResponses);
+        }
+
         @Test
         void getAllShouldReturnListOfProjectResponse() {
             // given
             var pageable = Pageable.ofSize(2);
             var projects = List.of(ProjectTestData.builder().build().buildProject());
             var expectedResponses = List.of(ProjectTestData.builder().build().buildProjectResponse());
-            var projectPage = new PageImpl<>(projects,pageable,2);
+            var projectPage = new PageImpl<>(projects, pageable, 2);
 
             doReturn(projectPage)
                     .when(projectRepository).findAll(pageable);
@@ -120,19 +158,21 @@ class ProjectServiceImplTest {
         void updateShouldReturnProjectResponse() {
             // given
             var projectRequest = ProjectTestData.builder().build().buildProjectRequest();
-            var expected = ProjectTestData.builder().build().buildProjectResponse();
+            var expectedResponse = ProjectTestData.builder().build().buildProjectResponse();
             var project = ProjectTestData.builder().build().buildProject();
+            var userProfile = UserProfileTestData.builder().build().buildUserProfile();
 
             when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
-            when(projectMapper.update(projectRequest, project)).thenReturn(project);
+            when(userProfileRepository.findById(projectRequest.owner())).thenReturn(Optional.of(userProfile));
+
             when(projectRepository.save(project)).thenReturn(project);
-            when(projectMapper.toProjectResponse(project)).thenReturn(expected);
+            when(projectMapper.toProjectResponse(project)).thenReturn(expectedResponse);
 
             // when
             var actual = projectService.update(1L, projectRequest);
 
             // then
-            assertEquals(expected, actual);
+            assertEquals(expectedResponse, actual);
         }
     }
 

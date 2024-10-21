@@ -7,11 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.ProjectMapper;
+import ru.senla.mapper.TaskMapper;
 import ru.senla.model.dto.request.ProjectRequest;
 import ru.senla.model.dto.response.ProjectResponse;
+import ru.senla.model.dto.response.TaskResponse;
 import ru.senla.model.entity.Project;
 import ru.senla.model.entity.UserProfile;
 import ru.senla.repository.api.ProjectRepository;
+import ru.senla.repository.api.TaskRepository;
+import ru.senla.repository.api.UserProfileRepository;
 import ru.senla.service.api.ProjectService;
 
 @Service
@@ -20,7 +24,10 @@ import ru.senla.service.api.ProjectService;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final TaskRepository taskRepository;
     private final ProjectMapper projectMapper;
+    private final TaskMapper taskMapper;
 
     @Override
     @Transactional
@@ -45,16 +52,27 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public ProjectResponse update(Long id, ProjectRequest projectRequest) {
-        return projectRepository.findById(id)
-                .map(current -> projectMapper.update(projectRequest, current))
-                .map(projectRepository::save)
-                .map(projectMapper::toProjectResponse)
+        var currentProject = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Project.class, id));
+
+        var userProfile = userProfileRepository.findById(projectRequest.owner())
                 .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
+
+        currentProject.setOwner(userProfile);
+
+        return projectMapper.toProjectResponse(projectRepository.save(currentProject));
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
         projectRepository.deleteById(id);
+    }
+
+
+    @Override
+    public Page<TaskResponse> getAllTaskRelatedToProjectByProjectId(Long projectId, Pageable pageable) {
+        return taskRepository.findTasksByProjectId(projectId, pageable)
+                .map(taskMapper::toTaskResponse);
     }
 }
