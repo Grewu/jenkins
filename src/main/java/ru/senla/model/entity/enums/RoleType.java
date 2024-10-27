@@ -23,7 +23,7 @@ public enum RoleType {
             PrivilegeType.USER_PROFILE_READ.getGrantedAuthority(),
             PrivilegeType.USER_PROFILE_WRITE.getGrantedAuthority(),
             PrivilegeType.PROJECT_READ.getGrantedAuthority(),
-            PrivilegeType.DEPARTMENT_READ.getGrantedAuthority()
+            PrivilegeType.DEPARTMENT_READ.getGrantedAuthority(),
             PrivilegeType.POSITION_READ.getGrantedAuthority()
     )),
 
