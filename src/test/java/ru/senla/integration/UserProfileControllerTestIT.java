@@ -1,12 +1,11 @@
-package ru.senla.controller;
+package ru.senla.integration;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,9 +15,12 @@ import ru.senla.util.IntegrationTest;
 import ru.senla.util.PostgresqlTestContainer;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -28,7 +30,7 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private UserProfileService userProfileService;
 
     private static final String URL = "/api/v0/user_profiles";
@@ -41,11 +43,6 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
         void createShouldReturnUserProfileResponse() throws Exception {
             // given
             var userProfileRequest = UserProfileTestData.builder().build().buildUserProfileRequest();
-            var expectedResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
-
-            doReturn(expectedResponse)
-                    .when(userProfileService).create(userProfileRequest);
-
             var requestBuilder = post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
@@ -59,7 +56,7 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                             """);
 
             // when
-            mockMvc.perform(requestBuilder)
+            mockMvc.perform(requestBuilder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     // then
                     .andExpectAll(
                             status().isCreated(),
@@ -73,9 +70,10 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                                         "user": 1
                                     }
                                     """)
-                    );
+                    ).andDo(print());
 
-            verify(userProfileService).create(any());
+            assertThatCode(() -> userProfileService.create(userProfileRequest))
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -94,11 +92,10 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                             """);
 
             // when
-            mockMvc.perform(requestBuilder)
+            mockMvc.perform(requestBuilder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     // then
                     .andExpect(status().isForbidden());
 
-            verify(userProfileService, never()).create(any());
         }
     }
 
@@ -111,11 +108,10 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
             var pageable = Pageable.ofSize(2);
             var expectedResponses = List.of(
                     UserProfileTestData.builder().build().buildUserProfileResponse(),
-                    UserProfileTestData.builder().withId(2L).build().buildUserProfileResponse()
+                    UserProfileTestData.builder().withId(2L).build().buildUserProfileResponse(),
+                    UserProfileTestData.builder().withId(3L).build().buildUserProfileResponse(),
+                    UserProfileTestData.builder().withId(4L).build().buildUserProfileResponse()
             );
-
-            when(userProfileService.getAll(any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(expectedResponses, pageable, 2));
 
             // when
             mockMvc.perform(get(URL)
@@ -125,32 +121,40 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                             status().isOk(),
                             content().contentType(MediaType.APPLICATION_JSON)
                     ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(2))
-                    .andExpect(jsonPath("$.content[0].id").value(1))
-                    .andExpect(jsonPath("$.content[0].firstName").value("firstName"))
-                    .andExpect(jsonPath("$.content[0].lastName").value("lastName"))
-                    .andExpect(jsonPath("$.content[0].position").value(1))
-                    .andExpect(jsonPath("$.content[0].department").value(1))
-                    .andExpect(jsonPath("$.content[0].user").value(1))
-                    .andExpect(jsonPath("$.content[1].id").value(2))
-                    .andExpect(jsonPath("$.content[1].firstName").value("firstName"))
-                    .andExpect(jsonPath("$.content[1].lastName").value("lastName"))
-                    .andExpect(jsonPath("$.content[1].position").value(1))
-                    .andExpect(jsonPath("$.content[1].department").value(1))
-                    .andExpect(jsonPath("$.content[1].user").value(1));
+                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
+                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
+                    .andExpect(jsonPath("$.content[0].firstName").value(expectedResponses.get(0).firstName()))
+                    .andExpect(jsonPath("$.content[0].lastName").value(expectedResponses.get(0).lastName()))
+                    .andExpect(jsonPath("$.content[0].position").value(expectedResponses.get(0).position()))
+                    .andExpect(jsonPath("$.content[0].department").value(expectedResponses.get(0).department()))
+                    .andExpect(jsonPath("$.content[0].user").value(expectedResponses.get(0).user()))
+                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
+                    .andExpect(jsonPath("$.content[1].firstName").value(expectedResponses.get(1).firstName()))
+                    .andExpect(jsonPath("$.content[1].lastName").value(expectedResponses.get(1).lastName()))
+                    .andExpect(jsonPath("$.content[1].position").value(expectedResponses.get(1).position()))
+                    .andExpect(jsonPath("$.content[1].department").value(expectedResponses.get(1).department()))
+                    .andExpect(jsonPath("$.content[1].user").value(expectedResponses.get(1).user()));
+
+
+            assertThatCode(() -> userProfileService.getAll(pageable))
+                    .doesNotThrowAnyException();
+
+
+            var actualResponse = userProfileService.getAll(pageable).stream().toList();
+
+            IntStream.range(0, actualResponse.size())
+                    .forEach((i) ->
+                            assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i))
+                    );
         }
 
         @Test
         void getAllShouldReturnForbidden() throws Exception {
-            //given
-            var pageable = Pageable.ofSize(2);
             // when
             mockMvc.perform(get(URL)
                             .contentType(MediaType.APPLICATION_JSON))
                     // then
                     .andExpect(status().isForbidden());
-
-            verify(userProfileService, never()).getAll(pageable);
         }
     }
 
@@ -162,9 +166,6 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
             // given
             var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
             var userProfileId = userProfileResponse.id();
-
-            doReturn(userProfileResponse)
-                    .when(userProfileService).getById(userProfileId);
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, userProfileId)
@@ -184,7 +185,8 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                                     }
                                     """)
                     );
-            verify(userProfileService).getById(any());
+            assertThatCode(() -> userProfileService.getById(userProfileId))
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -193,16 +195,14 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
             var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
             var userProfileId = userProfileResponse.id();
 
-            doReturn(userProfileResponse)
-                    .when(userProfileService).getById(userProfileId);
-
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, userProfileId)
                             .contentType(MediaType.APPLICATION_JSON))
                     // then
                     .andExpect(status().isForbidden());
 
-            verify(userProfileService, never()).getById(any());
+            assertThatCode(() -> userProfileService.getById(userProfileId))
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -218,23 +218,21 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                     .withLastName("UpdatedLastName")
                     .build().buildUserProfileRequest();
 
-            var updatedResponse = UserProfileTestData.builder()
+            var expectedResponse = UserProfileTestData.builder()
                     .withFirstName("UpdatedName")
                     .withLastName("UpdatedLastName")
                     .build().buildUserProfileResponse();
-
-            doReturn(updatedResponse).when(userProfileService).update(userProfileId, userProfileRequest);
 
             var requestBuilder = put(URL_WITH_PARAMETER_ID, userProfileId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
                               {
-                                                        "firstName": "UpdatedName",
-                                                        "lastName": "UpdatedLastName",
-                                                        "position": 1,
-                                                        "department": 1,
-                                                        "user": 1
-                                                    }
+                                 "firstName": "UpdatedName",
+                                 "lastName": "UpdatedLastName",
+                                 "position": 1,
+                                 "department": 1,
+                                 "user": 1
+                              }
                             """);
 
             // when
@@ -245,17 +243,22 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                             content().contentType(MediaType.APPLICATION_JSON),
                             content().json("""
                                      {
-                                                                       "id": 1,
-                                                                       "firstName": "UpdatedName",
-                                                                       "lastName": "UpdatedLastName",
-                                                                       "position": 1,
-                                                                       "department": 1,
-                                                                       "user": 1
-                                                                   }
+                                       "id": 1,
+                                       "firstName": "UpdatedName",
+                                       "lastName": "UpdatedLastName",
+                                       "position": 1,
+                                       "department": 1,
+                                       "user": 1
+                                      }
                                     """)
                     );
 
-            verify(userProfileService).update(any(), any());
+            assertThatCode(() -> userProfileService.update(userProfileId, userProfileRequest))
+                    .doesNotThrowAnyException();
+
+            var actualResponse = userProfileService.getById(userProfileId);
+
+            assertThat(actualResponse).isEqualTo(expectedResponse);
         }
 
         @Test
@@ -268,7 +271,6 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                     // then
                     .andExpect(status().isForbidden());
 
-            verify(userProfileService, never()).update(any(), any());
         }
     }
 
@@ -286,7 +288,8 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                     // then
                     .andExpect(status().isNoContent());
 
-            verify(userProfileService).delete(userProfileId);
+            assertThatCode(() -> userProfileService.delete(userProfileId))
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -300,7 +303,6 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
                     // then
                     .andExpect(status().isForbidden());
 
-            verify(userProfileService, never()).delete(userProfileId);
         }
     }
 }
