@@ -31,7 +31,7 @@ jobs:
       - name: Publish logging-starter to MavenLocal
         run: |
           cd logging-starter
-          ю./gradlew publishToMavenLocal  # Убедитесь, что здесь правильный путь
+          ../gradlew publishToMavenLocal  # Убедитесь, что здесь правильный путь
 
       # Проверяем содержимое Maven Local Repository
       - name: List Maven Local Repository
