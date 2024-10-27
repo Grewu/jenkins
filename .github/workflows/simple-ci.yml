@@ -31,7 +31,7 @@ jobs:
       - name: Publish logging-starter to MavenLocal
         run: |
           cd logging-starter
-          ./gradlew publishToMavenLocal
+          ../gradlew publishToMavenLocal
 
       # Публикуем exception-handling-starter в MavenLocal
       - name: Publish exception-handling-starter to MavenLocal
