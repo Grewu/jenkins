@@ -21,12 +21,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Устанавливаем права на выполнение для gradlew
       - name: Make gradlew executable
-          run: chmod +x gradlew
+        run: chmod +x gradlew
 
+      # Собираем проект и запускаем тесты
       - name: Build and Test
-          run: ./gradlew clean build
+        run: ./gradlew clean build
 
+      # Уведомление о успешной сборке
       - name: Notify on Success
-          if: success()
-          run: echo "Сборка прошла успешно!"
+        if: success()
+        run: echo "Сборка прошла успешно!"
