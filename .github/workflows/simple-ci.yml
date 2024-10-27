@@ -27,7 +27,7 @@ jobs:
 
       # Собираем проект и запускаем тесты
       - name: Build and Test
-        run: ./gradlew clean build
+        run: ./gradlew clean build --info
 
       # Уведомление о успешной сборке
       - name: Notify on Success
