@@ -21,9 +21,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Make gradlew executable
+          run: chmod +x gradlew
+
       - name: Build and Test
-        run: ./gradlew clean build
+          run: ./gradlew clean build
 
       - name: Notify on Success
-        if: success()
-        run: echo "—борка прошла успешно!"
+          if: success()
+          run: echo "—борка прошла успешно!"
