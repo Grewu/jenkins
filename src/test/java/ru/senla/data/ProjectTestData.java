@@ -2,7 +2,6 @@ package ru.senla.data;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.format.annotation.DateTimeFormat;
 import ru.senla.model.dto.request.ProjectRequest;
 import ru.senla.model.dto.response.ProjectResponse;
 import ru.senla.model.entity.Project;

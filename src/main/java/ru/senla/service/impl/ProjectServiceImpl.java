@@ -23,11 +23,12 @@ import ru.senla.service.api.ProjectService;
 @Transactional(readOnly = true)
 public class ProjectServiceImpl implements ProjectService {
 
+    private final ProjectMapper projectMapper;
+    private final TaskMapper taskMapper;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
     private final TaskRepository taskRepository;
-    private final ProjectMapper projectMapper;
-    private final TaskMapper taskMapper;
+
 
     @Override
     @Transactional
@@ -40,6 +41,12 @@ public class ProjectServiceImpl implements ProjectService {
     public Page<ProjectResponse> getAll(Pageable pageable) {
         return projectRepository.findAll(pageable)
                 .map(projectMapper::toProjectResponse);
+    }
+
+    @Override
+    public Page<TaskResponse> getAllTaskRelatedToProjectByProjectId(Long projectId, Pageable pageable) {
+        return taskRepository.findTasksByProjectId(projectId, pageable)
+                .map(taskMapper::toTaskResponse);
     }
 
     @Override
@@ -69,10 +76,4 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.deleteById(id);
     }
 
-
-    @Override
-    public Page<TaskResponse> getAllTaskRelatedToProjectByProjectId(Long projectId, Pageable pageable) {
-        return taskRepository.findTasksByProjectId(projectId, pageable)
-                .map(taskMapper::toTaskResponse);
-    }
 }

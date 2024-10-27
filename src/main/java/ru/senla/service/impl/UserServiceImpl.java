@@ -25,11 +25,10 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-    private final UserMapper userMapper;
-
 
     @Override
     public String getAuthorizationToken(UserRequest userRequest) throws InvalidEmailException {

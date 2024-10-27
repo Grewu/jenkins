@@ -1,4 +1,17 @@
 services:
+  config-service:
+    image: config-service
+    build: config
+    restart: always
+    healthcheck:
+      test: curl http://localhost:8888 || exit 1
+      interval: 5s
+      timeout: 3s
+    networks:
+      - news_ntwrk
+    ports:
+      - "8888:8888"
+
   senla-course:
     build:
       dockerfile: Dockerfile

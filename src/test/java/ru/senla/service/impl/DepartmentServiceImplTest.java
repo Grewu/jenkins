@@ -15,7 +15,6 @@ import ru.senla.mapper.DepartmentMapper;
 import ru.senla.mapper.UserProfileMapper;
 import ru.senla.repository.api.DepartmentRepository;
 import ru.senla.repository.api.UserProfileRepository;
-import ru.senla.repository.api.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +31,7 @@ class DepartmentServiceImplTest {
     @Mock
     private DepartmentMapper departmentMapper;
     @Mock
-    private  UserProfileMapper userProfileMapper;
+    private UserProfileMapper userProfileMapper;
 
     @Mock
     private DepartmentRepository departmentRepository;
@@ -81,7 +80,7 @@ class DepartmentServiceImplTest {
             var userProfilePage = new PageImpl<>(userProfiles, pageable, 2);
 
             doReturn(userProfilePage)
-                    .when(userProfileRepository).findByDepartmentId(departmentId,pageable);
+                    .when(userProfileRepository).findByDepartmentId(departmentId, pageable);
 
             IntStream.range(0, userProfiles.size())
                     .forEach(i -> doReturn(expectedResponses.get(i))
@@ -89,7 +88,7 @@ class DepartmentServiceImplTest {
 
             // when
             var actualResponses = departmentService
-                    .getAllUsersProfileByDepartmentId(departmentId,pageable).getContent();
+                    .getAllUsersProfileByDepartmentId(departmentId, pageable).getContent();
 
             // then
             assertEquals(expectedResponses, actualResponses);

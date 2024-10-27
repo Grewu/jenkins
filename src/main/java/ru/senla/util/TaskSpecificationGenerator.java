@@ -1,17 +1,15 @@
-package ru.senla.service.specification;
+package ru.senla.util;
 
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 import ru.senla.model.entity.Task;
 import ru.senla.model.filter.TaskFilter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
 public class TaskSpecificationGenerator {
-    public static Specification<Task> filter(TaskFilter filter) {
+    public static Specification<Task> filterToSpecification(TaskFilter filter) {
         return ((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import ru.senla.model.entity.Task;
 import ru.senla.repository.AbstractRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface TaskRepository extends AbstractRepository<Long, Task>, JpaSpecificationExecutor<Task> {
     @Query("""

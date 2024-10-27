@@ -2,6 +2,8 @@ package ru.senla.data;
 
 
 import lombok.Builder;
+import ru.senla.model.dto.request.PositionRequest;
+import ru.senla.model.dto.response.PositionResponse;
 import ru.senla.model.entity.Position;
 import ru.senla.model.entity.enums.PositionType;
 
@@ -18,4 +20,11 @@ public class PositionTestData {
         return new Position(id, name);
     }
 
+    public PositionRequest buildPositionRequest() {
+        return new PositionRequest(name);
+    }
+
+    public PositionResponse buildPositionResponse() {
+        return new PositionResponse(id, name.name());
+    }
 }

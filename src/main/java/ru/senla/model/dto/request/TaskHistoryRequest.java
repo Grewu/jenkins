@@ -1,5 +1,6 @@
 package ru.senla.model.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import ru.senla.model.entity.enums.PriorityType;
@@ -24,6 +25,7 @@ public record TaskHistoryRequest(
         Long createdBy,
 
         @NotNull(message = "Due date must not be null")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime dueDate,
 
         @NotNull(message = "Status must not be null")
@@ -36,6 +38,7 @@ public record TaskHistoryRequest(
         Long changedBy,
 
         @NotNull(message = "Changed date must not be null")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime changedDate,
 
         @NotBlank(message = "Changed description must not be blank")

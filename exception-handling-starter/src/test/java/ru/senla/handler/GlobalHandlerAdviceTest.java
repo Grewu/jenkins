@@ -78,5 +78,4 @@ class GlobalHandlerAdviceTest {
                 .hasFieldOrPropertyWithValue("message", "Invalid password: invalidPassword");
     }
 
-    //TODO: more test?
 }

@@ -1,4 +1,4 @@
-package config;
+package ru.senla.config;
 
 
 import org.junit.jupiter.api.Test;

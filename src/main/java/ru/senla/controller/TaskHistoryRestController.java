@@ -28,9 +28,8 @@ import ru.senla.service.api.TaskHistoryService;
 @RequiredArgsConstructor
 @RequestMapping(value = TaskHistoryRestController.TASK_API_PATH)
 public class TaskHistoryRestController {
-
-    private final TaskHistoryService taskHistoryService;
     protected static final String TASK_API_PATH = "/api/v0/task_history";
+    private final TaskHistoryService taskHistoryService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('task_history:read')")

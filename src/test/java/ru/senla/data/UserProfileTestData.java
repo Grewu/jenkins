@@ -5,12 +5,8 @@ import ru.senla.model.dto.request.UserProfileRequest;
 import ru.senla.model.dto.response.UserProfileResponse;
 import ru.senla.model.entity.Department;
 import ru.senla.model.entity.Position;
-import ru.senla.model.entity.Role;
 import ru.senla.model.entity.User;
 import ru.senla.model.entity.UserProfile;
-import ru.senla.model.entity.enums.DepartmentType;
-import ru.senla.model.entity.enums.PositionType;
-import ru.senla.model.entity.enums.RoleType;
 
 
 @Builder(setterPrefix = "with")

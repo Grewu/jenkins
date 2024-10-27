@@ -30,8 +30,9 @@ import ru.senla.service.api.UserProfileService;
 @RequestMapping(value = UserProfileRestController.USER_PROFILE_API_PATH)
 public class UserProfileRestController {
 
-    private final UserProfileService userProfileService;
     protected static final String USER_PROFILE_API_PATH = "/api/v0/user_profiles";
+    private final UserProfileService userProfileService;
+
 
     @PostMapping
     @PreAuthorize("hasAuthority('user_profile:write')")

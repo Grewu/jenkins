@@ -2,4 +2,5 @@ rootProject.name = 'Senla-Course'
 include 'exception-handling-starter'
 include 'logging-starter'
 include 'exception-handling-starter'
+include 'config'
 

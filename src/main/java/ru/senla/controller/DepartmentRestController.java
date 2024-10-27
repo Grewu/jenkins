@@ -31,8 +31,8 @@ import ru.senla.service.api.DepartmentService;
 @RequestMapping(value = DepartmentRestController.DEPARTMENT_API_PATH)
 public class DepartmentRestController {
 
-    private final DepartmentService departmentService;
     protected static final String DEPARTMENT_API_PATH = "/api/v0/departments";
+    private final DepartmentService departmentService;
 
 
     @PostMapping
@@ -45,8 +45,9 @@ public class DepartmentRestController {
 
     @GetMapping("/{departmentId}/users")
     @PreAuthorize("hasAuthority('department:read') && hasAuthority('user_profile:read')")
-    public ResponseEntity<Page<UserProfileResponse>> getAllUsersProfileByDepartmentId(@PathVariable Long departmentId,
-                                                                                      @PageableDefault(20) Pageable pageable) {
+    public ResponseEntity<Page<UserProfileResponse>> getAllUsersProfileByDepartmentId(
+            @PathVariable Long departmentId,
+            @PageableDefault(20) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(departmentService.getAllUsersProfileByDepartmentId(departmentId, pageable));

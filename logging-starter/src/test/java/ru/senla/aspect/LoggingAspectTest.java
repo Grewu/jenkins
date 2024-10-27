@@ -1,4 +1,4 @@
-package aspect;
+package ru.senla.aspect;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator;
@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import ru.senla.aspect.LoggingAspect;
 import ru.senla.util.FakeAnnotatedService;
 
 import static org.mockito.ArgumentMatchers.any;

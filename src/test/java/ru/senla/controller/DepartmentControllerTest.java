@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +17,6 @@ import ru.senla.data.DepartmentTestData;
 import ru.senla.data.UserProfileTestData;
 import ru.senla.model.entity.enums.DepartmentType;
 import ru.senla.service.api.DepartmentService;
-import ru.senla.util.IntegrationTest;
-import ru.senla.util.PostgresqlTestContainer;
 
 import java.util.List;
 
@@ -25,9 +24,9 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@IntegrationTest
+@SpringBootTest
 @AutoConfigureMockMvc
-class DepartmentControllerTestIT extends PostgresqlTestContainer {
+class DepartmentControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -157,19 +156,19 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
                             status().isOk(),
                             content().contentType(MediaType.APPLICATION_JSON)
                     ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(2))
-                    .andExpect(jsonPath("$.content[0].id").value(1))
-                    .andExpect(jsonPath("$.content[0].firstName").value("firstName"))
-                    .andExpect(jsonPath("$.content[0].lastName").value("lastName"))
-                    .andExpect(jsonPath("$.content[0].position").value(1))
-                    .andExpect(jsonPath("$.content[0].department").value(1))
-                    .andExpect(jsonPath("$.content[0].user").value(1))
-                    .andExpect(jsonPath("$.content[1].id").value(2))
-                    .andExpect(jsonPath("$.content[1].firstName").value("firstName"))
-                    .andExpect(jsonPath("$.content[1].lastName").value("lastName"))
-                    .andExpect(jsonPath("$.content[1].position").value(1))
-                    .andExpect(jsonPath("$.content[1].department").value(1))
-                    .andExpect(jsonPath("$.content[1].user").value(1));
+                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
+                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
+                    .andExpect(jsonPath("$.content[0].firstName").value(expectedResponses.get(0).firstName()))
+                    .andExpect(jsonPath("$.content[0].lastName").value(expectedResponses.get(0).lastName()))
+                    .andExpect(jsonPath("$.content[0].position").value(expectedResponses.get(0).position()))
+                    .andExpect(jsonPath("$.content[0].department").value(expectedResponses.get(0).department()))
+                    .andExpect(jsonPath("$.content[0].user").value(expectedResponses.get(0).user()))
+                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
+                    .andExpect(jsonPath("$.content[1].firstName").value(expectedResponses.get(1).firstName()))
+                    .andExpect(jsonPath("$.content[1].lastName").value(expectedResponses.get(1).lastName()))
+                    .andExpect(jsonPath("$.content[1].position").value(expectedResponses.get(1).position()))
+                    .andExpect(jsonPath("$.content[1].department").value(expectedResponses.get(1).department()))
+                    .andExpect(jsonPath("$.content[1].user").value(expectedResponses.get(1).user()));
         }
 
 
@@ -195,11 +194,11 @@ class DepartmentControllerTestIT extends PostgresqlTestContainer {
                             status().isOk(),
                             content().contentType(MediaType.APPLICATION_JSON)
                     ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(2))
-                    .andExpect(jsonPath("$.content[0].id").value(1))
-                    .andExpect(jsonPath("$.content[0].name").value("DEVELOPERS"))
-                    .andExpect(jsonPath("$.content[1].id").value(2))
-                    .andExpect(jsonPath("$.content[1].name").value("DEVELOPERS"));
+                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
+                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
+                    .andExpect(jsonPath("$.content[0].name").value(expectedResponses.get(0).name()))
+                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
+                    .andExpect(jsonPath("$.content[1].name").value(expectedResponses.get(1).name()));
         }
 
         @Test

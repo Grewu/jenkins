@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -13,8 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.senla.data.ProjectTestData;
 import ru.senla.data.TaskTestData;
 import ru.senla.service.api.ProjectService;
-import ru.senla.util.IntegrationTest;
-import ru.senla.util.PostgresqlTestContainer;
+import ru.senla.util.DateTimeFormatterUtil;
 
 import java.util.List;
 
@@ -23,9 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@IntegrationTest
+@SpringBootTest
 @AutoConfigureMockMvc
-class ProjectControllerTestIT extends PostgresqlTestContainer {
+class ProjectControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -52,12 +52,12 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
                             {
-                                                       "name": "name",
-                                                       "projectCode": "projectCode",
-                                                       "description": "description",
-                                                       "startDate": "2024-09-30T12:00:00",
-                                                       "endDate": "2024-09-30T12:00:00",
-                                                       "owner": 1
+                              "name": "name",
+                              "projectCode": "projectCode",
+                              "description": "description",
+                              "startDate": "2024-09-30T12:00:00",
+                              "endDate": "2024-09-30T12:00:00",
+                              "owner": 1
                             }
                             """);
 
@@ -69,12 +69,12 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
                             content().contentType(MediaType.APPLICATION_JSON),
                             content().json("""
                                        {
-                                                                 "name": "name",
-                                                                 "projectCode": "projectCode",
-                                                                 "description": "description",
-                                                                 "startDate": "2024-09-30T12:00:00",
-                                                                 "endDate": "2024-09-30T12:00:00",
-                                                                 "owner": 1
+                                         "name": "name",
+                                         "projectCode": "projectCode",
+                                         "description": "description",
+                                         "startDate": "2024-09-30T12:00:00",
+                                         "endDate": "2024-09-30T12:00:00",
+                                         "owner": 1
                                        }
                                     """)
                     );
@@ -89,13 +89,13 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
                              {
-                                                                "id": 1,
-                                                                "name": "name",
-                                                                "projectCode": "projectCode",
-                                                                "description": "description",
-                                                                "startDate": "2024-09-30T12:00:00",
-                                                                "endDate": "2024-09-30T12:00:00",
-                                                                "owner": 1
+                                 "id": 1,
+                                 "name": "name",
+                                 "projectCode": "projectCode",
+                                 "description": "description",
+                                 "startDate": "2024-09-30T12:00:00",
+                                 "endDate": "2024-09-30T12:00:00",
+                                 "owner": 1
                             }
                              """);
 
@@ -132,23 +132,25 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
                             status().isOk(),
                             content().contentType(MediaType.APPLICATION_JSON)
                     ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(2))
-                    .andExpect(jsonPath("$.content[0].id").value(1))
-                    .andExpect(jsonPath("$.content[0].name").value("name"))
-                    .andExpect(jsonPath("$.content[0].project").value(1))
-                    .andExpect(jsonPath("$.content[0].assignedTo").value(1))
-                    .andExpect(jsonPath("$.content[0].createdBy").value(1))
-                    .andExpect(jsonPath("$.content[0].dueDate").value("2024-09-30T12:00:00"))
-                    .andExpect(jsonPath("$.content[0].status").value("IN_PROGRESS"))
-                    .andExpect(jsonPath("$.content[0].priority").value("MEDIUM"))
-                    .andExpect(jsonPath("$.content[1].id").value(2))
-                    .andExpect(jsonPath("$.content[1].name").value("name"))
-                    .andExpect(jsonPath("$.content[1].project").value(1))
-                    .andExpect(jsonPath("$.content[1].assignedTo").value(1))
-                    .andExpect(jsonPath("$.content[1].createdBy").value(1))
-                    .andExpect(jsonPath("$.content[1].dueDate").value("2024-09-30T12:00:00"))
-                    .andExpect(jsonPath("$.content[1].status").value("IN_PROGRESS"))
-                    .andExpect(jsonPath("$.content[1].priority").value("MEDIUM"));
+                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
+                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
+                    .andExpect(jsonPath("$.content[0].name").value(expectedResponses.get(0).name()))
+                    .andExpect(jsonPath("$.content[0].project").value(expectedResponses.get(0).project()))
+                    .andExpect(jsonPath("$.content[0].assignedTo").value(expectedResponses.get(0).assignedTo()))
+                    .andExpect(jsonPath("$.content[0].createdBy").value(expectedResponses.get(0).createdBy()))
+                    .andExpect(jsonPath("$.content[0].dueDate").value(expectedResponses.get(0).dueDate()
+                            .format(DateTimeFormatterUtil.DATE_TIME_FORMATTER)))
+                    .andExpect(jsonPath("$.content[0].status").value(expectedResponses.get(0).status().toString()))
+                    .andExpect(jsonPath("$.content[0].priority").value(expectedResponses.get(0).priority().toString()))
+                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
+                    .andExpect(jsonPath("$.content[1].name").value(expectedResponses.get(1).name()))
+                    .andExpect(jsonPath("$.content[1].project").value(expectedResponses.get(1).project()))
+                    .andExpect(jsonPath("$.content[1].assignedTo").value(expectedResponses.get(1).assignedTo()))
+                    .andExpect(jsonPath("$.content[1].createdBy").value(expectedResponses.get(1).createdBy()))
+                    .andExpect(jsonPath("$.content[1].dueDate").value(expectedResponses.get(1).dueDate()
+                            .format(DateTimeFormatterUtil.DATE_TIME_FORMATTER)))
+                    .andExpect(jsonPath("$.content[1].status").value(expectedResponses.get(1).status().toString()))
+                    .andExpect(jsonPath("$.content[1].priority").value(expectedResponses.get(1).priority().toString()));
         }
 
         @Test
@@ -173,21 +175,25 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
                             status().isOk(),
                             content().contentType(MediaType.APPLICATION_JSON)
                     ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(2))
-                    .andExpect(jsonPath("$.content[0].id").value(1))
-                    .andExpect(jsonPath("$.content[0].name").value("name"))
-                    .andExpect(jsonPath("$.content[0].projectCode").value("projectCode"))
-                    .andExpect(jsonPath("$.content[0].description").value("description"))
-                    .andExpect(jsonPath("$.content[0].startDate").value("2024-09-30T12:00:00"))
-                    .andExpect(jsonPath("$.content[0].endDate").value("2024-09-30T12:00:00"))
-                    .andExpect(jsonPath("$.content[0].owner").value(1))
-                    .andExpect(jsonPath("$.content[1].id").value(2))
-                    .andExpect(jsonPath("$.content[1].name").value("name"))
-                    .andExpect(jsonPath("$.content[1].projectCode").value("projectCode"))
-                    .andExpect(jsonPath("$.content[1].description").value("description"))
-                    .andExpect(jsonPath("$.content[1].startDate").value("2024-09-30T12:00:00"))
-                    .andExpect(jsonPath("$.content[1].endDate").value("2024-09-30T12:00:00"))
-                    .andExpect(jsonPath("$.content[1].owner").value(1));
+                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
+                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
+                    .andExpect(jsonPath("$.content[0].name").value(expectedResponses.get(0).name()))
+                    .andExpect(jsonPath("$.content[0].projectCode").value(expectedResponses.get(0).projectCode()))
+                    .andExpect(jsonPath("$.content[0].description").value(expectedResponses.get(0).description()))
+                    .andExpect(jsonPath("$.content[0].startDate").value(expectedResponses.get(0).startDate()
+                            .format(DateTimeFormatterUtil.DATE_TIME_FORMATTER)))
+                    .andExpect(jsonPath("$.content[0].endDate").value(expectedResponses.get(0).endDate()
+                            .format(DateTimeFormatterUtil.DATE_TIME_FORMATTER)))
+                    .andExpect(jsonPath("$.content[0].owner").value(expectedResponses.get(0).owner()))
+                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
+                    .andExpect(jsonPath("$.content[1].name").value(expectedResponses.get(1).name()))
+                    .andExpect(jsonPath("$.content[1].projectCode").value(expectedResponses.get(1).projectCode()))
+                    .andExpect(jsonPath("$.content[1].description").value(expectedResponses.get(1).description()))
+                    .andExpect(jsonPath("$.content[1].startDate").value(expectedResponses.get(1).startDate()
+                            .format(DateTimeFormatterUtil.DATE_TIME_FORMATTER)))
+                    .andExpect(jsonPath("$.content[1].endDate").value(expectedResponses.get(1).endDate()
+                            .format(DateTimeFormatterUtil.DATE_TIME_FORMATTER)))
+                    .andExpect(jsonPath("$.content[1].owner").value(expectedResponses.get(1).owner()));
 
         }
 

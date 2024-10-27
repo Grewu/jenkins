@@ -39,7 +39,11 @@ public enum PrivilegeType {
 
     DEPARTMENT_READ(new SimpleGrantedAuthority("department:read")),
     DEPARTMENT_WRITE(new SimpleGrantedAuthority("department:write")),
-    DEPARTMENT_DELETE(new SimpleGrantedAuthority("department:delete"));
+    DEPARTMENT_DELETE(new SimpleGrantedAuthority("department:delete")),
+
+    POSITION_READ(new SimpleGrantedAuthority("position:read")),
+    POSITION_WRITE(new SimpleGrantedAuthority("position:write")),
+    POSITION_DELETE(new SimpleGrantedAuthority("position:delete"));
 
 
     private final GrantedAuthority grantedAuthority;

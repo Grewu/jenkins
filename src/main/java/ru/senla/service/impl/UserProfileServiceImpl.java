@@ -50,6 +50,12 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
+    public Page<CommentResponse> getAllCommentsByProfileId(Long userProfileId, Pageable pageable) {
+        return commentRepository.findCommentsByProfileId(userProfileId, pageable)
+                .map(commentMapper::toCommentResponse);
+    }
+
+    @Override
     public UserProfileResponse getById(Long id) {
         return userProfileRepository.findById(id)
                 .map(userProfileMapper::toUserProfileResponse)
@@ -62,7 +68,6 @@ public class UserProfileServiceImpl implements UserProfileService {
         var currentUserProfile = userProfileRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
 
-
         var user = userRepository.findById(userProfileRequest.user())
                 .orElseThrow(() -> new EntityNotFoundException(User.class, id));
 
@@ -72,6 +77,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         var position = positionRepository.findById(userProfileRequest.position())
                 .orElseThrow(() -> new EntityNotFoundException(Position.class, id));
 
+        currentUserProfile.setFirstName(userProfileRequest.firstName());
+        currentUserProfile.setLastName(userProfileRequest.lastName());
         currentUserProfile.setDepartment(department);
         currentUserProfile.setUser(user);
         currentUserProfile.setPosition(position);
@@ -85,10 +92,4 @@ public class UserProfileServiceImpl implements UserProfileService {
         userProfileRepository.deleteById(id);
     }
 
-
-    @Override
-    public Page<CommentResponse> getAllCommentsByProfileId(Long userProfileId, Pageable pageable) {
-        return commentRepository.findCommentsByProfileId(userProfileId,pageable)
-                .map(commentMapper::toCommentResponse);
-    }
 }

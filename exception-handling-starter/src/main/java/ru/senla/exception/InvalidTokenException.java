@@ -15,8 +15,3 @@ public class InvalidTokenException extends AbstractExceptionMessageException {
         return HttpStatus.UNAUTHORIZED;
     }
 }
-//TODO:
-// {
-//    "status": "BAD_REQUEST",
-//    "message": "status = Failed to convert value of type 'java.lang.String' to required type 'ru.senla.model.entity.enums.StatusType'; Failed to convert from type [java.lang.String] to type [ru.senla.model.entity.enums.StatusType] for value [IN_PROGRES]"
-// }

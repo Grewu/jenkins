@@ -1,7 +1,6 @@
 package ru.senla.model.entity.enums;
 
 public enum DepartmentType {
-    NOT_DEPARTMENT,
     DEVELOPERS,
     MANAGERS,
     MARKETING,

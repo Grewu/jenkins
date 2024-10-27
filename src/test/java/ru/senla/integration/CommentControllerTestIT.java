@@ -1,4 +1,4 @@
-package ru.senla.controller;
+package ru.senla.integration;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -6,9 +6,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,8 +18,10 @@ import ru.senla.util.PostgresqlTestContainer;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.IntStream;
 
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,7 +32,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private CommentService commentService;
 
     private static final String URL = "/api/v0/comments";
@@ -44,11 +45,6 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
         void createShouldReturnCommentResponse() throws Exception {
             // given
             var commentRequest = CommentTestData.builder().build().buildCommentRequest();
-            var expectedResponse = CommentTestData.builder().build().buildCommentResponse();
-
-            doReturn(expectedResponse)
-                    .when(commentService).create(commentRequest);
-
             var requestBuilder = post(URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
@@ -61,7 +57,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                             """);
 
             // when
-            mockMvc.perform(requestBuilder)
+            mockMvc.perform(requestBuilder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     // then
                     .andExpectAll(
                             status().isCreated(),
@@ -76,7 +72,9 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                                     """)
                     );
 
-            verify(commentService).create(any());
+            assertThatCode(() -> commentService.create(commentRequest))
+                    .doesNotThrowAnyException();
+
         }
 
         @Test
@@ -94,11 +92,9 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                             """);
 
             // when
-            mockMvc.perform(requestBuilder)
+            mockMvc.perform(requestBuilder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     // then
                     .andExpect(status().isForbidden());
-
-            verify(commentService, never()).create(any());
         }
     }
 
@@ -112,11 +108,11 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
             var expectedResponses = List.of(
                     CommentTestData.builder().build().buildCommentResponse(),
-                    CommentTestData.builder().withId(2L).build().buildCommentResponse()
+                    CommentTestData.builder().withId(2L).build().buildCommentResponse(),
+                    CommentTestData.builder().withId(3L).build().buildCommentResponse(),
+                    CommentTestData.builder().withId(4L).build().buildCommentResponse()
             );
 
-            when(commentService.getAll(any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(expectedResponses, pageable, 2));
             //when
             mockMvc.perform(get(URL)
                             .contentType(MediaType.APPLICATION_JSON))
@@ -125,11 +121,24 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                             status().isOk(),
                             content().contentType(MediaType.APPLICATION_JSON)
                     ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(2))
-                    .andExpect(jsonPath("$.content[0].id").value(1))
-                    .andExpect(jsonPath("$.content[0].commentText").value("commentText"))
-                    .andExpect(jsonPath("$.content[1].id").value(2))
-                    .andExpect(jsonPath("$.content[1].commentText").value("commentText"));
+                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
+                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
+                    .andExpect(jsonPath("$.content[0].commentText").value(
+                            expectedResponses.get(0).commentText()))
+                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
+                    .andExpect(jsonPath("$.content[1].commentText").value(
+                            expectedResponses.get(1).commentText()));
+
+            assertThatCode(() -> commentService.getAll(pageable))
+                    .doesNotThrowAnyException();
+
+
+            var actualResponse = commentService.getAll(pageable).stream().toList();
+
+            IntStream.range(0, actualResponse.size())
+                    .forEach((i) ->
+                            assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i))
+                    );
         }
 
         @Test
@@ -140,7 +149,6 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                     // then
                     .andExpect(status().isForbidden());
 
-            verify(commentService, never()).getAll(any());
         }
     }
 
@@ -150,10 +158,8 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
         @WithMockUser(authorities = {"comments:read"})
         void getByIdShouldReturnCommentResponse() throws Exception {
             // given
-            var commentResponse = CommentTestData.builder().build().buildCommentResponse();
-            var commentId = commentResponse.id();
-
-            doReturn(commentResponse).when(commentService).getById(commentId);
+            var expectedResponse = CommentTestData.builder().build().buildCommentResponse();
+            var commentId = expectedResponse.id();
 
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, commentId)
@@ -171,7 +177,12 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                                     }
                                     """)
                     );
-            verify(commentService).getById(any());
+            assertThatCode(() -> commentService.getById(commentId))
+                    .doesNotThrowAnyException();
+
+            var actualResponse = commentService.getById(commentId);
+
+            assertThat(actualResponse).isEqualTo(expectedResponse);
         }
 
         @Test
@@ -180,15 +191,14 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
             var commentResponse = CommentTestData.builder().build().buildCommentResponse();
             var commentId = commentResponse.id();
 
-            doReturn(commentResponse).when(commentService).getById(commentId);
-
             // when
             mockMvc.perform(get(URL_WITH_PARAMETER_ID, commentId)
                             .contentType(MediaType.APPLICATION_JSON))
                     // then
                     .andExpect(status().isForbidden());
 
-            verify(commentService, never()).getById(any());
+            assertThatCode(() -> commentService.getById(commentId))
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -208,12 +218,10 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                     .withCreatedAt(LocalDateTime.parse(createdAt))
                     .build().buildCommentRequest();
 
-            var updatedResponse = CommentTestData.builder()
+            var expectedResponses = CommentTestData.builder()
                     .withId(commentId)
                     .withCommentText(updatedCommentText)
                     .build().buildCommentResponse();
-
-            doReturn(updatedResponse).when(commentService).update(commentId, commentRequest);
 
             var requestBuilder = put(URL_WITH_PARAMETER_ID, commentId)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -242,7 +250,24 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                                     """, updatedCommentText, createdAt))
                     );
 
-            verify(commentService).update(any(), any());
+            assertThatCode(() -> commentService.update(commentId, commentRequest))
+                    .doesNotThrowAnyException();
+
+            var actualResponse = commentService.update(commentId, commentRequest);
+
+            assertThat(actualResponse).isEqualTo(expectedResponses);
+        }
+
+        @Test
+        void updateShouldReturnForbidden() throws Exception {
+            // given
+            var commentId = 1L;
+
+            // when
+            mockMvc.perform(put(URL_WITH_PARAMETER_ID, commentId))
+                    // then
+                    .andExpect(status().isForbidden());
+
         }
     }
 
@@ -260,7 +285,8 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                     // then
                     .andExpect(status().isNoContent());
 
-            verify(commentService).delete(commentId);
+            assertThatCode(() -> commentService.delete(commentId))
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -273,8 +299,6 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                             .contentType(MediaType.APPLICATION_JSON))
                     // then
                     .andExpect(status().isForbidden());
-
-            verify(commentService, never()).delete(commentId);
         }
     }
 }

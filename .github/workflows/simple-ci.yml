@@ -1,0 +1,30 @@
+name: Simple CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Клонируем код
+      - uses: actions/checkout@v2
+
+      # Устанавливаем JDK
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      # Собираем проект и запускаем тесты
+      - name: Build and Test
+        run: ./gradlew clean build
+
+      # Уведомление об успешной сборке
+      - name: Notify on Success
+        if: success()
+        run: echo "Сборка прошла успешно!"

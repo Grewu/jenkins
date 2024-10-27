@@ -54,7 +54,8 @@ public class GlobalHandlerAdviceTestIT {
     @Test
     void handleInvalidEmailException() throws Exception {
         var invalidEmail = "invalidEmail";
-        var exceptionMessage = new ExceptionMessage(HttpStatus.UNAUTHORIZED, String.format(INVALID_EMAIL_MESSAGE, invalidEmail));
+        var exceptionMessage = new ExceptionMessage(HttpStatus.UNAUTHORIZED,
+                String.format(INVALID_EMAIL_MESSAGE, invalidEmail));
 
         mockMvc.perform(get(URL + "/email/{email}", invalidEmail))
                 .andExpectAll(
@@ -81,7 +82,8 @@ public class GlobalHandlerAdviceTestIT {
     @Test
     void handleInvalidPasswordException() throws Exception {
         var invalidPassword = "invalidPassword";
-        var exceptionMessage = new ExceptionMessage(HttpStatus.UNAUTHORIZED, String.format(INVALID_PASSWORD_MESSAGE, invalidPassword));
+        var exceptionMessage = new ExceptionMessage(HttpStatus.UNAUTHORIZED,
+                String.format(INVALID_PASSWORD_MESSAGE, invalidPassword));
 
         mockMvc.perform(post(URL + "/password/{password}", invalidPassword))
                 .andExpectAll(

@@ -28,12 +28,9 @@ import ru.senla.service.api.CommentService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = CommentRestController.COMMENT_API_PATH)
-//TODO: OPEN API
 public class CommentRestController {
-
-    private final CommentService commentService;
     protected static final String COMMENT_API_PATH = "/api/v0/comments";
-
+    private final CommentService commentService;
 
     @PostMapping
     @PreAuthorize("hasAuthority('comments:write')")

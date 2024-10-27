@@ -12,8 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.senla.service.api.TokenService;
 import ru.senla.service.api.UserService;
-import ru.senla.service.impl.JwtTokenServiceImpl;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -22,10 +22,10 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtTokenServiceImpl jwtTokenService;
+    private static final String TYPE_AUTHORIZATION = "Bearer ";
+
+    private final TokenService tokenService;
     private final UserService userService;
-    //TODO ? application.yml?
-    private final String TYPE_AUTHORIZATION = "Bearer ";
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest req,
@@ -38,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         var token = header.substring(7);
-        var userName = jwtTokenService.getEmail(token);
+        var userName = tokenService.getEmail(token);
         var userDetails = userService.loadUserByUsername(userName);
 
         var authenticated = UsernamePasswordAuthenticationToken.authenticated(

@@ -5,7 +5,6 @@ import ru.senla.model.entity.enums.DepartmentType;
 
 public record DepartmentRequest(
         @NotNull(message = "Department name cannot be null")
-        //TODO:?
         DepartmentType name
 ) {
 }

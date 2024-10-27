@@ -28,7 +28,7 @@ public class TaskFilterTestData {
     private StatusType status = StatusType.IN_PROGRESS;
 
     @Builder.Default
-    private PriorityType priority =  PriorityType.MEDIUM;
+    private PriorityType priority = PriorityType.MEDIUM;
 
     public TaskFilter buildTaskFilter() {
         return new TaskFilter(name, assignedTo, createdBy, project, dueDate, status, priority);

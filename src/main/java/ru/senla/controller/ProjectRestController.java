@@ -30,8 +30,8 @@ import ru.senla.service.api.ProjectService;
 @RequiredArgsConstructor
 @RequestMapping(value = ProjectRestController.PROJECT_API_PATH)
 public class ProjectRestController {
-    private final ProjectService projectService;
     protected static final String PROJECT_API_PATH = "/api/v0/projects";
+    private final ProjectService projectService;
 
 
     @PostMapping

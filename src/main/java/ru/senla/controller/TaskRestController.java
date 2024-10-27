@@ -32,8 +32,8 @@ import ru.senla.service.api.TaskService;
 @RequestMapping(value = TaskRestController.TASK_API_PATH)
 public class TaskRestController {
 
-    private final TaskService taskService;
     protected static final String TASK_API_PATH = "/api/v0/tasks";
+    private final TaskService taskService;
 
     @PostMapping
     @PreAuthorize("hasAuthority('task:write')")
@@ -63,8 +63,9 @@ public class TaskRestController {
 
     @GetMapping("/{taskId}/history")
     @PreAuthorize("hasAuthority('task:read') && hasAuthority('task_history:read')")
-    public ResponseEntity<Page<TaskHistoryResponse>> getAllTaskHistoryByTaskId(@PathVariable Long taskId,
-                                                                               @PageableDefault(20) Pageable pageable) {
+    public ResponseEntity<Page<TaskHistoryResponse>> getAllTaskHistoryByTaskId(
+            @PathVariable Long taskId,
+            @PageableDefault(20) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(taskService.getAllTaskHistory(taskId, pageable));

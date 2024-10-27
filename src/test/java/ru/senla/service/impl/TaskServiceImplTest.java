@@ -1,5 +1,6 @@
 package ru.senla.service.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,13 +10,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import ru.senla.data.ProjectTestData;
 import ru.senla.data.TaskFilterTestData;
+import ru.senla.data.TaskHistoryTestData;
 import ru.senla.data.TaskTestData;
 import ru.senla.data.UserProfileTestData;
 import ru.senla.exception.EntityNotFoundException;
+import ru.senla.mapper.TaskHistoryMapper;
 import ru.senla.mapper.TaskMapper;
+import ru.senla.model.dto.request.TaskHistoryRequest;
+import ru.senla.model.entity.User;
 import ru.senla.repository.api.ProjectRepository;
+import ru.senla.repository.api.TaskHistoryRepository;
 import ru.senla.repository.api.TaskRepository;
 import ru.senla.repository.api.UserProfileRepository;
 
@@ -36,16 +45,19 @@ class TaskServiceImplTest {
     private TaskMapper taskMapper;
 
     @Mock
+    private TaskHistoryMapper taskHistoryMapper;
+
+    @Mock
     private TaskRepository taskRepository;
+
+    @Mock
+    private TaskHistoryRepository taskHistoryRepository;
 
     @Mock
     private UserProfileRepository userProfileRepository;
 
     @Mock
     private ProjectRepository projectRepository;
-
-    @Mock
-    private TaskHistoryServiceImpl taskHistoryService;
 
     @InjectMocks
     private TaskServiceImpl taskService;
@@ -56,6 +68,7 @@ class TaskServiceImplTest {
         @Test
         void createShouldReturnTaskResponse() {
             // given
+            var taskHistory = TaskHistoryTestData.builder().build().buildTaskHistory();
             var taskRequest = TaskTestData.builder().build().buildTaskRequest();
             var task = TaskTestData.builder().build().buildTask();
             var expected = TaskTestData.builder().build().buildTaskResponse();
@@ -63,6 +76,8 @@ class TaskServiceImplTest {
             when(taskMapper.toTask(taskRequest)).thenReturn(task);
             when(taskRepository.save(task)).thenReturn(task);
             when(taskMapper.toTaskResponse(task)).thenReturn(expected);
+            when(taskHistoryMapper.toTaskHistory(any(TaskHistoryRequest.class))).thenReturn(taskHistory);
+            when(taskHistoryRepository.save(taskHistory)).thenReturn(taskHistory);
 
             // when
             var actual = taskService.create(taskRequest);
@@ -71,6 +86,7 @@ class TaskServiceImplTest {
             verify(taskRepository).save(task);
             verify(taskMapper).toTask(taskRequest);
             verify(taskMapper).toTaskResponse(task);
+            verify(taskHistoryRepository).save(taskHistory);
             assertEquals(expected, actual);
         }
     }
@@ -78,7 +94,29 @@ class TaskServiceImplTest {
     @Nested
     class GetAll {
         @Test
-        void getAllByFilter() {
+        void getAllByFilterShouldReturnPageOfTaskHistoryResponse() {
+            var pageable = Pageable.ofSize(2);
+            var taskId = TaskTestData.builder().build().buildTask().getId();
+            var taskHistories = List.of(TaskHistoryTestData.builder().build().buildTaskHistory());
+            var taskPage = new PageImpl<>(taskHistories, pageable, 2);
+            var expectedResponses = List.of(TaskHistoryTestData.builder().build().buildTaskHistoryResponse());
+
+            doReturn(taskPage)
+                    .when(taskHistoryRepository).findTaskHistoryByTaskId(taskId, pageable);
+
+            IntStream.range(0, taskHistories.size())
+                    .forEach(i -> doReturn(expectedResponses.get(i))
+                            .when(taskHistoryMapper).toTaskHistoryResponse(taskHistories.get(i)));
+
+            var actualResponse =
+                    taskService.getAllTaskHistory(taskId, pageable).getContent();
+
+            assertThat(actualResponse).isEqualTo(expectedResponses);
+        }
+
+
+        @Test
+        void getAllByFilterShouldReturnPageOfTaskResponse() {
             var pageable = Pageable.ofSize(2);
             var taskFilter = TaskFilterTestData.builder().build().buildTaskFilter();
             var tasks = List.of(TaskTestData.builder().build().buildTask());
@@ -156,13 +194,25 @@ class TaskServiceImplTest {
 
     @Nested
     class Update {
+        @BeforeEach
+        void setUp() {
+            var securityContext = mock(SecurityContext.class);
+            var authentication = mock(Authentication.class);
+
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(authentication.getPrincipal()).thenReturn(new User());
+
+            SecurityContextHolder.setContext(securityContext);
+        }
+
         @Test
         void updateShouldReturnTaskResponse() {
             // given
+            var userProfile = UserProfileTestData.builder().build().buildUserProfile();
+            var taskHistory = TaskHistoryTestData.builder().build().buildTaskHistory();
             var taskRequest = TaskTestData.builder().build().buildTaskRequest();
             var expected = TaskTestData.builder().build().buildTaskResponse();
             var task = TaskTestData.builder().build().buildTask();
-            var userProfile = UserProfileTestData.builder().build().buildUserProfile();
             var project = ProjectTestData.builder().build().buildProject();
 
             when(taskRepository.findById(task.getId())).thenReturn(Optional.of(task));
@@ -172,6 +222,8 @@ class TaskServiceImplTest {
             when(taskMapper.update(taskRequest, task)).thenReturn(task);
             when(taskRepository.save(task)).thenReturn(task);
             when(taskMapper.toTaskResponse(task)).thenReturn(expected);
+            when(taskHistoryMapper.toTaskHistory(any(TaskHistoryRequest.class))).thenReturn(taskHistory);
+            when(taskHistoryRepository.save(taskHistory)).thenReturn(taskHistory);
 
             // when
             var actual = taskService.update(1L, taskRequest);

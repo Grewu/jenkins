@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db-tasks:5432/postgres
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: true
+  security:
+    secret: 2A462D4A614E645267556B58703273357638792F423F4428472B4B6250655368566D597133743677397A244326462948404D635166546A576E5A723475377821
+    issuer: Senla
+server:
+  port: 8080

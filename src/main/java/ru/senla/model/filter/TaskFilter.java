@@ -15,7 +15,7 @@ public record TaskFilter(
 
         Long project,
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime dueDate,
 
         StatusType status,
