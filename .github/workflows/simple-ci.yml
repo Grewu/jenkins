@@ -1,3 +1,13 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - spring-boot  # Или ветка, на которую вы хотите реагировать
+  pull_request:
+    branches:
+      - main  # Или ветка, на которую вы хотите реагировать
+
 jobs:
   build:
     runs-on: ubuntu-latest
