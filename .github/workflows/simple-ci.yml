@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'temurin' # Или используйте 'adopt' или 'zulu' в зависимости от ваших предпочтений
+          distribution: 'temurin'
 
       # Собираем проект и запускаем тесты
       - name: Build and Test
