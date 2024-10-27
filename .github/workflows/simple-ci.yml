@@ -1,11 +1,3 @@
-name: CI
-
-on:
-  push:
-    branches: [ spring-boot ]
-  pull_request:
-    branches: [ main ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,18 +17,17 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # Вывод структуры каталогов для отладки
-      - name: List directory contents
-        run: ls -R
+      # Публикуем logging-starter в MavenLocal
+      - name: Publish logging-starter to MavenLocal
+        run: |
+          cd logging-starter
+          ./gradlew publishToMavenLocal
 
+      # Публикуем exception-handling-starter в MavenLocal
       - name: Publish exception-handling-starter to MavenLocal
         run: |
-          cd exception-handling-starter  # Переходим в директорию exception-handling-starter
-          ../gradlew publishToMavenLocal  # Запускаем gradlew из корневой директории
-
-      # Публикуем основной проект в MavenLocal
-      - name: Publish main project to MavenLocal
-        run: ./gradlew publishToMavenLocal
+          cd exception-handling-starter
+          ../gradlew publishToMavenLocal
 
       # Собираем проект и запускаем тесты
       - name: Build and Test

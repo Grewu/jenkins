@@ -8,8 +8,8 @@ group 'ru.senla'
 version = '1.0.0'
 
 repositories {
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
 }
 
 publishing {
