@@ -25,10 +25,14 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      # Вывод структуры каталогов для отладки
+      - name: List directory contents
+        run: ls -R
+
       # Публикуем exception-handling-starter в MavenLocal
       - name: Publish exception-handling-starter to MavenLocal
         run: |
-          cd ../exception-handling-starter  # Переход на уровень выше и в папку exception-handling-starter
+          cd exception-handling-starter  # Переходим в директорию exception-handling-starter
           ./gradlew publishToMavenLocal
 
       # Публикуем основной проект в MavenLocal
