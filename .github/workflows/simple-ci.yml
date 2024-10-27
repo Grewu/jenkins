@@ -33,7 +33,7 @@ jobs:
       - name: Publish exception-handling-starter to MavenLocal
         run: |
           cd exception-handling-starter  # Переходим в директорию exception-handling-starter
-          ./gradlew publishToMavenLocal
+          ../gradlew publishToMavenLocal  # Запускаем gradlew из корневой директории
 
       # Публикуем основной проект в MavenLocal
       - name: Publish main project to MavenLocal
