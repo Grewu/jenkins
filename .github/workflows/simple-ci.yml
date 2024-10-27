@@ -2,7 +2,7 @@ name: Simple CI
 
 on:
   push:
-    branches: [ spring-boot ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -19,12 +19,12 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
+          distribution: 'temurin' # Или используйте 'adopt' или 'zulu' в зависимости от ваших предпочтений
 
       # Собираем проект и запускаем тесты
       - name: Build and Test
         run: ./gradlew clean build
 
-      # Уведомление об успешной сборке
       - name: Notify on Success
         if: success()
         run: echo "Сборка прошла успешно!"
