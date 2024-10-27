@@ -29,7 +29,6 @@ jobs:
       - name: List directory contents
         run: ls -R
 
-      # Публикуем exception-handling-starter в MavenLocal
       - name: Publish exception-handling-starter to MavenLocal
         run: |
           cd exception-handling-starter  # Переходим в директорию exception-handling-starter
