@@ -25,6 +25,10 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      # Публикуем в MavenLocal
+      - name: Publish to MavenLocal
+        run: ./gradlew publishToMavenLocal
+
       # Собираем проект и запускаем тесты
       - name: Build and Test
         run: ./gradlew clean build --info
