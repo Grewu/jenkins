@@ -6,6 +6,13 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO for creating a comment request.
+ * <p>
+ * This class includes information about a comment, including the associated task,
+ * user profile, comment text, and creation timestamp.
+ * </p>
+ */
 public record CommentRequest(
         @NotNull(message = "Task ID must not be null")
         Long task,

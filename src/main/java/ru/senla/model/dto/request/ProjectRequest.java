@@ -7,6 +7,13 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO for creating a project request.
+ * <p>
+ * This class includes information required to create a project, such as its name, code, description,
+ * start and end dates, and the owner's ID.
+ * </p>
+ */
 public record ProjectRequest(
         @NotBlank(message = "Project name must not be blank")
         String name,

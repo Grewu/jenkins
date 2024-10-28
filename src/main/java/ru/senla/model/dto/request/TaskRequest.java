@@ -8,6 +8,13 @@ import ru.senla.model.entity.enums.StatusType;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO for creating a task request.
+ * <p>
+ * This class holds the essential information needed to create a task, including its name, assigned user,
+ * creator, project association, due date, status, and priority level.
+ * </p>
+ */
 public record TaskRequest(
         @NotBlank(message = "Name must not be blank")
         String name,

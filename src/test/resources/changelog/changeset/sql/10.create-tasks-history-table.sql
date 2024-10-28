@@ -6,7 +6,7 @@ CREATE TABLE tasks_history
     project_id          BIGINT,
     assigned_to         BIGINT,
     created_by          BIGINT,
-    due_date            DATE          NOT NULL,
+    due_date            TIMESTAMP     NOT NULL,
     status              status_type   NOT NULL,
     priority            priority_type NOT NULL,
     changed_by          BIGINT        NOT NULL,

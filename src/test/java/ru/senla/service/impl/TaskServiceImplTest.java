@@ -27,6 +27,7 @@ import ru.senla.repository.api.ProjectRepository;
 import ru.senla.repository.api.TaskHistoryRepository;
 import ru.senla.repository.api.TaskRepository;
 import ru.senla.repository.api.UserProfileRepository;
+import ru.senla.service.api.NotificationService;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +59,9 @@ class TaskServiceImplTest {
 
     @Mock
     private ProjectRepository projectRepository;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private TaskServiceImpl taskService;

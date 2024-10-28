@@ -6,6 +6,15 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration class for OpenAPI documentation.
+ *
+ * <p>
+ * This class configures OpenAPI documentation for the Task Management System.
+ * It sets the title and version of the API and defines security schemes for
+ * bearer token authentication using JWT.
+ * </p>
+ */
 @Configuration
 @OpenAPIDefinition(info = @Info(
         title = "Task management system",

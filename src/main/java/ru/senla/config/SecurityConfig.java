@@ -13,6 +13,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import ru.senla.controller.filter.ExceptionFilter;
 import ru.senla.controller.filter.JwtFilter;
 
+/**
+ * Security configuration class for setting up Spring Security.
+ *
+ * <p>
+ * This class configures security settings for the web application, including
+ * authentication and authorization policies, as well as custom filters for
+ * handling JWT authentication and exception management.
+ * </p>
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -22,6 +31,19 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final ExceptionFilter exceptionFilter;
 
+    /**
+     * Configures the security filter chain for the application.
+     *
+     * <p>
+     * This method sets up the security configuration, including CSRF protection,
+     * HTTP basic authentication, session management, and authorization rules.
+     * It also adds custom filters for JWT authentication and exception handling.
+     * </p>
+     *
+     * @param http the HttpSecurity object to configure
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -46,5 +68,4 @@ public class SecurityConfig {
                 .addFilterBefore(exceptionFilter, JwtFilter.class)
                 .build();
     }
-
 }

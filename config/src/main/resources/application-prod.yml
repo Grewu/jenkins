@@ -8,5 +8,16 @@ spring:
   security:
     secret: 2A462D4A614E645267556B58703273357638792F423F4428472B4B6250655368566D597133743677397A244326462948404D635166546A576E5A723475377821
     issuer: Senla
+  mail:
+    username: testsenderemailexample@gmail.com
+    password: vhpp euxu sppa uevm
+    host: smtp.gmail.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    port: 587
 server:
   port: 8080

@@ -18,6 +18,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The JwtTokenServiceImpl class implements the TokenService interface
+ * to provide functionality for generating and validating JSON Web Tokens (JWT).
+ */
 @Service
 public class JwtTokenServiceImpl implements TokenService {
 
@@ -27,6 +31,12 @@ public class JwtTokenServiceImpl implements TokenService {
     @Value("${spring.security.issuer}")
     private String issuer;
 
+    /**
+     * Generates a JWT for the given user.
+     *
+     * @param user the user for whom the token is generated
+     * @return a signed JWT as a string
+     */
     @Override
     public String generateToken(User user) {
         var authorities = user.getAuthorities().stream()
@@ -41,18 +51,38 @@ public class JwtTokenServiceImpl implements TokenService {
                 .compact();
     }
 
+    /**
+     * Retrieves the email from the given JWT.
+     *
+     * @param token the JWT to extract the email from
+     * @return the email contained in the JWT
+     * @throws InvalidTokenException if the token is invalid or expired
+     */
     @Override
     public String getEmail(String token) {
         checkToken(token);
         return getClaims(token).getSubject();
     }
 
+    /**
+     * Retrieves the authorities from the given JWT.
+     *
+     * @param token the JWT to extract the authorities from
+     * @return a list of authorities contained in the JWT
+     * @throws InvalidTokenException if the token is invalid or expired
+     */
     @Override
     public List<String> getAuthorities(String token) {
-        checkToken(token);
+        checkToken(token); // Validate the token
         return getClaims(token).get("authorities", List.class);
     }
 
+    /**
+     * Validates the provided JWT token, checking its expiration.
+     *
+     * @param token the JWT to validate
+     * @throws InvalidTokenException if the token is expired or invalid
+     */
     private void checkToken(String token) {
         boolean isValid;
         try {
@@ -65,6 +95,12 @@ public class JwtTokenServiceImpl implements TokenService {
         }
     }
 
+    /**
+     * Parses the claims from the provided JWT.
+     *
+     * @param token the JWT to parse claims from
+     * @return the claims contained in the JWT
+     */
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
@@ -74,6 +110,11 @@ public class JwtTokenServiceImpl implements TokenService {
                 .getBody();
     }
 
+    /**
+     * Retrieves the signing key from the base64-encoded secret.
+     *
+     * @return the signing key used for token signing
+     */
     private Key getSignInKey() {
         byte[] decode = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(decode);

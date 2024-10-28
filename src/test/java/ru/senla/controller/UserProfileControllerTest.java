@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.senla.data.CommentTestData;
 import ru.senla.data.UserProfileTestData;
 import ru.senla.service.api.UserProfileService;
 
@@ -32,6 +33,7 @@ class UserProfileControllerTest {
 
     private static final String URL = "/api/v0/user_profiles";
     private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
+    private static final String URL_WITH_USERPROFILE_ID = URL + "/{userProfileId}/comments";
 
     @Nested
     class Create {
@@ -103,6 +105,36 @@ class UserProfileControllerTest {
 
     @Nested
     class GetAll {
+        @Test
+        @WithMockUser(authorities = {"user_profile:read", "comments:read"})
+        void getCommentsByProfileIdShouldReturnPageOfCommentsResponse() throws Exception {
+            var pageable = Pageable.ofSize(2);
+            var userProfileId = UserProfileTestData.builder().build().buildUserProfile().getId();
+            var expectedResponses = List.of(
+                    CommentTestData.builder().build().buildCommentResponse(),
+                    CommentTestData.builder().withId(2L).build().buildCommentResponse()
+            );
+
+            when(userProfileService.getAllCommentsByProfileId(anyLong(), any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(expectedResponses, pageable, expectedResponses.size()));
+
+            //when
+            mockMvc.perform(get(URL_WITH_USERPROFILE_ID, userProfileId)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    // then
+                    .andExpectAll(
+                            status().isOk(),
+                            content().contentType(MediaType.APPLICATION_JSON)
+                    ).andExpect(jsonPath("$.content").isNotEmpty())
+                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
+                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
+                    .andExpect(jsonPath("$.content[0].commentText").value(
+                            expectedResponses.get(0).commentText()))
+                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
+                    .andExpect(jsonPath("$.content[1].commentText").value(
+                            expectedResponses.get(1).commentText()));
+        }
+
         @Test
         @WithMockUser(authorities = {"user_profile:read"})
         void getAllShouldReturnListOfUserProfileResponses() throws Exception {

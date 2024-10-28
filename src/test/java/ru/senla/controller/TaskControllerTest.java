@@ -113,10 +113,9 @@ class TaskControllerTest {
 
     @Nested
     class GetAll {
-
         @Test
         @WithMockUser(authorities = {"task:read", "task_history:read"})
-        void getAllTaskHistoryByTaskIdShouldReturnListOfTaskHistoryResponse() throws Exception {
+        void getAllTaskHistoryByTaskIdShouldReturnPageOfTaskHistoryResponse() throws Exception {
             var pageable = Pageable.ofSize(2);
             var taskId = TaskTestData.builder().build().buildTask().getId();
             var expectedResponses = List.of(
@@ -168,7 +167,7 @@ class TaskControllerTest {
 
         @Test
         @WithMockUser(authorities = {"task:read"})
-        void getAllByFilterShouldReturnListOfTaskResponses() throws Exception {
+        void getAllByFilterShouldReturnPageOfTaskResponses() throws Exception {
             var pageable = Pageable.ofSize(2);
             var expectedResponses = List.of(
                     TaskTestData.builder().build().buildTaskResponse(),
@@ -222,7 +221,7 @@ class TaskControllerTest {
 
         @Test
         @WithMockUser(authorities = {"task:read"})
-        void getAllShouldReturnListOfTaskResponses() throws Exception {
+        void getAllShouldReturnPageOfTaskResponses() throws Exception {
             // given
             var pageable = Pageable.ofSize(2);
             var expectedResponses = List.of(

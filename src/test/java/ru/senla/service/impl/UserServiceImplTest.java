@@ -43,6 +43,7 @@ class UserServiceImplTest {
 
     private static final String MOCKED_TOKEN = "mocked-token";
     private static final String ENCODED_PASSWORD = "encodedPassword";
+    private static final String EXCEPTION_ERROR = "Database error";
 
     @Nested
     class GetAuthorizationToken {
@@ -144,7 +145,7 @@ class UserServiceImplTest {
 
             when(userMapper.toUser(userRequest)).thenReturn(user);
             when(passwordEncoder.encode(userRequest.password())).thenReturn(ENCODED_PASSWORD);
-            when(userRepository.save(any(User.class))).thenThrow(new DataAccessException("Database error") {
+            when(userRepository.save(any(User.class))).thenThrow(new DataAccessException(EXCEPTION_ERROR) {
             });
 
             // when & then

@@ -23,15 +23,48 @@ import ru.senla.model.dto.request.CommentRequest;
 import ru.senla.model.dto.response.CommentResponse;
 import ru.senla.service.api.CommentService;
 
+/**
+ * The CommentRestController class provides REST endpoints for managing comments.
+ * This controller supports operations for creating, retrieving, updating, and deleting comments.
+ * Each endpoint has specific authorization requirements and supports JSON media type responses.
+ * It uses {@link CommentService} to perform business logic for comment management.
+ *
+ * <p>Endpoints:</p>
+ * <ul>
+ *     <li><b>POST /api/v0/comments</b>: Creates a new comment.</li>
+ *     <li><b>GET /api/v0/comments</b>: Retrieves a paginated list of all comments.</li>
+ *     <li><b>GET /api/v0/comments/{id}</b>: Retrieves a comment by its ID.</li>
+ *     <li><b>PUT /api/v0/comments/{id}</b>: Updates a comment with the specified ID.</li>
+ *     <li><b>DELETE /api/v0/comments/{id}</b>: Deletes a comment with the specified ID.</li>
+ * </ul>
+ *
+ * <p>Authorization Requirements:</p>
+ * <ul>
+ *     <li><b>comments:write</b> permission is required for creating and updating comments.</li>
+ *     <li><b>comments:read</b> permission is required for retrieving comments.</li>
+ *     <li><b>comments:delete</b> permission is required for deleting comments.</li>
+ * </ul>
+ *
+ * @see CommentRequest
+ * @see CommentResponse
+ * @see CommentService
+ */
 @Logging
 @Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = CommentRestController.COMMENT_API_PATH)
 public class CommentRestController {
+
     protected static final String COMMENT_API_PATH = "/api/v0/comments";
     private final CommentService commentService;
 
+    /**
+     * Creates a new comment.
+     *
+     * @param commentRequest the {@link CommentRequest} object containing details of the comment to create.
+     * @return a {@link ResponseEntity} containing the created {@link CommentResponse} with HTTP status 201 (Created).
+     */
     @PostMapping
     @PreAuthorize("hasAuthority('comments:write')")
     public ResponseEntity<CommentResponse> create(@Valid @RequestBody CommentRequest commentRequest) {
@@ -40,6 +73,12 @@ public class CommentRestController {
                 .body(commentService.create(commentRequest));
     }
 
+    /**
+     * Retrieves a paginated list of all comments.
+     *
+     * @param pageable the pagination information, with a default page size of 20.
+     * @return a {@link ResponseEntity} containing a {@link Page} of {@link CommentResponse} objects with HTTP status 200 (OK).
+     */
     @GetMapping
     @PreAuthorize("hasAuthority('comments:read')")
     public ResponseEntity<Page<CommentResponse>> getAll(@PageableDefault(20) Pageable pageable) {
@@ -48,7 +87,12 @@ public class CommentRestController {
                 .body(commentService.getAll(pageable));
     }
 
-
+    /**
+     * Retrieves a comment by its ID.
+     *
+     * @param id the ID of the comment to retrieve.
+     * @return a {@link ResponseEntity} containing the {@link CommentResponse} with HTTP status 200 (OK).
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('comments:read')")
     public ResponseEntity<CommentResponse> getById(@PathVariable Long id) {
@@ -57,6 +101,13 @@ public class CommentRestController {
                 .body(commentService.getById(id));
     }
 
+    /**
+     * Updates an existing comment with the specified ID.
+     *
+     * @param id             the ID of the comment to update.
+     * @param commentRequest the {@link CommentRequest} object containing updated details of the comment.
+     * @return a {@link ResponseEntity} containing the updated {@link CommentResponse} with HTTP status 200 (OK).
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('comments:write')")
     public ResponseEntity<CommentResponse> update(@PathVariable Long id,
@@ -66,12 +117,16 @@ public class CommentRestController {
                 .body(commentService.update(id, commentRequest));
     }
 
-
+    /**
+     * Deletes a comment with the specified ID.
+     *
+     * @param id the ID of the comment to delete.
+     * @return a {@link ResponseEntity} with HTTP status 204 (No Content) indicating successful deletion.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('comments:delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         commentService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

@@ -8,7 +8,23 @@ import ru.senla.model.filter.TaskFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Utility class for generating JPA Specifications for Task filtering.
+ */
 public class TaskSpecificationGenerator {
+
+    /**
+     * Converts a {@link TaskFilter} into a {@link Specification} for the {@link Task} entity.
+     *
+     * <p>
+     * This method builds a compound predicate based on the filter criteria provided
+     * in the {@link TaskFilter} object. It constructs a {@link Specification} that can
+     * be used in repository queries to filter tasks according to the specified criteria.
+     * </p>
+     *
+     * @param filter the filter criteria to apply when querying tasks
+     * @return a {@link Specification} representing the filtering criteria
+     */
     public static Specification<Task> filterToSpecification(TaskFilter filter) {
         return ((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

@@ -4,7 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * DTO for a project response.
+ * <p>
+ * This class encapsulates the details of a project, including its unique identifier, name, project code,
+ * description, start and end dates, and the ID of the owner.
+ * </p>
+ */
 public record ProjectResponse(
         Long id,
         String name,

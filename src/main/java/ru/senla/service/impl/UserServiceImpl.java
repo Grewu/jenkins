@@ -19,7 +19,10 @@ import ru.senla.service.api.UserService;
 
 import java.util.Optional;
 
-
+/**
+ * Implementation of the UserService interface, providing methods to manage users,
+ * including user creation and authentication.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -30,6 +33,14 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
+    /**
+     * Generates an authorization token for a user based on their email and password.
+     *
+     * @param userRequest the request containing the user's email and password
+     * @return the generated authorization token
+     * @throws InvalidEmailException    if the provided email does not exist
+     * @throws InvalidPasswordException if the provided password is incorrect
+     */
     @Override
     public String getAuthorizationToken(UserRequest userRequest) throws InvalidEmailException {
         return userRepository.findByEmail(userRequest.email())
@@ -43,13 +54,26 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new InvalidEmailException(userRequest.email()));
     }
 
-
+    /**
+     * Loads a user by their email address.
+     *
+     * @param email the email address of the user
+     * @return the UserDetails object for the user
+     * @throws EntityNotFoundException if the user with the given email does not exist
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws EntityNotFoundException {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, email));
     }
 
+    /**
+     * Creates a new user based on the provided UserRequest.
+     *
+     * @param userRequest the request containing user details for creation
+     * @return the response containing the created user details
+     * @throws InvalidEmailException if the email is already in use or invalid
+     */
     @Override
     @Transactional
     public UserResponse create(UserRequest userRequest) throws InvalidEmailException {

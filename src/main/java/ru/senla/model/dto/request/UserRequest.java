@@ -5,6 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+/**
+ * DTO for creating a user request.
+ * <p>
+ * This class holds essential information for creating a new user, including their email, password, and role ID.
+ * </p>
+ */
 public record UserRequest(
         @NotBlank(message = "Email must not be blank")
         @Email(message = "Email must be a valid email address")

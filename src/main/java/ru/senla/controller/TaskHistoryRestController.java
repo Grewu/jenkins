@@ -22,15 +22,47 @@ import ru.senla.model.dto.request.TaskHistoryRequest;
 import ru.senla.model.dto.response.TaskHistoryResponse;
 import ru.senla.service.api.TaskHistoryService;
 
+/**
+ * The TaskHistoryRestController class provides REST endpoints for managing task history records.
+ * This controller allows clients to retrieve, update, and delete task history entities.
+ * Each endpoint has specific authorization requirements and supports JSON responses.
+ * It uses {@link TaskHistoryService} to handle the business logic related to task history management.
+ *
+ * <p>Endpoints:</p>
+ * <ul>
+ *     <li><b>GET /api/v0/task_history</b>: Retrieves a paginated list of all task history records.</li>
+ *     <li><b>GET /api/v0/task_history/{id}</b>: Retrieves a specific task history record by its ID.</li>
+ *     <li><b>PUT /api/v0/task_history/{id}</b>: Updates a specific task history record by its ID.</li>
+ *     <li><b>DELETE /api/v0/task_history/{id}</b>: Deletes a specific task history record by its ID.</li>
+ * </ul>
+ *
+ * <p>Authorization Requirements:</p>
+ * <ul>
+ *     <li><b>task_history:read</b> permission is required for retrieving task history records.</li>
+ *     <li><b>task_history:write</b> permission is required for updating task history records.</li>
+ *     <li><b>task_history:delete</b> permission is required for deleting task history records.</li>
+ * </ul>
+ *
+ * @see TaskHistoryRequest
+ * @see TaskHistoryResponse
+ * @see TaskHistoryService
+ */
 @Logging
 @Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = TaskHistoryRestController.TASK_API_PATH)
 public class TaskHistoryRestController {
+
     protected static final String TASK_API_PATH = "/api/v0/task_history";
     private final TaskHistoryService taskHistoryService;
 
+    /**
+     * Retrieves a paginated list of all task history records.
+     *
+     * @param pageable the pagination information, with a default page size of 20.
+     * @return a {@link ResponseEntity} containing a {@link Page} of {@link TaskHistoryResponse} objects with HTTP status 200 (OK).
+     */
     @GetMapping
     @PreAuthorize("hasAuthority('task_history:read')")
     public ResponseEntity<Page<TaskHistoryResponse>> getAll(@PageableDefault(20) Pageable pageable) {
@@ -39,6 +71,12 @@ public class TaskHistoryRestController {
                 .body(taskHistoryService.getAll(pageable));
     }
 
+    /**
+     * Retrieves a specific task history record by its ID.
+     *
+     * @param id the ID of the task history record to retrieve.
+     * @return a {@link ResponseEntity} containing the {@link TaskHistoryResponse} with HTTP status 200 (OK).
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('task_history:read')")
     public ResponseEntity<TaskHistoryResponse> getById(@PathVariable Long id) {
@@ -47,6 +85,13 @@ public class TaskHistoryRestController {
                 .body(taskHistoryService.getById(id));
     }
 
+    /**
+     * Updates an existing task history record with the specified ID.
+     *
+     * @param id                 the ID of the task history record to update.
+     * @param taskHistoryRequest the {@link TaskHistoryRequest} object containing updated details of the task history record.
+     * @return a {@link ResponseEntity} containing the updated {@link TaskHistoryResponse} with HTTP status 200 (OK).
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('task_history:write')")
     public ResponseEntity<TaskHistoryResponse> update(@PathVariable Long id,
@@ -56,6 +101,12 @@ public class TaskHistoryRestController {
                 .body(taskHistoryService.update(id, taskHistoryRequest));
     }
 
+    /**
+     * Deletes a task history record with the specified ID.
+     *
+     * @param id the ID of the task history record to delete.
+     * @return a {@link ResponseEntity} with HTTP status 204 (No Content) indicating successful deletion.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('task_history:delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -63,3 +114,4 @@ public class TaskHistoryRestController {
         return ResponseEntity.noContent().build();
     }
 }
+

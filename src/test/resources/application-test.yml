@@ -7,3 +7,14 @@ spring:
     password: test
   liquibase:
     change-log: changelog/db.changelog-test-master.yaml
+  mail:
+    username: test
+    password: test
+    host: smtp.gmail.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    port: 587

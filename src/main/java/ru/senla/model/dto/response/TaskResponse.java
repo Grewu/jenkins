@@ -6,6 +6,13 @@ import ru.senla.model.entity.enums.StatusType;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO for a task response.
+ * <p>
+ * This class represents the details of a task, including its unique identifier, name, associated project,
+ * assigned user, creator, due date, status, and priority.
+ * </p>
+ */
 public record TaskResponse(
         Long id,
         String name,

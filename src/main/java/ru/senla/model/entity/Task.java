@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tasks")
+@NamedEntityGraph(
+        name = "task_entity_graph",
+        attributeNodes = {
+                @NamedAttributeNode("project"),
+                @NamedAttributeNode("assignedTo"),
+                @NamedAttributeNode("createdBy")
+        }
+)
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

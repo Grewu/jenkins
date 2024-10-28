@@ -8,6 +8,13 @@ import ru.senla.model.entity.enums.StatusType;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO for creating a task history request.
+ * <p>
+ * This class contains details about a task's history, including its name, associated project,
+ * assigned user, creator, due date, status, priority, and information on changes made.
+ * </p>
+ */
 public record TaskHistoryRequest(
         @NotNull(message = "Task ID must not be null")
         Long task,

@@ -1,5 +1,12 @@
 package ru.senla.model.dto.response;
 
+/**
+ * DTO for a user response.
+ * <p>
+ * This class contains the details of a user account, including the user's unique identifier,
+ * email address, and role ID.
+ * </p>
+ */
 public record UserResponse(
         Long id,
         String email,
