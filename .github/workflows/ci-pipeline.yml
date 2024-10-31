@@ -23,15 +23,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew  # Установка прав на выполнение для gradlew.
 
+      - name: Publish to Maven Local
+        run: ../gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий.
+
+      - name: Publish to Maven Local 2
+        run: ../gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий.
+
       - name: Build with Gradle
         run: ./gradlew build --refresh-dependencies --info  # Сборка проекта с помощью Gradle и обновление зависимостей с подробной информацией.
 
       - name: Run tests
         run: ./gradlew test --info  # Запуск тестов с подробной информацией.
-
-      - name: Publish to Maven Local (optional)
-        if: success()  # Условие, при котором выполняется публикация, только если сборка прошла успешно
-        run: ./gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий, если это нужно.
 
       - name: Clean up (optional)
         if: success()  # Удаление временных файлов или очистка кэша, если это необходимо
