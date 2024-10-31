@@ -1,0 +1,25 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - spring-boot  # Измените на нужную ветку.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Укажите окружение, на котором будет выполняться сборка.
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # Проверка кода из репозитория.
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2  # Установка JDK.
+        with:
+          java-version: '17'  # Укажите версию Java.
+
+      - name: Build with Gradle
+        run: ./gradlew build  # Сборка проекта с помощью Gradle.
+
+      - name: Run tests
+        run: ./gradlew test  # Запуск тестов.

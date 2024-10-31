@@ -1,6 +1,8 @@
 plugins {
+    id 'jacoco'
     id 'java-library'
     id 'maven-publish'
+    id "com.diffplug.spotless" version "7.0.0.BETA4"
     id 'io.freefair.lombok' version '8.0.1'
 }
 
@@ -54,9 +56,29 @@ tasks.named('test') {
 }
 
 tasks.named("build") {
+    dependsOn 'spotlessApply'
     finalizedBy('publishToMavenLocal')
 }
 
 tasks.named('compileJava') {
     inputs.files(tasks.named('processResources'))
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        target 'src/**/*.java'
+    }
+}
+
+jacoco {
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
 }

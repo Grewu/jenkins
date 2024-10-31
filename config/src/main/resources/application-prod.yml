@@ -12,16 +12,29 @@ spring:
     username: testsenderemailexample@gmail.com
     password: vhpp euxu sppa uevm
     host: smtp.gmail.com
+    port: 587
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-    port: 587
 
 notification:
   cron: "0 0 9 * * ?"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
 
 server:
   port: 8080

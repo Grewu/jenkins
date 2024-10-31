@@ -1,4 +1,3 @@
 package ru.senla.util;
 
-public class MockEntity {
-}
+public class MockEntity {}

@@ -13,33 +13,32 @@ import ru.senla.exception.InvalidEmailException;
 import ru.senla.exception.InvalidPasswordException;
 import ru.senla.exception.InvalidTokenException;
 
-
 @RestController
 @RequestMapping("/fake")
 public class ControllerFake {
 
-    @GetMapping("/entity/{id}")
-    ResponseEntity<DtoFake> throwEntityNotFoundException(@PathVariable Long id) {
-        throw new EntityNotFoundException(DtoFake.class, id);
-    }
+  @GetMapping("/entity/{id}")
+  ResponseEntity<DtoFake> throwEntityNotFoundException(@PathVariable Long id) {
+    throw new EntityNotFoundException(DtoFake.class, id);
+  }
 
-    @GetMapping("/email/{email}")
-    ResponseEntity<Void> throwInvalidEmailException(@PathVariable String email) {
-        throw new InvalidEmailException(email);
-    }
+  @GetMapping("/email/{email}")
+  ResponseEntity<Void> throwInvalidEmailException(@PathVariable String email) {
+    throw new InvalidEmailException(email);
+  }
 
-    @PostMapping("/token")
-    ResponseEntity<Void> InvalidTokenException() {
-        throw new InvalidTokenException();
-    }
+  @PostMapping("/token")
+  ResponseEntity<Void> InvalidTokenException() {
+    throw new InvalidTokenException();
+  }
 
-    @PostMapping("/password/{password}")
-    ResponseEntity<Void> InvalidPasswordException(@PathVariable String password) {
-        throw new InvalidPasswordException(password);
-    }
+  @PostMapping("/password/{password}")
+  ResponseEntity<Void> InvalidPasswordException(@PathVariable String password) {
+    throw new InvalidPasswordException(password);
+  }
 
-    @PostMapping("/valid")
-    ResponseEntity<Void> throwValidationException(@Valid @RequestBody DtoFake dto) {
-        return ResponseEntity.ok().build();
-    }
+  @PostMapping("/valid")
+  ResponseEntity<Void> throwValidationException(@Valid @RequestBody DtoFake dto) {
+    return ResponseEntity.ok().build();
+  }
 }
