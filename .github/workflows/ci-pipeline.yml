@@ -1,37 +1,29 @@
-name: CI Pipeline
-
-on:
-  push:
-    branches:
-      - main
-      - spring-boot  # Указываем ветку для запуска CI
-
 jobs:
   build:
-    runs-on: ubuntu-latest  # Укажите окружение, на котором будет выполняться сборка.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # Обновленная версия для проверки кода из репозитория.
+        uses: actions/checkout@v3
 
       - name: Set up JDK
-        uses: actions/setup-java@v3  # Обновленная версия для установки JDK.
+        uses: actions/setup-java@v3
         with:
-          java-version: '17'  # Укажите версию Java.
-          distribution: 'temurin'  # Укажите дистрибутив (temurin, zulu и т.д.)
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew  # Установка прав на выполнение для gradlew.
+        run: chmod +x gradlew
 
-      - name: Publish to Maven Local
-        run: ./gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий.
+      - name: Publish logging-starter to Maven Local
+        run: ./gradlew :logging-starter:publishToMavenLocal  # Публикация logging-starter в локальный Maven-репозиторий
 
       - name: Build with Gradle
-        run: ./gradlew build --refresh-dependencies --info  # Сборка проекта с помощью Gradle и обновление зависимостей с подробной информацией.
+        run: ./gradlew build --refresh-dependencies --info
 
       - name: Run tests
-        run: ./gradlew test --info  # Запуск тестов с подробной информацией.
+        run: ./gradlew test --info
 
-      - name: Clean up
-        if: success()  # Удаление временных файлов или очистка кэша, если это необходимо
-        run: ./gradlew clean  # Очистка проекта после сборки и тестирования.
+      - name: Clean up (optional)
+        if: success()
+        run: ./gradlew clean
