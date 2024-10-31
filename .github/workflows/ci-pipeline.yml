@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - spring-boot  # »змените на нужную ветку.
+      - spring-boot
 
 jobs:
   build:
@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-java@v2  # ”становка JDK.
         with:
           java-version: '17'  # ”кажите версию Java.
+          distribution: 'temurin'  # ”кажите дистрибуцию JDK (например, 'temurin' дл€ Adoptium).
 
       - name: Build with Gradle
         run: ./gradlew build  # —борка проекта с помощью Gradle.
