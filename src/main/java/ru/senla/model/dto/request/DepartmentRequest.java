@@ -5,12 +5,8 @@ import ru.senla.model.entity.enums.DepartmentType;
 
 /**
  * DTO for creating a department request.
- * <p>
- * This class contains information about a department, specifically its type.
- * </p>
+ *
+ * <p>This class contains information about a department, specifically its type.
  */
 public record DepartmentRequest(
-        @NotNull(message = "Department name cannot be null")
-        DepartmentType name
-) {
-}
+    @NotNull(message = "Department name cannot be null") DepartmentType name) {}

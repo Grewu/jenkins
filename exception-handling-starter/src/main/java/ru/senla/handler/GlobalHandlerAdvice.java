@@ -1,6 +1,5 @@
 package ru.senla.handler;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +12,18 @@ import ru.senla.exception.ExceptionMessage;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * The {@code GlobalHandlerAdvice} class is a global exception handler
+ * for REST controllers, responsible for managing and handling exceptions
+ * thrown during the processing of web requests.
+ *
+ * <p>
+ * This class leverages Spring's {@code @RestControllerAdvice} to
+ * provide centralized exception handling across all controllers.
+ * It captures specific exceptions and returns structured error
+ * responses to the clients.
+ * </p>
+ */
 @Logging
 @RestControllerAdvice
 public class GlobalHandlerAdvice {

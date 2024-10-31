@@ -23,38 +23,37 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users_profiles")
-@NamedEntityGraph(name = "userProfile_entity-graph",
-        attributeNodes = {
-                @NamedAttributeNode("position"),
-                @NamedAttributeNode("department"),
-                @NamedAttributeNode("user")
-        }
-
-)
+@NamedEntityGraph(
+    name = "userProfile_entity-graph",
+    attributeNodes = {
+      @NamedAttributeNode("position"),
+      @NamedAttributeNode("department"),
+      @NamedAttributeNode("user")
+    })
 public class UserProfile {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+  @Column(name = "first_name", nullable = false)
+  private String firstName;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+  @Column(name = "last_name", nullable = false)
+  private String lastName;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "position_id", referencedColumnName = "id", nullable = false)
-    private Position position;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "position_id", referencedColumnName = "id", nullable = false)
+  private Position position;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", referencedColumnName = "id")
-    private Department department;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "department_id", referencedColumnName = "id")
+  private Department department;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+  private User user;
 
-    public UserProfile(Long assignedTo) {
-        this.id = assignedTo;
-    }
+  public UserProfile(Long assignedTo) {
+    this.id = assignedTo;
+  }
 }

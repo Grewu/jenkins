@@ -10,7 +10,8 @@ import ru.senla.repository.AbstractRepository;
 
 @Repository
 public interface CommentRepository extends AbstractRepository<Long, Comment> {
-    @Query("""
+  @Query(
+      """
             SELECT new ru.senla.model.entity.Comment(
                c.id,
                c.task,
@@ -21,5 +22,6 @@ public interface CommentRepository extends AbstractRepository<Long, Comment> {
             FROM Comment c
             WHERE c.usersProfile.id = :userProfileId
             """)
-    Page<Comment> findCommentsByProfileId(@Param("userProfileId") Long userProfileId, Pageable pageable);
+  Page<Comment> findCommentsByProfileId(
+      @Param("userProfileId") Long userProfileId, Pageable pageable);
 }

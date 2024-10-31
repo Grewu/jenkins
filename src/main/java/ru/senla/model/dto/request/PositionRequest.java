@@ -5,12 +5,8 @@ import ru.senla.model.entity.enums.PositionType;
 
 /**
  * DTO for creating a position request.
- * <p>
- * This class contains information about a position, specifically its type.
- * </p>
+ *
+ * <p>This class contains information about a position, specifically its type.
  */
 public record PositionRequest(
-        @NotNull(message = "Position name cannot be null")
-        PositionType name
-) {
-}
+    @NotNull(message = "Position name cannot be null") PositionType name) {}

@@ -12,9 +12,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.senla.model.entity.enums.DepartmentType;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import ru.senla.model.entity.enums.DepartmentType;
 
 @Getter
 @Setter
@@ -23,17 +23,16 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 @AllArgsConstructor
 @Table(name = "departments")
 public class Department {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "name", nullable = false)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    private DepartmentType name;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "name", nullable = false)
+  @JdbcType(PostgreSQLEnumJdbcType.class)
+  private DepartmentType name;
 
-    public Department(Long departmentId) {
-        this.id = departmentId;
-    }
-
+  public Department(Long departmentId) {
+    this.id = departmentId;
+  }
 }

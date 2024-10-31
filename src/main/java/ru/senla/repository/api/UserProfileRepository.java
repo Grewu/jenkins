@@ -11,7 +11,8 @@ import ru.senla.repository.AbstractRepository;
 @Repository
 public interface UserProfileRepository extends AbstractRepository<Long, UserProfile> {
 
-    @Query("""
+  @Query(
+      """
             SELECT new ru.senla.model.entity.UserProfile(
             u.id,
             u.firstName,
@@ -22,5 +23,5 @@ public interface UserProfileRepository extends AbstractRepository<Long, UserProf
             FROM UserProfile u
             WHERE u.department.id = :departmentId
             """)
-    Page<UserProfile> findByDepartmentId(@Param("departmentId") Long departmentId, Pageable pageable);
+  Page<UserProfile> findByDepartmentId(@Param("departmentId") Long departmentId, Pageable pageable);
 }

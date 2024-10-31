@@ -9,12 +9,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,30 +22,30 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "projects")
 public class Project {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @Column(name = "project_code", nullable = false)
-    private String projectCode;
+  @Column(name = "project_code", nullable = false)
+  private String projectCode;
 
-    @Column(name = "description", nullable = false)
-    private String description;
+  @Column(name = "description", nullable = false)
+  private String description;
 
-    @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+  @Column(name = "start_date", nullable = false)
+  private LocalDateTime startDate;
 
-    @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+  @Column(name = "end_date", nullable = false)
+  private LocalDateTime endDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", referencedColumnName = "id")
-    private UserProfile owner;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "owner_id", referencedColumnName = "id")
+  private UserProfile owner;
 
-    public Project(Long project) {
-        this.id = project;
-    }
+  public Project(Long project) {
+    this.id = project;
+  }
 }

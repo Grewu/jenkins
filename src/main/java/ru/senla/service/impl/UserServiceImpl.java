@@ -1,5 +1,6 @@
 package ru.senla.service.impl;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,78 +18,80 @@ import ru.senla.repository.api.UserRepository;
 import ru.senla.service.api.TokenService;
 import ru.senla.service.api.UserService;
 
-import java.util.Optional;
-
 /**
- * Implementation of the UserService interface, providing methods to manage users,
- * including user creation and authentication.
+ * Implementation of the UserService interface, providing methods to manage users, including user
+ * creation and authentication.
  */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private final UserMapper userMapper;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
+  private final UserMapper userMapper;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final TokenService tokenService;
 
-    /**
-     * Generates an authorization token for a user based on their email and password.
-     *
-     * @param userRequest the request containing the user's email and password
-     * @return the generated authorization token
-     * @throws InvalidEmailException    if the provided email does not exist
-     * @throws InvalidPasswordException if the provided password is incorrect
-     */
-    @Override
-    public String getAuthorizationToken(UserRequest userRequest) throws InvalidEmailException {
-        return userRepository.findByEmail(userRequest.email())
-                .map(u -> {
-                    if (passwordEncoder.matches(userRequest.password(), u.getPassword())) {
-                        return tokenService.generateToken(u);
-                    } else {
-                        throw new InvalidPasswordException(userRequest.password());
-                    }
-                })
-                .orElseThrow(() -> new InvalidEmailException(userRequest.email()));
-    }
+  /**
+   * Generates an authorization token for a user based on their email and password.
+   *
+   * @param userRequest the request containing the user's email and password
+   * @return the generated authorization token
+   * @throws InvalidEmailException if the provided email does not exist
+   * @throws InvalidPasswordException if the provided password is incorrect
+   */
+  @Override
+  public String getAuthorizationToken(UserRequest userRequest) throws InvalidEmailException {
+    return userRepository
+        .findByEmail(userRequest.email())
+        .map(
+            u -> {
+              if (passwordEncoder.matches(userRequest.password(), u.getPassword())) {
+                return tokenService.generateToken(u);
+              } else {
+                throw new InvalidPasswordException(userRequest.password());
+              }
+            })
+        .orElseThrow(() -> new InvalidEmailException(userRequest.email()));
+  }
 
-    /**
-     * Loads a user by their email address.
-     *
-     * @param email the email address of the user
-     * @return the UserDetails object for the user
-     * @throws EntityNotFoundException if the user with the given email does not exist
-     */
-    @Override
-    public UserDetails loadUserByUsername(String email) throws EntityNotFoundException {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException(User.class, email));
-    }
+  /**
+   * Loads a user by their email address.
+   *
+   * @param email the email address of the user
+   * @return the UserDetails object for the user
+   * @throws EntityNotFoundException if the user with the given email does not exist
+   */
+  @Override
+  public UserDetails loadUserByUsername(String email) throws EntityNotFoundException {
+    return userRepository
+        .findByEmail(email)
+        .orElseThrow(() -> new EntityNotFoundException(User.class, email));
+  }
 
-    /**
-     * Creates a new user based on the provided UserRequest.
-     *
-     * @param userRequest the request containing user details for creation
-     * @return the response containing the created user details
-     * @throws InvalidEmailException if the email is already in use or invalid
-     */
-    @Override
-    @Transactional
-    public UserResponse create(UserRequest userRequest) throws InvalidEmailException {
-        try {
-            return Optional.of(userRequest)
-                    .map(userMapper::toUser)
-                    .map(u -> {
-                        u.setPassword(passwordEncoder.encode(userRequest.password()));
-                        return u;
-                    })
-                    .map(userRepository::save)
-                    .map(userMapper::toUserResponse)
-                    .orElseThrow();
-        } catch (DataAccessException e) {
-            throw new InvalidEmailException(userRequest.email());
-        }
+  /**
+   * Creates a new user based on the provided UserRequest.
+   *
+   * @param userRequest the request containing user details for creation
+   * @return the response containing the created user details
+   * @throws InvalidEmailException if the email is already in use or invalid
+   */
+  @Override
+  @Transactional
+  public UserResponse create(UserRequest userRequest) throws InvalidEmailException {
+    try {
+      return Optional.of(userRequest)
+          .map(userMapper::toUser)
+          .map(
+              u -> {
+                u.setPassword(passwordEncoder.encode(userRequest.password()));
+                return u;
+              })
+          .map(userRepository::save)
+          .map(userMapper::toUserResponse)
+          .orElseThrow();
+    } catch (DataAccessException e) {
+      throw new InvalidEmailException(userRequest.email());
     }
+  }
 }

@@ -5,5 +5,4 @@ import ru.senla.model.entity.Position;
 import ru.senla.repository.AbstractRepository;
 
 @Repository
-public interface PositionRepository extends AbstractRepository<Long, Position> {
-}
+public interface PositionRepository extends AbstractRepository<Long, Position> {}

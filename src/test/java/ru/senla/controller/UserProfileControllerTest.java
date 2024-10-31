@@ -1,5 +1,12 @@
 package ru.senla.controller;
 
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,323 +22,316 @@ import ru.senla.data.CommentTestData;
 import ru.senla.data.UserProfileTestData;
 import ru.senla.service.api.UserProfileService;
 
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-
 @SpringBootTest
 @AutoConfigureMockMvc
 class UserProfileControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+  @MockBean private UserProfileService userProfileService;
 
-    @MockBean
-    private UserProfileService userProfileService;
+  private static final String URL = "/api/v0/user_profiles";
+  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
+  private static final String URL_WITH_USERPROFILE_ID = URL + "/{userProfileId}/comments";
 
-    private static final String URL = "/api/v0/user_profiles";
-    private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
-    private static final String URL_WITH_USERPROFILE_ID = URL + "/{userProfileId}/comments";
+  @Nested
+  class Create {
+    @Test
+    @WithMockUser(authorities = {"user_profile:write"})
+    void createShouldReturnUserProfileResponse() throws Exception {
+      // given
+      var userProfileRequest = UserProfileTestData.builder().build().buildUserProfileRequest();
+      var expectedResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
 
-    @Nested
-    class Create {
-        @Test
-        @WithMockUser(authorities = {"user_profile:write"})
-        void createShouldReturnUserProfileResponse() throws Exception {
-            // given
-            var userProfileRequest = UserProfileTestData.builder().build().buildUserProfileRequest();
-            var expectedResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
+      doReturn(expectedResponse).when(userProfileService).create(userProfileRequest);
 
-            doReturn(expectedResponse)
-                    .when(userProfileService).create(userProfileRequest);
+      var requestBuilder =
+          post(URL)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(
+                  """
+                                            {
+                                                "firstName": "firstName",
+                                                "lastName": "lastName",
+                                                "position": 1,
+                                                "department": 1,
+                                                "user": 1
+                                            }
+                                            """);
 
-            var requestBuilder = post(URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "firstName": "firstName",
-                                "lastName": "lastName",
-                                "position": 1,
-                                "department": 1,
-                                "user": 1
-                            }
-                            """);
+      // when
+      mockMvc
+          .perform(requestBuilder)
+          // then
+          .andExpectAll(
+              status().isCreated(),
+              content().contentType(MediaType.APPLICATION_JSON),
+              content()
+                  .json(
+                      """
+                                                    {
+                                                        "firstName": "firstName",
+                                                        "lastName": "lastName",
+                                                        "position": 1,
+                                                        "department": 1,
+                                                        "user": 1
+                                                    }
+                                                    """));
 
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpectAll(
-                            status().isCreated(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            content().json("""
-                                    {
-                                        "firstName": "firstName",
-                                        "lastName": "lastName",
-                                        "position": 1,
-                                        "department": 1,
-                                        "user": 1
-                                    }
-                                    """)
-                    );
-
-            verify(userProfileService).create(any());
-        }
-
-        @Test
-        void createShouldReturnForbidden() throws Exception {
-            // given
-            var requestBuilder = post(URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "firstName": "firstName",
-                                "lastName": "lastName",
-                                "positionId": 1,
-                                "departmentId": 1,
-                                "userId": 1
-                            }
-                            """);
-
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(userProfileService, never()).create(any());
-        }
+      verify(userProfileService).create(any());
     }
 
-    @Nested
-    class GetAll {
-        @Test
-        @WithMockUser(authorities = {"user_profile:read", "comments:read"})
-        void getCommentsByProfileIdShouldReturnPageOfCommentsResponse() throws Exception {
-            var pageable = Pageable.ofSize(2);
-            var userProfileId = UserProfileTestData.builder().build().buildUserProfile().getId();
-            var expectedResponses = List.of(
-                    CommentTestData.builder().build().buildCommentResponse(),
-                    CommentTestData.builder().withId(2L).build().buildCommentResponse()
-            );
+    @Test
+    void createShouldReturnForbidden() throws Exception {
+      // given
+      var requestBuilder =
+          post(URL)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(
+                  """
+                                            {
+                                                "firstName": "firstName",
+                                                "lastName": "lastName",
+                                                "positionId": 1,
+                                                "departmentId": 1,
+                                                "userId": 1
+                                            }
+                                            """);
 
-            when(userProfileService.getAllCommentsByProfileId(anyLong(), any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(expectedResponses, pageable, expectedResponses.size()));
+      // when
+      mockMvc
+          .perform(requestBuilder)
+          // then
+          .andExpect(status().isForbidden());
 
-            //when
-            mockMvc.perform(get(URL_WITH_USERPROFILE_ID, userProfileId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpectAll(
-                            status().isOk(),
-                            content().contentType(MediaType.APPLICATION_JSON)
-                    ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
-                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
-                    .andExpect(jsonPath("$.content[0].commentText").value(
-                            expectedResponses.get(0).commentText()))
-                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
-                    .andExpect(jsonPath("$.content[1].commentText").value(
-                            expectedResponses.get(1).commentText()));
-        }
+      verify(userProfileService, never()).create(any());
+    }
+  }
 
-        @Test
-        @WithMockUser(authorities = {"user_profile:read"})
-        void getAllShouldReturnListOfUserProfileResponses() throws Exception {
-            // given
-            var pageable = Pageable.ofSize(2);
-            var expectedResponses = List.of(
-                    UserProfileTestData.builder().build().buildUserProfileResponse(),
-                    UserProfileTestData.builder().withId(2L).build().buildUserProfileResponse()
-            );
+  @Nested
+  class GetAll {
+    @Test
+    @WithMockUser(authorities = {"user_profile:read", "comments:read"})
+    void getCommentsByProfileIdShouldReturnPageOfCommentsResponse() throws Exception {
+      // given
+      var pageable = Pageable.ofSize(2);
+      var userProfileId = UserProfileTestData.builder().build().buildUserProfile().getId();
 
-            when(userProfileService.getAll(any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(expectedResponses, pageable, 2));
+      var expectedResponses =
+          List.of(
+              CommentTestData.builder().build().buildCommentResponse(),
+              CommentTestData.builder().withId(2L).build().buildCommentResponse());
 
-            // when
-            mockMvc.perform(get(URL)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpectAll(
-                            status().isOk(),
-                            content().contentType(MediaType.APPLICATION_JSON)
-                    ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
-                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
-                    .andExpect(jsonPath("$.content[0].firstName").value(expectedResponses.get(0).firstName()))
-                    .andExpect(jsonPath("$.content[0].lastName").value(expectedResponses.get(0).lastName()))
-                    .andExpect(jsonPath("$.content[0].position").value(expectedResponses.get(0).position()))
-                    .andExpect(jsonPath("$.content[0].department").value(expectedResponses.get(0).department()))
-                    .andExpect(jsonPath("$.content[0].user").value(expectedResponses.get(0).user()))
-                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
-                    .andExpect(jsonPath("$.content[1].firstName").value(expectedResponses.get(1).firstName()))
-                    .andExpect(jsonPath("$.content[1].lastName").value(expectedResponses.get(1).lastName()))
-                    .andExpect(jsonPath("$.content[1].position").value(expectedResponses.get(1).position()))
-                    .andExpect(jsonPath("$.content[1].department").value(expectedResponses.get(1).department()))
-                    .andExpect(jsonPath("$.content[1].user").value(expectedResponses.get(1).user()));
-        }
+      var expectedPage = new PageImpl<>(expectedResponses, pageable, expectedResponses.size());
 
-        @Test
-        void getAllShouldReturnForbidden() throws Exception {
-            //given
-            var pageable = Pageable.ofSize(2);
-            // when
-            mockMvc.perform(get(URL)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isForbidden());
+      when(userProfileService.getAllCommentsByProfileId(anyLong(), any(Pageable.class)))
+          .thenReturn(expectedPage);
 
-            verify(userProfileService, never()).getAll(pageable);
-        }
+      // when
+      mockMvc
+          .perform(
+              get(URL_WITH_USERPROFILE_ID, userProfileId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isOk())
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(content().json(objectMapper.writeValueAsString(expectedPage)));
     }
 
-    @Nested
-    class GetByID {
-        @Test
-        @WithMockUser(authorities = {"user_profile:read"})
-        void getByIdShouldReturnUserProfileResponse() throws Exception {
-            // given
-            var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
-            var userProfileId = userProfileResponse.id();
+    @Test
+    @WithMockUser(authorities = {"user_profile:read"})
+    void getAllShouldReturnListOfUserProfileResponses() throws Exception {
+      // given
+      var pageable = Pageable.ofSize(2);
+      var expectedResponses =
+          List.of(
+              UserProfileTestData.builder().build().buildUserProfileResponse(),
+              UserProfileTestData.builder().withId(2L).build().buildUserProfileResponse());
 
-            doReturn(userProfileResponse)
-                    .when(userProfileService).getById(userProfileId);
+      var expectedPage = new PageImpl<>(expectedResponses, pageable, expectedResponses.size());
 
-            // when
-            mockMvc.perform(get(URL_WITH_PARAMETER_ID, userProfileId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpectAll(
-                            status().isOk(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            content().json("""
-                                    {
-                                        "id": 1,
-                                        "firstName": "firstName",
-                                        "lastName": "lastName",
-                                        "position": 1,
-                                        "department": 1,
-                                        "user": 1
-                                    }
-                                    """)
-                    );
-            verify(userProfileService).getById(any());
-        }
+      when(userProfileService.getAll(any(Pageable.class))).thenReturn(expectedPage);
 
-        @Test
-        void getByIdShouldReturnForbidden() throws Exception {
-            // given
-            var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
-            var userProfileId = userProfileResponse.id();
-
-            doReturn(userProfileResponse)
-                    .when(userProfileService).getById(userProfileId);
-
-            // when
-            mockMvc.perform(get(URL_WITH_PARAMETER_ID, userProfileId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(userProfileService, never()).getById(any());
-        }
+      // when
+      mockMvc
+          .perform(get(URL).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isOk())
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(content().json(objectMapper.writeValueAsString(expectedPage)));
     }
 
-    @Nested
-    class Update {
-        @Test
-        @WithMockUser(authorities = {"user_profile:write"})
-        void updateShouldReturnUpdatedUserProfileResponse() throws Exception {
-            // given
-            var userProfileId = 1L;
-            var userProfileRequest = UserProfileTestData.builder()
-                    .withFirstName("UpdatedName")
-                    .withLastName("UpdatedLastName")
-                    .build().buildUserProfileRequest();
+    @Test
+    void getAllShouldReturnForbidden() throws Exception {
+      // given
+      var pageable = Pageable.ofSize(2);
+      // when
+      mockMvc
+          .perform(get(URL).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isForbidden());
 
-            var updatedResponse = UserProfileTestData.builder()
-                    .withFirstName("UpdatedName")
-                    .withLastName("UpdatedLastName")
-                    .build().buildUserProfileResponse();
+      verify(userProfileService, never()).getAll(pageable);
+    }
+  }
 
-            doReturn(updatedResponse).when(userProfileService).update(userProfileId, userProfileRequest);
+  @Nested
+  class GetByID {
+    @Test
+    @WithMockUser(authorities = {"user_profile:read"})
+    void getByIdShouldReturnUserProfileResponse() throws Exception {
+      // given
+      var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
+      var userProfileId = userProfileResponse.id();
 
-            var requestBuilder = put(URL_WITH_PARAMETER_ID, userProfileId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                              {
-                                 "firstName": "UpdatedName",
-                                 "lastName": "UpdatedLastName",
-                                 "position": 1,
-                                  "department": 1,
-                                  "user": 1
-                               }
-                            """);
+      doReturn(userProfileResponse).when(userProfileService).getById(userProfileId);
 
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpectAll(
-                            status().isOk(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            content().json("""
-                                     {
-                                       "id": 1,
-                                       "firstName": "UpdatedName",
-                                       "lastName": "UpdatedLastName",
-                                       "position": 1,
-                                       "department": 1,
-                                       "user": 1
-                                      }
-                                    """)
-                    );
-
-            verify(userProfileService).update(any(), any());
-        }
-
-        @Test
-        void updateShouldReturnForbidden() throws Exception {
-            // given
-            var userProfileId = 1L;
-
-            // when
-            mockMvc.perform(put(URL_WITH_PARAMETER_ID, userProfileId))
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(userProfileService, never()).update(any(), any());
-        }
+      // when
+      mockMvc
+          .perform(
+              get(URL_WITH_PARAMETER_ID, userProfileId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpectAll(
+              status().isOk(),
+              content().contentType(MediaType.APPLICATION_JSON),
+              content()
+                  .json(
+                      """
+                                                    {
+                                                        "id": 1,
+                                                        "firstName": "firstName",
+                                                        "lastName": "lastName",
+                                                        "position": 1,
+                                                        "department": 1,
+                                                        "user": 1
+                                                    }
+                                                    """));
+      verify(userProfileService).getById(any());
     }
 
-    @Nested
-    class Delete {
-        @Test
-        @WithMockUser(authorities = {"user_profile:delete"})
-        void deleteShouldReturnNoContent() throws Exception {
-            // given
-            var userProfileId = 1L;
+    @Test
+    void getByIdShouldReturnForbidden() throws Exception {
+      // given
+      var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
+      var userProfileId = userProfileResponse.id();
 
-            // when
-            mockMvc.perform(delete(URL_WITH_PARAMETER_ID, userProfileId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isNoContent());
+      doReturn(userProfileResponse).when(userProfileService).getById(userProfileId);
 
-            verify(userProfileService).delete(userProfileId);
-        }
+      // when
+      mockMvc
+          .perform(
+              get(URL_WITH_PARAMETER_ID, userProfileId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isForbidden());
 
-        @Test
-        void deleteShouldReturnForbidden() throws Exception {
-            // given
-            var userProfileId = 1L;
-
-            // when
-            mockMvc.perform(delete(URL_WITH_PARAMETER_ID, userProfileId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(userProfileService, never()).delete(userProfileId);
-        }
+      verify(userProfileService, never()).getById(any());
     }
+  }
+
+  @Nested
+  class Update {
+    @Test
+    @WithMockUser(authorities = {"user_profile:write"})
+    void updateShouldReturnUpdatedUserProfileResponse() throws Exception {
+      // given
+      var userProfileId = 1L;
+      var userProfileRequest =
+          UserProfileTestData.builder()
+              .withFirstName("UpdatedName")
+              .withLastName("UpdatedLastName")
+              .build()
+              .buildUserProfileRequest();
+
+      var updatedResponse =
+          UserProfileTestData.builder()
+              .withFirstName("UpdatedName")
+              .withLastName("UpdatedLastName")
+              .build()
+              .buildUserProfileResponse();
+
+      doReturn(updatedResponse).when(userProfileService).update(userProfileId, userProfileRequest);
+
+      var requestBuilder =
+          put(URL_WITH_PARAMETER_ID, userProfileId)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(
+                  """
+                                              {
+                                                 "firstName": "UpdatedName",
+                                                 "lastName": "UpdatedLastName",
+                                                 "position": 1,
+                                                  "department": 1,
+                                                  "user": 1
+                                               }
+                                            """);
+
+      // when
+      mockMvc
+          .perform(requestBuilder)
+          // then
+          .andExpectAll(
+              status().isOk(),
+              content().contentType(MediaType.APPLICATION_JSON),
+              content()
+                  .json(
+                      """
+                                                     {
+                                                       "id": 1,
+                                                       "firstName": "UpdatedName",
+                                                       "lastName": "UpdatedLastName",
+                                                       "position": 1,
+                                                       "department": 1,
+                                                       "user": 1
+                                                      }
+                                                    """));
+
+      verify(userProfileService).update(any(), any());
+    }
+
+    @Test
+    void updateShouldReturnForbidden() throws Exception {
+      // given
+      var userProfileId = 1L;
+
+      // when
+      mockMvc
+          .perform(put(URL_WITH_PARAMETER_ID, userProfileId))
+          // then
+          .andExpect(status().isForbidden());
+
+      verify(userProfileService, never()).update(any(), any());
+    }
+  }
+
+  @Nested
+  class Delete {
+    @Test
+    @WithMockUser(authorities = {"user_profile:delete"})
+    void deleteShouldReturnNoContent() throws Exception {
+      // given
+      var userProfileId = 1L;
+
+      // when
+      mockMvc
+          .perform(
+              delete(URL_WITH_PARAMETER_ID, userProfileId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isNoContent());
+
+      verify(userProfileService).delete(userProfileId);
+    }
+
+    @Test
+    void deleteShouldReturnForbidden() throws Exception {
+      // given
+      var userProfileId = 1L;
+
+      // when
+      mockMvc
+          .perform(
+              delete(URL_WITH_PARAMETER_ID, userProfileId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isForbidden());
+
+      verify(userProfileService, never()).delete(userProfileId);
+    }
+  }
 }

@@ -19,16 +19,21 @@ import ru.senla.model.dto.response.UserProfileResponse;
 
 @Tag(name = "UserProfile", description = "API for working with user profiles")
 public interface UserProfileOpenApi {
-    @Operation(
-            method = "POST",
-            tags = "UserProfile",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "user_profile:write"),
-            description = "Create a new user profile",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = UserProfileResponse.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "POST",
+      tags = "UserProfile",
+      security =
+          @SecurityRequirement(name = "Bearer Authentication", scopes = "user_profile:write"),
+      description = "Create a new user profile",
+      requestBody =
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = UserProfileResponse.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                       "firstName": "Ivan",
                                       "lastName": "Ivanov",
@@ -36,16 +41,17 @@ public interface UserProfileOpenApi {
                                       "department": 2,
                                       "user": 1
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = UserProfileResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserProfileResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 5,
                                                 "firstName": "Ivan",
@@ -54,42 +60,43 @@ public interface UserProfileOpenApi {
                                                 "department": 2,
                                                 "user": 1
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<UserProfileResponse> create(UserProfileRequest userProfileRequest);
+                                            """)))
+      })
+  ResponseEntity<UserProfileResponse> create(UserProfileRequest userProfileRequest);
 
-    @Operation(
-            method = "GET",
-            tags = "UserProfile",
-            description = "Get page of user profiles",
-            parameters = {
-                    @Parameter(name = "page", description = "UserProfile page", example = "0"),
-                    @Parameter(name = "size", description = "Page size", example = "2"),
-                    @Parameter(name = "sort", description = "Sorting by field", example = "id")
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = UserProfileResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "UserProfile",
+      description = "Get page of user profiles",
+      parameters = {
+        @Parameter(name = "page", description = "UserProfile page", example = "0"),
+        @Parameter(name = "size", description = "Page size", example = "2"),
+        @Parameter(name = "sort", description = "Sorting by field", example = "id")
+      },
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserProfileResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "content": [
                                                     {
@@ -151,37 +158,38 @@ public interface UserProfileOpenApi {
                                                 },
                                                 "empty": false
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<Page<UserProfileResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
+                                            """)))
+      })
+  ResponseEntity<Page<UserProfileResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
 
-    @Operation(
-            method = "GET",
-            tags = "UserProfile",
-            description = "Get a user profiles by id",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = UserProfileResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "UserProfile",
+      description = "Get a user profiles by id",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserProfileResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "firstName": "Alice",
@@ -190,37 +198,40 @@ public interface UserProfileOpenApi {
                                                 "department": 1,
                                                 "user": 1
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "UserProfile with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<UserProfileResponse> getById(@Parameter(example = "1") Long id);
+                                            """)))
+      })
+  ResponseEntity<UserProfileResponse> getById(@Parameter(example = "1") Long id);
 
-    @Operation(
-            method = "PUT",
-            tags = "UserProfile",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "user_profile:write"),
-            description = "Update existed user profile",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = TaskRequest.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "PUT",
+      tags = "UserProfile",
+      security =
+          @SecurityRequirement(name = "Bearer Authentication", scopes = "user_profile:write"),
+      description = "Update existed user profile",
+      requestBody =
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              required = true,
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = TaskRequest.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                       "firstName": "Pavel",
                                       "lastName": "Pavlovich",
@@ -228,16 +239,17 @@ public interface UserProfileOpenApi {
                                       "position": 2,
                                       "user": 1
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "firstName": "Pavel",
@@ -246,38 +258,38 @@ public interface UserProfileOpenApi {
                                                 "department": 1,
                                                 "user": 1
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "UserProfile with ID 11234 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<UserProfileResponse> update(@Parameter(example = "1") Long id, UserProfileRequest userProfileRequest);
+                                            """)))
+      })
+  ResponseEntity<UserProfileResponse> update(
+      @Parameter(example = "1") Long id, UserProfileRequest userProfileRequest);
 
-    ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
+  ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
 }

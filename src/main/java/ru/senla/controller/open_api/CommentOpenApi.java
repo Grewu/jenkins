@@ -18,32 +18,37 @@ import ru.senla.model.dto.response.CommentResponse;
 
 @Tag(name = "Comment", description = "API for working with comments")
 public interface CommentOpenApi {
-    @Operation(
-            method = "POST",
-            tags = "Comment",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "comments:write"),
-            description = "Create a new comment",
-            requestBody = @RequestBody(
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CommentRequest.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "POST",
+      tags = "Comment",
+      security = @SecurityRequirement(name = "Bearer Authentication", scopes = "comments:write"),
+      description = "Create a new comment",
+      requestBody =
+          @RequestBody(
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = CommentRequest.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                       "task": 1,
                                       "usersProfile": 2,
                                       "commentText": "commentTest",
                                       "createdAt": "2024-09-27T12:34:56"
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = CommentResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CommentResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "task": 1,
@@ -51,55 +56,57 @@ public interface CommentOpenApi {
                                                 "commentText": "commentTest",
                                                 "createdAt": "2024-09-27T12:34:56"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "400",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "BAD_REQUEST",
                                                 "message": "commentText = Comment text must not be null"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                  "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<CommentResponse> create(CommentRequest commentRequest);
+                                            """)))
+      })
+  ResponseEntity<CommentResponse> create(CommentRequest commentRequest);
 
-
-    @Operation(
-            method = "GET",
-            tags = "Comment",
-            description = "Get page of comments",
-            parameters = {
-                    @Parameter(name = "page", description = "Comments page", example = "0"),
-                    @Parameter(name = "size", description = "Page size", example = "2"),
-                    @Parameter(name = "sort", description = "Sorting by field", example = "id")
-            },
-            responses = @ApiResponse(
-                    responseCode = "200",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CommentResponse.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "Comment",
+      description = "Get page of comments",
+      parameters = {
+        @Parameter(name = "page", description = "Comments page", example = "0"),
+        @Parameter(name = "size", description = "Page size", example = "2"),
+        @Parameter(name = "sort", description = "Sorting by field", example = "id")
+      },
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = CommentResponse.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                         "content": [
                                             {
@@ -157,24 +164,23 @@ public interface CommentOpenApi {
                                         "numberOfElements": 4,
                                         "empty": false
                                     }
-                                    """)
-                    )
-            )
-    )
-    ResponseEntity<Page<CommentResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
+                                    """))))
+  ResponseEntity<Page<CommentResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
 
-
-    @Operation(
-            method = "GET",
-            tags = "Comment",
-            description = "Get a comment by id",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = CommentResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "Comment",
+      description = "Get a comment by id",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CommentResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "task": 1,
@@ -182,54 +188,56 @@ public interface CommentOpenApi {
                                                 "commentText": "Initial schema design completed.",
                                                 "createdAt": "2024-01-15T10:00:00"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "Comment with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<CommentResponse> getById(@Parameter(example = "1") Long id);
+                                            """)))
+      })
+  ResponseEntity<CommentResponse> getById(@Parameter(example = "1") Long id);
 
-
-    @Operation(
-            method = "PUT",
-            tags = "Comment",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "comments:write"),
-            description = "Update existed comment",
-            requestBody = @RequestBody(
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CommentRequest.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "PUT",
+      tags = "Comment",
+      security = @SecurityRequirement(name = "Bearer Authentication", scopes = "comments:write"),
+      description = "Update existed comment",
+      requestBody =
+          @RequestBody(
+              required = true,
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = CommentRequest.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                       "task": 1,
                                       "usersProfile": 2,
                                       "commentText": "commentText",
                                       "createdAt": "2024-09-27T12:34:56"
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = CommentResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CommentResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "task": 1,
@@ -237,65 +245,63 @@ public interface CommentOpenApi {
                                                 "commentText": "commentText",
                                                 "createdAt": "2024-09-27T12:34:56"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "Comment with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<CommentResponse> update(@Parameter(example = "1") Long id, CommentRequest commentRequest);
+                                            """)))
+      })
+  ResponseEntity<CommentResponse> update(
+      @Parameter(example = "1") Long id, CommentRequest commentRequest);
 
-    @Operation(
-            method = "DELETE",
-            tags = "Comment",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "department:delete"),
-            description = "Delete a comment by id",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "Successfully processed, no content to return",
-                            content = @Content
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "DELETE",
+      tags = "Comment",
+      security = @SecurityRequirement(name = "Bearer Authentication", scopes = "department:delete"),
+      description = "Delete a comment by id",
+      responses = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Successfully processed, no content to return",
+            content = @Content),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-
-            }
-    )
-    ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
+                                            """))),
+      })
+  ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
 }

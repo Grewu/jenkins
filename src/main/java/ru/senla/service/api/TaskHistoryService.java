@@ -6,11 +6,10 @@ import ru.senla.service.AbstractService;
 
 /**
  * Service interface for managing task histories within the application.
- * <p>
- * This interface defines the operations for creating, retrieving, updating, and deleting
- * task history records. It extends the abstract service interface to provide a consistent
- * way to manage task histories.
- * </p>
+ *
+ * <p>This interface defines the operations for creating, retrieving, updating, and deleting task
+ * history records. It extends the abstract service interface to provide a consistent way to manage
+ * task histories.
  */
-public interface TaskHistoryService extends AbstractService<Long, TaskHistoryRequest, TaskHistoryResponse> {
-}
+public interface TaskHistoryService
+    extends AbstractService<Long, TaskHistoryRequest, TaskHistoryResponse> {}

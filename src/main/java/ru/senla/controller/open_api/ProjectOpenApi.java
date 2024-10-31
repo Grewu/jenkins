@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import ru.senla.exception.ExceptionMessage;
 import ru.senla.model.dto.request.ProjectRequest;
@@ -19,16 +18,20 @@ import ru.senla.model.dto.response.ProjectResponse;
 
 @Tag(name = "Project", description = "API for working with projects")
 public interface ProjectOpenApi {
-    @Operation(
-            method = "POST",
-            tags = "Department",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "department:write"),
-            description = "Create a new comment",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ProjectRequest.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "POST",
+      tags = "Department",
+      security = @SecurityRequirement(name = "Bearer Authentication", scopes = "department:write"),
+      description = "Create a new comment",
+      requestBody =
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = ProjectRequest.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                         "name": "New Project",
                                         "projectCode": "NP-001",
@@ -37,16 +40,17 @@ public interface ProjectOpenApi {
                                         "endDate": "2024-12-27T10:00:00",
                                         "owner": 1
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = DepartmentResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = DepartmentResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 4,
                                                 "name": "New Project",
@@ -56,55 +60,57 @@ public interface ProjectOpenApi {
                                                 "endDate": "2024-12-27T10:00:00",
                                                 "owner": 1
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "400",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "BAD_REQUEST",
                                                 "message": "name = Project name must not be blank"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<ProjectResponse> create(ProjectRequest projectRequest);
+                                            """)))
+      })
+  ResponseEntity<ProjectResponse> create(ProjectRequest projectRequest);
 
-    @Operation(
-            method = "GET",
-            tags = "Project",
-            description = "Get page of projects",
-            parameters = {
-                    @Parameter(name = "page", description = "Projects page", example = "0"),
-                    @Parameter(name = "size", description = "Page size", example = "2"),
-                    @Parameter(name = "sort", description = "Sorting by field", example = "id")
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ProjectResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "Project",
+      description = "Get page of projects",
+      parameters = {
+        @Parameter(name = "page", description = "Projects page", example = "0"),
+        @Parameter(name = "size", description = "Page size", example = "2"),
+        @Parameter(name = "sort", description = "Sorting by field", example = "id")
+      },
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProjectResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "content": [
                                                     {
@@ -156,38 +162,38 @@ public interface ProjectOpenApi {
                                                 "numberOfElements": 3,
                                                 "empty": false
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<Page<ProjectResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
+                                            """)))
+      })
+  ResponseEntity<Page<ProjectResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
 
-
-    @Operation(
-            method = "GET",
-            tags = "Project",
-            description = "Get a project by id",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ProjectResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "Project",
+      description = "Get a project by id",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProjectResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "name": "Web Application Development",
@@ -197,37 +203,39 @@ public interface ProjectOpenApi {
                                                 "endDate": "2024-12-31T00:00:00",
                                                 "owner": 1
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "Project with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<ProjectResponse> getById(@Parameter(example = "1") Long id);
+                                            """)))
+      })
+  ResponseEntity<ProjectResponse> getById(@Parameter(example = "1") Long id);
 
-    @Operation(
-            method = "PUT",
-            tags = "Project",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "project:write"),
-            description = "Update existed comment",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ProjectRequest.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "PUT",
+      tags = "Project",
+      security = @SecurityRequirement(name = "Bearer Authentication", scopes = "project:write"),
+      description = "Update existed comment",
+      requestBody =
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              required = true,
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = ProjectRequest.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                       "name": "Update Project",
                                       "projectCode": "NP-001",
@@ -236,16 +244,17 @@ public interface ProjectOpenApi {
                                       "endDate": "2024-12-27T10:00:00",
                                       "owner": 1
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ProjectResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProjectResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "name": "Update Project",
@@ -255,66 +264,63 @@ public interface ProjectOpenApi {
                                                 "endDate": "2024-12-27T10:00:00",
                                                 "owner": 1
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "Project with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<ProjectResponse> update(@Parameter(example = "1") Long id, ProjectRequest projectRequest);
+                                            """)))
+      })
+  ResponseEntity<ProjectResponse> update(
+      @Parameter(example = "1") Long id, ProjectRequest projectRequest);
 
-    @Operation(
-            method = "DELETE",
-            tags = "Department",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "comments:delete"),
-            description = "Delete a comment by id",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "Successfully processed, no content to return",
-                            content = @Content
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "DELETE",
+      tags = "Department",
+      security = @SecurityRequirement(name = "Bearer Authentication", scopes = "comments:delete"),
+      description = "Delete a comment by id",
+      responses = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Successfully processed, no content to return",
+            content = @Content),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-
-            }
-    )
-
-    ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
+                                            """))),
+      })
+  ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
 }

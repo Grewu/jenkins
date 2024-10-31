@@ -19,5 +19,9 @@ spring:
           starttls:
             enable: true
     port: 587
+
+notification:
+  cron: "0 0 9 * * ?"
+
 server:
   port: 8080

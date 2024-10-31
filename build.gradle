@@ -1,12 +1,13 @@
 plugins {
     id 'java'
+    id 'jacoco'
+    id "com.diffplug.spotless" version "7.0.0.BETA4"
     id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'ru.senla'
 version = '1.0.0'
-
 
 repositories {
     mavenLocal()
@@ -25,7 +26,6 @@ configurations {
     }
 }
 
-
 ext {
     lombokMapstructBindingVersion = '0.2.0'
     mapstructVersion = '1.5.5.Final'
@@ -33,7 +33,6 @@ ext {
     testcontainersVersion = "1.20.2"
     jjwtVersion = '0.11.5'
     exceptionHandlingVersion = '1.0.0'
-    lombokMapstructBindingVersion = '0.2.0'
     springDocVersion = '2.1.0'
     jacksonDataTypeVersion = '2.15.2'
 }
@@ -41,21 +40,19 @@ ext {
 dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
     implementation "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
     implementation "ru.senla:exception-handling-starter:${exceptionHandlingVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     implementation 'org.liquibase:liquibase-core'
-
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-
     runtimeOnly 'org.postgresql:postgresql'
-
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDataTypeVersion}"
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -68,17 +65,38 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation "org.testcontainers:postgresql:$testcontainersVersion"
     testImplementation "org.testcontainers:junit-jupiter:$testcontainersVersion"
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
+tasks.test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
-tasks.named('compileJava') {
+spotless {
+    java {
+        googleJavaFormat()
+        target 'src/**/*.java'
+    }
+}
+
+jacoco {
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
+
+tasks.build {
+    dependsOn 'spotlessApply'
+}
+
+tasks.compileJava {
     options.compilerArgs = [
             '-Amapstruct.defaultComponentModel=spring',
             '-parameters'

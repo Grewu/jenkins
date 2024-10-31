@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import ru.senla.exception.ExceptionMessage;
 import ru.senla.model.dto.request.TaskHistoryRequest;
@@ -19,22 +18,25 @@ import ru.senla.model.dto.response.TaskResponse;
 
 @Tag(name = "TaskHistory", description = "API for working with task history")
 public interface TaskHistoryOpenApi {
-    @Operation(
-            method = "GET",
-            tags = "TaskHistory",
-            description = "Get page of task history",
-            parameters = {
-                    @Parameter(name = "page", description = "TaskHistory page", example = "0"),
-                    @Parameter(name = "size", description = "Page size", example = "2"),
-                    @Parameter(name = "sort", description = "Sorting by field", example = "id")
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "TaskHistory",
+      description = "Get page of task history",
+      parameters = {
+        @Parameter(name = "page", description = "TaskHistory page", example = "0"),
+        @Parameter(name = "size", description = "Page size", example = "2"),
+        @Parameter(name = "sort", description = "Sorting by field", example = "id")
+      },
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "content": [
                                                     {
@@ -106,37 +108,38 @@ public interface TaskHistoryOpenApi {
                                                 "numberOfElements": 3,
                                                 "empty": false
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<Page<TaskHistoryResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
+                                            """)))
+      })
+  ResponseEntity<Page<TaskHistoryResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
 
-    @Operation(
-            method = "GET",
-            tags = "TaskHistory",
-            description = "Get a task history by id",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskHistoryResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "TaskHistory",
+      description = "Get a task history by id",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskHistoryResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "task": 1,
@@ -151,37 +154,40 @@ public interface TaskHistoryOpenApi {
                                                 "changedDate": "2024-09-12T00:00:00",
                                                 "changedDescription": "Initial task creation and assignment."
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "TaskHistory with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<TaskHistoryResponse> getById(@Parameter(example = "1") Long id);
+                                            """)))
+      })
+  ResponseEntity<TaskHistoryResponse> getById(@Parameter(example = "1") Long id);
 
-    @Operation(
-            method = "PUT",
-            tags = "TaskHistory",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "task_history:write"),
-            description = "Update existed task history",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = TaskHistoryRequest.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "PUT",
+      tags = "TaskHistory",
+      security =
+          @SecurityRequirement(name = "Bearer Authentication", scopes = "task_history:write"),
+      description = "Update existed task history",
+      requestBody =
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              required = true,
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = TaskHistoryRequest.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                         "id": 1,
                                         "task": 1,
@@ -196,16 +202,17 @@ public interface TaskHistoryOpenApi {
                                         "changedDate": "2024-09-12T00:00:00",
                                         "changedDescription": "Initial task creation and assignment."
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskHistoryResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskHistoryResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "task": 1,
@@ -220,66 +227,64 @@ public interface TaskHistoryOpenApi {
                                                 "changedDate": "2024-09-12T00:00:00",
                                                 "changedDescription": "Initial task creation and assignment."
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "TaskHistory with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<TaskHistoryResponse> update(@Parameter(example = "1") Long id, TaskHistoryRequest taskHistoryRequest);
+                                            """)))
+      })
+  ResponseEntity<TaskHistoryResponse> update(
+      @Parameter(example = "1") Long id, TaskHistoryRequest taskHistoryRequest);
 
-    @Operation(
-            method = "DELETE",
-            tags = "Department",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "task_history:delete"),
-            description = "Delete a comment by id",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "Successfully processed, no content to return",
-                            content = @Content
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "DELETE",
+      tags = "Department",
+      security =
+          @SecurityRequirement(name = "Bearer Authentication", scopes = "task_history:delete"),
+      description = "Delete a comment by id",
+      responses = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Successfully processed, no content to return",
+            content = @Content),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-
-            }
-    )
-    ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
-
+                                            """))),
+      })
+  ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
 }

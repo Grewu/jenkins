@@ -28,10 +28,10 @@ VALUES (1, 'MANAGER'),
        (4, 'HR');
 
 INSERT INTO users (email, password, role_id)
-VALUES ('user@example.com', 'password', 1),
-       ('user@example.com', 'password', 1),
-       ('user@example.com', 'password', 1),
-       ('user@example.comm', 'password', 1);
+VALUES ('pavelgurevichwork@gmail.com', 'password', 1),
+       ('pavelgurevich97@gmail.com', 'password', 2),
+       ('guest@example.com', 'password', 3),
+       ('anotheruser@example.com', 'password', 4);
 
 INSERT INTO users_profiles (first_name, last_name, position_id, department_id, user_id)
 VALUES ('firstName', 'lastName', 1, 1, 1),

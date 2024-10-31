@@ -31,106 +31,116 @@ import ru.senla.service.api.UserProfileService;
 @Transactional(readOnly = true)
 public class UserProfileServiceImpl implements UserProfileService {
 
-    private final UserProfileMapper userProfileMapper;
-    private final CommentMapper commentMapper;
-    private final UserProfileRepository userProfileRepository;
-    private final UserRepository userRepository;
-    private final DepartmentRepository departmentRepository;
-    private final CommentRepository commentRepository;
-    private final PositionRepository positionRepository;
+  private final UserProfileMapper userProfileMapper;
+  private final CommentMapper commentMapper;
+  private final UserProfileRepository userProfileRepository;
+  private final UserRepository userRepository;
+  private final DepartmentRepository departmentRepository;
+  private final CommentRepository commentRepository;
+  private final PositionRepository positionRepository;
 
-    /**
-     * Creates a new user profile based on the provided UserProfileRequest.
-     *
-     * @param userProfileRequest the request containing details of the user profile to create
-     * @return the response containing the created user profile details
-     */
-    @Override
-    @Transactional
-    public UserProfileResponse create(UserProfileRequest userProfileRequest) {
-        var userProfile = userProfileMapper.toUserProfile(userProfileRequest);
-        return userProfileMapper.toUserProfileResponse(userProfileRepository.save(userProfile));
-    }
+  /**
+   * Creates a new user profile based on the provided UserProfileRequest.
+   *
+   * @param userProfileRequest the request containing details of the user profile to create
+   * @return the response containing the created user profile details
+   */
+  @Override
+  @Transactional
+  public UserProfileResponse create(UserProfileRequest userProfileRequest) {
+    var userProfile = userProfileMapper.toUserProfile(userProfileRequest);
+    return userProfileMapper.toUserProfileResponse(userProfileRepository.save(userProfile));
+  }
 
-    /**
-     * Retrieves a paginated list of all user profiles.
-     *
-     * @param pageable pagination information
-     * @return a page of user profile responses
-     */
-    @Override
-    public Page<UserProfileResponse> getAll(Pageable pageable) {
-        return userProfileRepository.findAll(pageable)
-                .map(userProfileMapper::toUserProfileResponse);
-    }
+  /**
+   * Retrieves a paginated list of all user profiles.
+   *
+   * @param pageable pagination information
+   * @return a page of user profile responses
+   */
+  @Override
+  public Page<UserProfileResponse> getAll(Pageable pageable) {
+    return userProfileRepository.findAll(pageable).map(userProfileMapper::toUserProfileResponse);
+  }
 
-    /**
-     * Retrieves a paginated list of comments associated with a specific user profile.
-     *
-     * @param userProfileId the ID of the user profile for which comments are retrieved
-     * @param pageable      pagination information
-     * @return a page of comment responses for the specified user profile
-     */
-    @Override
-    public Page<CommentResponse> getAllCommentsByProfileId(Long userProfileId, Pageable pageable) {
-        return commentRepository.findCommentsByProfileId(userProfileId, pageable)
-                .map(commentMapper::toCommentResponse);
-    }
+  /**
+   * Retrieves a paginated list of comments associated with a specific user profile.
+   *
+   * @param userProfileId the ID of the user profile for which comments are retrieved
+   * @param pageable pagination information
+   * @return a page of comment responses for the specified user profile
+   */
+  @Override
+  public Page<CommentResponse> getAllCommentsByProfileId(Long userProfileId, Pageable pageable) {
+    return commentRepository
+        .findCommentsByProfileId(userProfileId, pageable)
+        .map(commentMapper::toCommentResponse);
+  }
 
-    /**
-     * Retrieves a user profile by its ID.
-     *
-     * @param id the ID of the user profile to retrieve
-     * @return the response containing the user profile details
-     * @throws EntityNotFoundException if the user profile with the given ID is not found
-     */
-    @Override
-    public UserProfileResponse getById(Long id) {
-        return userProfileRepository.findById(id)
-                .map(userProfileMapper::toUserProfileResponse)
-                .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
-    }
+  /**
+   * Retrieves a user profile by its ID.
+   *
+   * @param id the ID of the user profile to retrieve
+   * @return the response containing the user profile details
+   * @throws EntityNotFoundException if the user profile with the given ID is not found
+   */
+  @Override
+  public UserProfileResponse getById(Long id) {
+    return userProfileRepository
+        .findById(id)
+        .map(userProfileMapper::toUserProfileResponse)
+        .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
+  }
 
-    /**
-     * Updates an existing user profile with the provided details.
-     *
-     * @param id                  the ID of the user profile to update
-     * @param userProfileRequest  the request containing updated user profile details
-     * @return the response containing the updated user profile details
-     * @throws EntityNotFoundException if the user profile, user, department, or position with the given ID is not found
-     */
-    @Override
-    @Transactional
-    public UserProfileResponse update(Long id, UserProfileRequest userProfileRequest) {
-        var currentUserProfile = userProfileRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
+  /**
+   * Updates an existing user profile with the provided details.
+   *
+   * @param id the ID of the user profile to update
+   * @param userProfileRequest the request containing updated user profile details
+   * @return the response containing the updated user profile details
+   * @throws EntityNotFoundException if the user profile, user, department, or position with the
+   *     given ID is not found
+   */
+  @Override
+  @Transactional
+  public UserProfileResponse update(Long id, UserProfileRequest userProfileRequest) {
+    var currentUserProfile =
+        userProfileRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
 
-        var user = userRepository.findById(userProfileRequest.user())
-                .orElseThrow(() -> new EntityNotFoundException(User.class, id));
+    var user =
+        userRepository
+            .findById(userProfileRequest.user())
+            .orElseThrow(() -> new EntityNotFoundException(User.class, id));
 
-        var department = departmentRepository.findById(userProfileRequest.department())
-                .orElseThrow(() -> new EntityNotFoundException(Department.class, id));
+    var department =
+        departmentRepository
+            .findById(userProfileRequest.department())
+            .orElseThrow(() -> new EntityNotFoundException(Department.class, id));
 
-        var position = positionRepository.findById(userProfileRequest.position())
-                .orElseThrow(() -> new EntityNotFoundException(Position.class, id));
+    var position =
+        positionRepository
+            .findById(userProfileRequest.position())
+            .orElseThrow(() -> new EntityNotFoundException(Position.class, id));
 
-        currentUserProfile.setFirstName(userProfileRequest.firstName());
-        currentUserProfile.setLastName(userProfileRequest.lastName());
-        currentUserProfile.setDepartment(department);
-        currentUserProfile.setUser(user);
-        currentUserProfile.setPosition(position);
+    currentUserProfile.setFirstName(userProfileRequest.firstName());
+    currentUserProfile.setLastName(userProfileRequest.lastName());
+    currentUserProfile.setDepartment(department);
+    currentUserProfile.setUser(user);
+    currentUserProfile.setPosition(position);
 
-        return userProfileMapper.toUserProfileResponse(userProfileRepository.save(currentUserProfile));
-    }
+    return userProfileMapper.toUserProfileResponse(userProfileRepository.save(currentUserProfile));
+  }
 
-    /**
-     * Deletes a user profile by its ID.
-     *
-     * @param id the ID of the user profile to delete
-     */
-    @Override
-    @Transactional
-    public void delete(Long id) {
-        userProfileRepository.deleteById(id);
-    }
+  /**
+   * Deletes a user profile by its ID.
+   *
+   * @param id the ID of the user profile to delete
+   */
+  @Override
+  @Transactional
+  public void delete(Long id) {
+    userProfileRepository.deleteById(id);
+  }
 }

@@ -1,6 +1,5 @@
 package ru.senla.model.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,16 +22,15 @@ import ru.senla.model.entity.enums.PositionType;
 @Table(name = "positions")
 public class Position {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "name", nullable = false)
-    private PositionType name;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "name", nullable = false)
+  private PositionType name;
 
-    public Position(Long positionId) {
-        this.id = positionId;
-    }
-
+  public Position(Long positionId) {
+    this.id = positionId;
+  }
 }

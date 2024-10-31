@@ -14,20 +14,23 @@ import ru.senla.model.dto.response.UserResponse;
 
 @Tag(name = " Authentication", description = "API for working with users")
 public interface AuthenticationOpenApi {
-    @Operation(
-            method = "POST",
-            tags = "User",
-            description = "Get JWT token user by login and password",
-            parameters = {
-                    @Parameter(name = "email", example = "admin@example.com", required = true),
-                    @Parameter(name = "password", example = "securepassword123", required = true),
-                    @Parameter(name = "role", example = "1", required = true)
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "POST",
+      tags = "User",
+      description = "Get JWT token user by login and password",
+      parameters = {
+        @Parameter(name = "email", example = "admin@example.com", required = true),
+        @Parameter(name = "password", example = "securepassword123", required = true),
+        @Parameter(name = "role", example = "1", required = true)
+      },
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    examples =
+                        @ExampleObject(
+                            """
                                             eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlz
                                             cyI6IlNlbmxhIiwiYXV0aG9yaXRpZXMiOlsiY29tbWVudHM6cmVhZCIsImNvbW1
                                             lbnRzOndyaXRlIiwiY29tbWVudHM6ZGVsZXRlIiwidGFzazpyZWFkIiwidGFzazp3cml0Z
@@ -39,70 +42,68 @@ public interface AuthenticationOpenApi {
                                             RlIl0sImlhdCI6MTcy
                                             OTE3MDM4OCwiZXhwIjoxNzI5Nzc1MTg4fQ.PWl-TXiEtFaid_avGHgRsl6RzxvU2DcLtRrMaKoeX
                                             RREIaVtCptpMebWK0odGATglg6pf55AaXwgshxEKU775w
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "401",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "UNAUTHORIZED",
                                                 "message": "Invalid email: admin@example.c1om"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-            }
-    )
-    ResponseEntity<String> register(UserRequest userRequest);
+                                            """))),
+      })
+  ResponseEntity<String> register(UserRequest userRequest);
 
-    @Operation(
-            method = "POST",
-            tags = "User",
-            description = "Create new user ",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "POST",
+      tags = "User",
+      description = "Create new user ",
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 5,
                                                 "email": "test@example.com",
                                                 "role": 3
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            content = @Content(
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "400",
+            content =
+                @Content(
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "UNAUTHORIZED",
                                                 "message": "Invalid email: test@example.com1"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<UserResponse> authenticate(@Parameter(hidden = true) UserRequest userRequest);
-
-
+                                            """)))
+      })
+  ResponseEntity<UserResponse> authenticate(@Parameter(hidden = true) UserRequest userRequest);
 }

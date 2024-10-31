@@ -1,5 +1,13 @@
 package ru.senla.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,332 +25,334 @@ import ru.senla.data.PositionTestData;
 import ru.senla.model.entity.enums.PositionType;
 import ru.senla.service.api.PositionService;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class PositionControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+  @MockBean private PositionService positionService;
 
-    @MockBean
-    private PositionService positionService;
+  private static final String URL = "/api/v0/positions";
+  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
 
-    private static final String URL = "/api/v0/positions";
-    private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
+  @Nested
+  class Create {
+    @ParameterizedTest
+    @CsvSource({"MANAGER, 1", "DEVELOPER, 2", "SALESPERSON, 3"})
+    @WithMockUser(authorities = {"position:write"})
+    void createShouldReturnPositionResponse(String name, Long id) throws Exception {
+      // given
+      var positionRequest =
+          PositionTestData.builder()
+              .withName(PositionType.valueOf(name))
+              .build()
+              .buildPositionRequest();
+      var expectedResponse =
+          PositionTestData.builder()
+              .withId(id)
+              .withName(PositionType.valueOf(name))
+              .build()
+              .buildPositionResponse();
 
-    @Nested
-    class Create {
-        @ParameterizedTest
-        @CsvSource({
-                "MANAGER, 1",
-                "DEVELOPER, 2",
-                "SALESPERSON, 3"
-        })
-        @WithMockUser(authorities = {"position:write"})
-        void createShouldReturnPositionResponse(String name, Long id) throws Exception {
-            // given
-            var positionRequest = PositionTestData.builder()
-                    .withName(PositionType.valueOf(name))
-                    .build().buildPositionRequest();
-            var expectedResponse = PositionTestData.builder()
-                    .withId(id)
-                    .withName(PositionType.valueOf(name))
-                    .build().buildPositionResponse();
+      doReturn(expectedResponse).when(positionService).create(positionRequest);
 
-            doReturn(expectedResponse)
-                    .when(positionService).create(positionRequest);
+      var requestBuilder =
+          post(URL)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(
+                  """
+                                            {
+                                                "name": "%s"
+                                            }
+                                            """
+                      .formatted(name));
 
-            var requestBuilder = post(URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "name": "%s"
-                            }
-                            """.formatted(name));
+      // when
+      mockMvc
+          .perform(requestBuilder)
+          // then
+          .andExpect(status().isCreated());
 
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpect(status().isCreated());
-
-            verify(positionService).create(positionRequest);
-        }
-
-
-        @Test
-        @WithMockUser(authorities = {"position:write"})
-        void createShouldReturnPositionResponse() throws Exception {
-            // given
-            var positionRequest = PositionTestData.builder().build().buildPositionRequest();
-            var expectedResponse = PositionTestData.builder().build().buildPositionResponse();
-
-            doReturn(expectedResponse)
-                    .when(positionService).create(positionRequest);
-
-            var requestBuilder = post(URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "name": "DEVELOPER"
-                            }
-                            """);
-
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpectAll(
-                            status().isCreated(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            content().json("""
-                                     {
-                                         "id": 1,
-                                         "name": "DEVELOPER"
-                                     }
-                                    """)
-                    );
-
-            verify(positionService).create(any());
-        }
-
-        @Test
-        void createShouldReturnForbidden() throws Exception {
-            // given
-            var requestBuilder = post(URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "name": "DEVELOPER"
-                            }
-                            """);
-
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(positionService, never()).create(any());
-        }
+      verify(positionService).create(positionRequest);
     }
 
-    @Nested
-    class GetAll {
+    @Test
+    @WithMockUser(authorities = {"position:write"})
+    void createShouldReturnPositionResponse() throws Exception {
+      // given
+      var positionRequest = PositionTestData.builder().build().buildPositionRequest();
+      var expectedResponse = PositionTestData.builder().build().buildPositionResponse();
 
-        @Test
-        @WithMockUser(authorities = {"position:read"})
-        void getAllShouldReturnListOfPositionResponses() throws Exception {
-            // given
-            var pageable = Pageable.ofSize(2);
+      doReturn(expectedResponse).when(positionService).create(positionRequest);
 
-            var expectedResponses = List.of(
-                    PositionTestData.builder().build().buildPositionResponse(),
-                    PositionTestData.builder().withId(2L).build().buildPositionResponse()
-            );
+      var requestBuilder =
+          post(URL)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(
+                  """
+                                            {
+                                                "name": "DEVELOPER"
+                                            }
+                                            """);
 
-            when(positionService.getAll(any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(expectedResponses, pageable, 2));
+      // when
+      mockMvc
+          .perform(requestBuilder)
+          // then
+          .andExpectAll(
+              status().isCreated(),
+              content().contentType(MediaType.APPLICATION_JSON),
+              content()
+                  .json(
+                      """
+                                                     {
+                                                         "id": 1,
+                                                         "name": "DEVELOPER"
+                                                     }
+                                                    """));
 
-            // when
-            mockMvc.perform(get(URL)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpectAll(
-                            status().isOk(),
-                            content().contentType(MediaType.APPLICATION_JSON)
-                    ).andExpect(jsonPath("$.content").isNotEmpty())
-                    .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()))
-                    .andExpect(jsonPath("$.content[0].id").value(expectedResponses.get(0).id()))
-                    .andExpect(jsonPath("$.content[0].name").value(expectedResponses.get(0).name()))
-                    .andExpect(jsonPath("$.content[1].id").value(expectedResponses.get(1).id()))
-                    .andExpect(jsonPath("$.content[1].name").value(expectedResponses.get(1).name()));
-        }
-
-        @Test
-        void getAllShouldReturnForbidden() throws Exception {
-            //given
-            var pageable = Pageable.ofSize(2);
-            // when
-            mockMvc.perform(get(URL)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(positionService, never()).getAll(pageable);
-        }
+      verify(positionService).create(any());
     }
 
-    @Nested
-    class GetByID {
-        @ParameterizedTest
-        @CsvSource({
-                "1, MANAGER",
-                "2, DEVELOPER",
-                "3, SALESPERSON"
-        })
-        @WithMockUser(authorities = {"position:read"})
-        void getByIdShouldReturnPositionResponse(Long id, String expectedName) throws Exception {
-            // given
-            var expectedResponse = PositionTestData.builder()
-                    .withId(id)
-                    .withName(PositionType.valueOf(expectedName))
-                    .build().buildPositionResponse();
+    @Test
+    void createShouldReturnForbidden() throws Exception {
+      // given
+      var requestBuilder =
+          post(URL)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(
+                  """
+                                            {
+                                                "name": "DEVELOPER"
+                                            }
+                                            """);
 
-            doReturn(expectedResponse)
-                    .when(positionService).getById(id);
+      // when
+      mockMvc
+          .perform(requestBuilder)
+          // then
+          .andExpect(status().isForbidden());
 
-            // when
-            mockMvc.perform(get(URL_WITH_PARAMETER_ID, id)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isOk());
+      verify(positionService, never()).create(any());
+    }
+  }
 
-            verify(positionService).getById(id);
-        }
+  @Nested
+  class GetAll {
 
-        @Test
-        @WithMockUser(authorities = {"position:read"})
-        void getByIdShouldReturnPositionResponse() throws Exception {
-            // given
-            var positionResponse = PositionTestData.builder().build().buildPositionResponse();
-            var positionId = positionResponse.id();
+    @Test
+    @WithMockUser(authorities = {"position:read"})
+    void getAllShouldReturnListOfPositionResponses() throws Exception {
+      // given
+      var pageable = Pageable.ofSize(2);
 
-            doReturn(positionResponse)
-                    .when(positionService).getById(positionId);
+      var expectedResponses =
+          List.of(
+              PositionTestData.builder().build().buildPositionResponse(),
+              PositionTestData.builder().withId(2L).build().buildPositionResponse());
 
-            // when
-            mockMvc.perform(get(URL_WITH_PARAMETER_ID, positionId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpectAll(
-                            status().isOk(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            content().json("""
-                                    {
-                                       "id": 1,
-                                       "name": "DEVELOPER"
-                                    }
-                                    """)
-                    );
-            verify(positionService).getById(any());
-        }
+      var expectedPage = new PageImpl<>(expectedResponses, pageable, expectedResponses.size());
 
-        @Test
-        void getByIdShouldReturnForbidden() throws Exception {
-            // given
-            var positionResponse = PositionTestData.builder().build().buildPositionResponse();
-            var positionId = positionResponse.id();
+      when(positionService.getAll(any(Pageable.class))).thenReturn(expectedPage);
 
-            doReturn(positionResponse)
-                    .when(positionService).getById(positionId);
-
-            // when
-            mockMvc.perform(get(URL_WITH_PARAMETER_ID, positionId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(positionService, never()).getById(any());
-        }
+      // when
+      mockMvc
+          .perform(get(URL).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isOk())
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(content().json(objectMapper.writeValueAsString(expectedPage)));
     }
 
-    @Nested
-    class Update {
-        @Test
-        @WithMockUser(authorities = {"position:write"})
-        void updateShouldReturnUpdatedDepartmentResponse() throws Exception {
-            // given
-            var positionId = 1L;
-            var positionRequest = PositionTestData.builder()
-                    .withName(PositionType.DEVELOPER)
-                    .build().buildPositionRequest();
+    @Test
+    void getAllShouldReturnForbidden() throws Exception {
+      // given
+      var pageable = Pageable.ofSize(2);
+      // when
+      mockMvc
+          .perform(get(URL).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isForbidden());
 
-            var updatedResponse = PositionTestData.builder()
-                    .withId(positionId)
-                    .withName(PositionType.DEVELOPER)
-                    .build().buildPositionResponse();
+      verify(positionService, never()).getAll(pageable);
+    }
+  }
 
-            doReturn(updatedResponse)
-                    .when(positionService).update(positionId, positionRequest);
+  @Nested
+  class GetByID {
+    @ParameterizedTest
+    @CsvSource({"1, MANAGER", "2, DEVELOPER", "3, SALESPERSON"})
+    @WithMockUser(authorities = {"position:read"})
+    void getByIdShouldReturnPositionResponse(Long id, String expectedName) throws Exception {
+      // given
+      var expectedResponse =
+          PositionTestData.builder()
+              .withId(id)
+              .withName(PositionType.valueOf(expectedName))
+              .build()
+              .buildPositionResponse();
 
-            var requestBuilder = put(URL_WITH_PARAMETER_ID, positionId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                            {
-                                "name": "DEVELOPER"
-                            }
-                            """);
+      doReturn(expectedResponse).when(positionService).getById(id);
 
-            // when
-            mockMvc.perform(requestBuilder)
-                    // then
-                    .andExpectAll(
-                            status().isOk(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            content().json("""
-                                    {
-                                         "id": 1,
-                                         "name": "DEVELOPER"
-                                    }
-                                    """)
-                    );
+      // when
+      mockMvc
+          .perform(get(URL_WITH_PARAMETER_ID, id).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isOk());
 
-            verify(positionService).update(any(), any());
-        }
-
-        @Test
-        void updateShouldReturnForbidden() throws Exception {
-            // given
-            var positionId = 1L;
-
-            // when
-            mockMvc.perform(put(URL_WITH_PARAMETER_ID, positionId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content("""
-                                    {
-                                        "name": "Updated Department"
-                                    }
-                                    """))
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(positionService, never()).update(any(), any());
-        }
+      verify(positionService).getById(id);
     }
 
-    @Nested
-    class Delete {
-        @Test
-        @WithMockUser(authorities = {"position:delete"})
-        void deleteShouldReturnNoContent() throws Exception {
-            // given
-            var positionId = 1L;
+    @Test
+    @WithMockUser(authorities = {"position:read"})
+    void getByIdShouldReturnPositionResponse() throws Exception {
+      // given
+      var positionResponse = PositionTestData.builder().build().buildPositionResponse();
+      var positionId = positionResponse.id();
 
-            // when
-            mockMvc.perform(delete(URL_WITH_PARAMETER_ID, positionId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isNoContent());
+      doReturn(positionResponse).when(positionService).getById(positionId);
 
-            verify(positionService).delete(positionId);
-        }
-
-        @Test
-        void deleteShouldReturnForbidden() throws Exception {
-            // given
-            var positionId = 1L;
-
-            // when
-            mockMvc.perform(delete(URL_WITH_PARAMETER_ID, positionId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    // then
-                    .andExpect(status().isForbidden());
-
-            verify(positionService, never()).delete(positionId);
-        }
+      // when
+      mockMvc
+          .perform(get(URL_WITH_PARAMETER_ID, positionId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpectAll(
+              status().isOk(),
+              content().contentType(MediaType.APPLICATION_JSON),
+              content()
+                  .json(
+                      """
+                                                    {
+                                                       "id": 1,
+                                                       "name": "DEVELOPER"
+                                                    }
+                                                    """));
+      verify(positionService).getById(any());
     }
+
+    @Test
+    void getByIdShouldReturnForbidden() throws Exception {
+      // given
+      var positionResponse = PositionTestData.builder().build().buildPositionResponse();
+      var positionId = positionResponse.id();
+
+      doReturn(positionResponse).when(positionService).getById(positionId);
+
+      // when
+      mockMvc
+          .perform(get(URL_WITH_PARAMETER_ID, positionId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isForbidden());
+
+      verify(positionService, never()).getById(any());
+    }
+  }
+
+  @Nested
+  class Update {
+    @Test
+    @WithMockUser(authorities = {"position:write"})
+    void updateShouldReturnUpdatedDepartmentResponse() throws Exception {
+      // given
+      var positionId = 1L;
+      var positionRequest =
+          PositionTestData.builder()
+              .withName(PositionType.DEVELOPER)
+              .build()
+              .buildPositionRequest();
+
+      var updatedResponse =
+          PositionTestData.builder()
+              .withId(positionId)
+              .withName(PositionType.DEVELOPER)
+              .build()
+              .buildPositionResponse();
+
+      doReturn(updatedResponse).when(positionService).update(positionId, positionRequest);
+
+      var requestBuilder =
+          put(URL_WITH_PARAMETER_ID, positionId)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(
+                  """
+                                            {
+                                                "name": "DEVELOPER"
+                                            }
+                                            """);
+
+      // when
+      mockMvc
+          .perform(requestBuilder)
+          // then
+          .andExpectAll(
+              status().isOk(),
+              content().contentType(MediaType.APPLICATION_JSON),
+              content()
+                  .json(
+                      """
+                                                    {
+                                                         "id": 1,
+                                                         "name": "DEVELOPER"
+                                                    }
+                                                    """));
+
+      verify(positionService).update(any(), any());
+    }
+
+    @Test
+    void updateShouldReturnForbidden() throws Exception {
+      // given
+      var positionId = 1L;
+
+      // when
+      mockMvc
+          .perform(
+              put(URL_WITH_PARAMETER_ID, positionId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(
+                      """
+                                                    {
+                                                        "name": "Updated Department"
+                                                    }
+                                                    """))
+          // then
+          .andExpect(status().isForbidden());
+
+      verify(positionService, never()).update(any(), any());
+    }
+  }
+
+  @Nested
+  class Delete {
+    @Test
+    @WithMockUser(authorities = {"position:delete"})
+    void deleteShouldReturnNoContent() throws Exception {
+      // given
+      var positionId = 1L;
+
+      // when
+      mockMvc
+          .perform(
+              delete(URL_WITH_PARAMETER_ID, positionId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isNoContent());
+
+      verify(positionService).delete(positionId);
+    }
+
+    @Test
+    void deleteShouldReturnForbidden() throws Exception {
+      // given
+      var positionId = 1L;
+
+      // when
+      mockMvc
+          .perform(
+              delete(URL_WITH_PARAMETER_ID, positionId).contentType(MediaType.APPLICATION_JSON))
+          // then
+          .andExpect(status().isForbidden());
+
+      verify(positionService, never()).delete(positionId);
+    }
+  }
 }

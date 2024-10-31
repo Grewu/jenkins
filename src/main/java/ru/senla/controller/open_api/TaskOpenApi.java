@@ -18,16 +18,20 @@ import ru.senla.model.filter.TaskFilter;
 
 @Tag(name = "Task", description = "API for working with tasks")
 public interface TaskOpenApi {
-    @Operation(
-            method = "POST",
-            tags = "Task",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "task:write"),
-            description = "Create a new task",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = TaskRequest.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "POST",
+      tags = "Task",
+      security = @SecurityRequirement(name = "Bearer Authentication", scopes = "task:write"),
+      description = "Create a new task",
+      requestBody =
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = TaskRequest.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                       "name": "Task 1",
                                       "assignedTo": 1,
@@ -37,16 +41,17 @@ public interface TaskOpenApi {
                                       "status": "COMPLETED",
                                       "priority": "MEDIUM"
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 5,
                                                 "name": "Task 1",
@@ -57,55 +62,57 @@ public interface TaskOpenApi {
                                                 "status": "COMPLETED",
                                                 "priority": "MEDIUM"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "400",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "BAD_REQUEST",
                                                 "message": "name = Name must not be blank"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<TaskResponse> create(TaskRequest taskRequest);
+                                            """)))
+      })
+  ResponseEntity<TaskResponse> create(TaskRequest taskRequest);
 
-    @Operation(
-            method = "GET",
-            tags = "Task",
-            description = "Get page of task",
-            parameters = {
-                    @Parameter(name = "page", description = "Task page", example = "0"),
-                    @Parameter(name = "size", description = "Page size", example = "2"),
-                    @Parameter(name = "sort", description = "Sorting by field", example = "id")
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "Task",
+      description = "Get page of task",
+      parameters = {
+        @Parameter(name = "page", description = "Task page", example = "0"),
+        @Parameter(name = "size", description = "Page size", example = "2"),
+        @Parameter(name = "sort", description = "Sorting by field", example = "id")
+      },
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "content": [
                                                     {
@@ -175,45 +182,46 @@ public interface TaskOpenApi {
                                                 "numberOfElements": 4,
                                                 "empty": false
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<Page<TaskResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
+                                            """)))
+      })
+  ResponseEntity<Page<TaskResponse>> getAll(@Parameter(hidden = true) Pageable pageable);
 
-    @Operation(
-            method = "GET",
-            tags = "Task",
-            description = "Find tasks page by filter",
-            parameters = {
-                    @Parameter(name = "page", description = "Tasks page number", example = "0"),
-                    @Parameter(name = "size", description = "Number of tasks per page", example = "20"),
-                    @Parameter(name = "sort", description = "Field to sort by", example = "dueDate,desc"),
-                    @Parameter(name = "status", description = "Task status filter", example = "IN_PROGRESS"),
-                    @Parameter(name = "priority", description = "Task priority filter", example = "HIGH")
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Successfully retrieved the tasks based on filters",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "Task",
+      description = "Find tasks page by filter",
+      parameters = {
+        @Parameter(name = "page", description = "Tasks page number", example = "0"),
+        @Parameter(name = "size", description = "Number of tasks per page", example = "20"),
+        @Parameter(name = "sort", description = "Field to sort by", example = "dueDate,desc"),
+        @Parameter(name = "status", description = "Task status filter", example = "IN_PROGRESS"),
+        @Parameter(name = "priority", description = "Task priority filter", example = "HIGH")
+      },
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved the tasks based on filters",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                                 {
                                                     "content": [
                                                         {
@@ -253,44 +261,43 @@ public interface TaskOpenApi {
                                                     "numberOfElements": 1,
                                                     "empty": false
                                                 }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid filter parameters",
-                            content = @Content(mediaType = "application/json")
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid filter parameters",
+            content = @Content(mediaType = "application/json")),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<Page<TaskResponse>> getAllByFilter(@Parameter(hidden = true) TaskFilter taskFilter,
-                                                      @Parameter(hidden = true) Pageable pageable);
+                                            """)))
+      })
+  ResponseEntity<Page<TaskResponse>> getAllByFilter(
+      @Parameter(hidden = true) TaskFilter taskFilter, @Parameter(hidden = true) Pageable pageable);
 
-
-    @Operation(
-            method = "GET",
-            tags = "Task",
-            description = "Get a task  by id",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskResponse.class),
-                                    examples = @ExampleObject("""
+  @Operation(
+      method = "GET",
+      tags = "Task",
+      description = "Get a task  by id",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 1,
                                                 "name": "Design Database Schema",
@@ -301,37 +308,39 @@ public interface TaskOpenApi {
                                                 "status": "IN_PROGRESS",
                                                 "priority": "HIGH"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "TaskHistory with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<TaskResponse> getById(@Parameter(example = "1") Long id);
+                                            """)))
+      })
+  ResponseEntity<TaskResponse> getById(@Parameter(example = "1") Long id);
 
-    @Operation(
-            method = "PUT",
-            tags = "Task",
-            security = @SecurityRequirement(name = "Bearer Authentication", scopes = "task:write"),
-            description = "Update existed task",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = TaskRequest.class),
-                            examples = @ExampleObject("""
+  @Operation(
+      method = "PUT",
+      tags = "Task",
+      security = @SecurityRequirement(name = "Bearer Authentication", scopes = "task:write"),
+      description = "Update existed task",
+      requestBody =
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              required = true,
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = TaskRequest.class),
+                      examples =
+                          @ExampleObject(
+                              """
                                     {
                                       "name": "Update",
                                       "assignedTo": 1,
@@ -341,16 +350,17 @@ public interface TaskOpenApi {
                                       "status": "IN_PROGRESS",
                                       "priority": "MEDIUM"
                                     }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskResponse.class),
-                                    examples = @ExampleObject("""
+                                    """))),
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TaskResponse.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "id": 5,
                                                 "name": "Update",
@@ -361,38 +371,37 @@ public interface TaskOpenApi {
                                                 "status": "IN_PROGRESS",
                                                 "priority": "MEDIUM"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "403",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "FORBIDDEN",
                                                 "message": "Full authentication is required to access this resource"
                                             }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ExceptionMessage.class),
-                                    examples = @ExampleObject("""
+                                            """))),
+        @ApiResponse(
+            responseCode = "404",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionMessage.class),
+                    examples =
+                        @ExampleObject(
+                            """
                                             {
                                                 "status": "NOT_FOUND",
                                                 "message": "Task with ID 1 was not found"
                                             }
-                                            """)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<TaskResponse> update(@Parameter(example = "1") Long id, TaskRequest taskRequest);
+                                            """)))
+      })
+  ResponseEntity<TaskResponse> update(@Parameter(example = "1") Long id, TaskRequest taskRequest);
 
-    ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
+  ResponseEntity<Void> delete(@Parameter(example = "1") Long id);
 }

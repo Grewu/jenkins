@@ -1,5 +1,13 @@
 package ru.senla.service.impl;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,173 +24,166 @@ import ru.senla.mapper.UserProfileMapper;
 import ru.senla.repository.api.DepartmentRepository;
 import ru.senla.repository.api.UserProfileRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.IntStream;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class DepartmentServiceImplTest {
 
-    @Mock
-    private DepartmentMapper departmentMapper;
-    @Mock
-    private UserProfileMapper userProfileMapper;
+  @Mock private DepartmentMapper departmentMapper;
+  @Mock private UserProfileMapper userProfileMapper;
 
-    @Mock
-    private DepartmentRepository departmentRepository;
+  @Mock private DepartmentRepository departmentRepository;
 
-    @Mock
-    private UserProfileRepository userProfileRepository;
+  @Mock private UserProfileRepository userProfileRepository;
 
-    @InjectMocks
-    private DepartmentServiceImpl departmentService;
+  @InjectMocks private DepartmentServiceImpl departmentService;
 
-    @Nested
-    class Create {
-        @Test
-        void createShouldReturnDepartmentResponse() {
-            // given
-            var departmentRequest = DepartmentTestData.builder().build().buildDepartmentRequest();
-            var department = DepartmentTestData.builder().build().buildDepartment();
-            var expectedResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
+  private static final String ERROR_MESSAGE = "Department with ID -1 was not found";
 
-            when(departmentMapper.toDepartment(departmentRequest)).thenReturn(department);
-            when(departmentRepository.save(department)).thenReturn(department);
-            when(departmentMapper.toDepartmentResponse(department)).thenReturn(expectedResponse);
+  @Nested
+  class Create {
+    @Test
+    void createShouldReturnDepartmentResponse() {
+      // given
+      var departmentRequest = DepartmentTestData.builder().build().buildDepartmentRequest();
+      var department = DepartmentTestData.builder().build().buildDepartment();
+      var expectedResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
 
-            // when
-            var actualResponse = departmentService.create(departmentRequest);
+      when(departmentMapper.toDepartment(departmentRequest)).thenReturn(department);
+      when(departmentRepository.save(department)).thenReturn(department);
+      when(departmentMapper.toDepartmentResponse(department)).thenReturn(expectedResponse);
 
-            // then
-            verify(departmentRepository).save(department);
-            verify(departmentMapper).toDepartment(departmentRequest);
-            verify(departmentMapper).toDepartmentResponse(department);
-            assertEquals(expectedResponse, actualResponse);
-        }
+      // when
+      var actualResponse = departmentService.create(departmentRequest);
+
+      // then
+      verify(departmentRepository).save(department);
+      verify(departmentMapper).toDepartment(departmentRequest);
+      verify(departmentMapper).toDepartmentResponse(department);
+      assertEquals(expectedResponse, actualResponse);
+    }
+  }
+
+  @Nested
+  class GetAll {
+    @Test
+    void getAllShouldReturnUsersProfileByDepartmentId() {
+      // given
+      var pageable = Pageable.ofSize(2);
+      var departmentId = DepartmentTestData.builder().build().buildDepartment().getId();
+      var userProfiles = List.of(UserProfileTestData.builder().build().buildUserProfile());
+      var expectedResponses =
+          List.of(UserProfileTestData.builder().build().buildUserProfileResponse());
+
+      var userProfilePage = new PageImpl<>(userProfiles, pageable, 2);
+
+      doReturn(userProfilePage)
+          .when(userProfileRepository)
+          .findByDepartmentId(departmentId, pageable);
+
+      IntStream.range(0, userProfiles.size())
+          .forEach(
+              i ->
+                  doReturn(expectedResponses.get(i))
+                      .when(userProfileMapper)
+                      .toUserProfileResponse(userProfiles.get(i)));
+
+      // when
+      var actualResponses =
+          departmentService.getAllUsersProfileByDepartmentId(departmentId, pageable).getContent();
+
+      // then
+      assertEquals(expectedResponses, actualResponses);
     }
 
-    @Nested
-    class GetAll {
-        @Test
-        void getAllShouldReturnUsersProfileByDepartmentId() {
-            //given
-            var pageable = Pageable.ofSize(2);
-            var departmentId = DepartmentTestData.builder().build().buildDepartment().getId();
-            var userProfiles = List.of(UserProfileTestData.builder().build().buildUserProfile());
-            var expectedResponses = List.of(UserProfileTestData.builder().build()
-                    .buildUserProfileResponse());
+    @Test
+    void getAllShouldReturnListOfDepartmentResponses() {
+      // given
+      var pageable = Pageable.ofSize(2);
+      var departments = List.of(DepartmentTestData.builder().build().buildDepartment());
+      var expectedResponses =
+          List.of(DepartmentTestData.builder().build().buildDepartmentResponse());
 
-            var userProfilePage = new PageImpl<>(userProfiles, pageable, 2);
+      var departmentPage = new PageImpl<>(departments, pageable, 2);
 
-            doReturn(userProfilePage)
-                    .when(userProfileRepository).findByDepartmentId(departmentId, pageable);
+      doReturn(departmentPage).when(departmentRepository).findAll(pageable);
 
-            IntStream.range(0, userProfiles.size())
-                    .forEach(i -> doReturn(expectedResponses.get(i))
-                            .when(userProfileMapper).toUserProfileResponse(userProfiles.get(i)));
+      IntStream.range(0, departments.size())
+          .forEach(
+              i ->
+                  doReturn(expectedResponses.get(i))
+                      .when(departmentMapper)
+                      .toDepartmentResponse(departments.get(i)));
 
-            // when
-            var actualResponses = departmentService
-                    .getAllUsersProfileByDepartmentId(departmentId, pageable).getContent();
+      // when
+      var actualResponses = departmentService.getAll(pageable).getContent();
 
-            // then
-            assertEquals(expectedResponses, actualResponses);
-        }
+      // then
+      assertEquals(expectedResponses, actualResponses);
+    }
+  }
 
-        @Test
-        void getAllShouldReturnListOfDepartmentResponses() {
-            // given
-            var pageable = Pageable.ofSize(2);
-            var departments = List.of(DepartmentTestData.builder().build().buildDepartment());
-            var expectedResponses = List.of(DepartmentTestData.builder().build().buildDepartmentResponse());
+  @Nested
+  class GetById {
+    @Test
+    void getByIdShouldReturnExpectedDepartmentResponse() {
+      // given
+      var department = DepartmentTestData.builder().build().buildDepartment();
+      var expectedResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
 
-            var departmentPage = new PageImpl<>(departments, pageable, 2);
+      when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
+      when(departmentMapper.toDepartmentResponse(department)).thenReturn(expectedResponse);
 
-            doReturn(departmentPage)
-                    .when(departmentRepository).findAll(pageable);
+      // when
+      var actualResponse = departmentService.getById(department.getId());
 
-            IntStream.range(0, departments.size())
-                    .forEach(i -> doReturn(expectedResponses.get(i))
-                            .when(departmentMapper).toDepartmentResponse(departments.get(i)));
-
-            // when
-            var actualResponses = departmentService.getAll(pageable).getContent();
-
-            // then
-            assertEquals(expectedResponses, actualResponses);
-        }
+      // then
+      assertEquals(expectedResponse, actualResponse);
     }
 
-    @Nested
-    class GetById {
-        @Test
-        void getByIdShouldReturnExpectedDepartmentResponse() {
-            // given
-            var department = DepartmentTestData.builder().build().buildDepartment();
-            var expectedResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
+    @Test
+    void getByIdShouldThrowNotFoundException() {
+      // given
+      var id = -1L;
+      // when
+      var exception =
+          assertThrows(EntityNotFoundException.class, () -> departmentService.getById(id));
 
-            when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
-            when(departmentMapper.toDepartmentResponse(department)).thenReturn(expectedResponse);
-
-            // when
-            var actualResponse = departmentService.getById(department.getId());
-
-            // then
-            assertEquals(expectedResponse, actualResponse);
-        }
-
-        @Test
-        void getByIdShouldThrowNotFoundException() {
-            // given
-            var id = -1L;
-            // when
-            var exception = assertThrows(EntityNotFoundException.class,
-                    () -> departmentService.getById(id));
-
-            // then
-            assertEquals("Department with ID -1 was not found", exception.getMessage());
-        }
+      // then
+      assertEquals(ERROR_MESSAGE, exception.getMessage());
     }
+  }
 
-    @Nested
-    class Update {
-        @Test
-        void updateShouldReturnDepartmentResponse() {
-            // given
-            var departmentRequest = DepartmentTestData.builder().build().buildDepartmentRequest();
-            var expectedResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
-            var department = DepartmentTestData.builder().build().buildDepartment();
+  @Nested
+  class Update {
+    @Test
+    void updateShouldReturnDepartmentResponse() {
+      // given
+      var departmentRequest = DepartmentTestData.builder().build().buildDepartmentRequest();
+      var expectedResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
+      var department = DepartmentTestData.builder().build().buildDepartment();
 
-            when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
-            when(departmentMapper.update(departmentRequest, department)).thenReturn(department);
-            when(departmentRepository.save(department)).thenReturn(department);
-            when(departmentMapper.toDepartmentResponse(department)).thenReturn(expectedResponse);
+      when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
+      when(departmentMapper.update(departmentRequest, department)).thenReturn(department);
+      when(departmentRepository.save(department)).thenReturn(department);
+      when(departmentMapper.toDepartmentResponse(department)).thenReturn(expectedResponse);
 
-            // when
-            var actualResponse = departmentService.update(1L, departmentRequest);
+      // when
+      var actualResponse = departmentService.update(1L, departmentRequest);
 
-            // then
-            assertEquals(expectedResponse, actualResponse);
-        }
+      // then
+      assertEquals(expectedResponse, actualResponse);
     }
+  }
 
-    @Nested
-    class Delete {
-        @Test
-        void deleteShouldCallDaoDeleteMethod() {
-            // given
-            var id = 1L;
+  @Nested
+  class Delete {
+    @Test
+    void deleteShouldCallDaoDeleteMethod() {
+      // given
+      var id = 1L;
 
-            doNothing()
-                    .when(departmentRepository).deleteById(id);
+      doNothing().when(departmentRepository).deleteById(id);
 
-            assertThatNoException()
-                    .isThrownBy(() -> departmentService.delete(id));
-        }
+      assertThatNoException().isThrownBy(() -> departmentService.delete(id));
     }
+  }
 }

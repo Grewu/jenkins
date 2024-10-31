@@ -1,5 +1,13 @@
 package ru.senla.service.impl;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,176 +26,163 @@ import ru.senla.repository.api.ProjectRepository;
 import ru.senla.repository.api.TaskRepository;
 import ru.senla.repository.api.UserProfileRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.IntStream;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceImplTest {
 
-    @Mock
-    private ProjectMapper projectMapper;
-    @Mock
-    private TaskMapper taskMapper;
-    @Mock
-    private ProjectRepository projectRepository;
+  @Mock private ProjectMapper projectMapper;
+  @Mock private TaskMapper taskMapper;
+  @Mock private ProjectRepository projectRepository;
 
-    @Mock
-    private UserProfileRepository userProfileRepository;
+  @Mock private UserProfileRepository userProfileRepository;
 
-    @Mock
-    private TaskRepository taskRepository;
+  @Mock private TaskRepository taskRepository;
 
-    @InjectMocks
-    private ProjectServiceImpl projectService;
+  @InjectMocks private ProjectServiceImpl projectService;
 
-    @Nested
-    class Create {
-        @Test
-        void createShouldReturnProjectResponse() {
-            // given
-            var projectRequest = ProjectTestData.builder().build().buildProjectRequest();
-            var project = ProjectTestData.builder().build().buildProject();
-            var expected = ProjectTestData.builder().build().buildProjectResponse();
+  private static final String ERROR_MESSAGE = "Project with ID -1 was not found";
 
-            when(projectMapper.toProject(projectRequest)).thenReturn(project);
-            when(projectRepository.save(project)).thenReturn(project);
-            when(projectMapper.toProjectResponse(project)).thenReturn(expected);
+  @Nested
+  class Create {
+    @Test
+    void createShouldReturnProjectResponse() {
+      // given
+      var projectRequest = ProjectTestData.builder().build().buildProjectRequest();
+      var project = ProjectTestData.builder().build().buildProject();
+      var expected = ProjectTestData.builder().build().buildProjectResponse();
 
-            // when
-            var actual = projectService.create(projectRequest);
+      when(projectMapper.toProject(projectRequest)).thenReturn(project);
+      when(projectRepository.save(project)).thenReturn(project);
+      when(projectMapper.toProjectResponse(project)).thenReturn(expected);
 
-            // then
-            verify(projectRepository).save(project);
-            verify(projectMapper).toProject(projectRequest);
-            verify(projectMapper).toProjectResponse(project);
-            assertEquals(expected, actual);
-        }
+      // when
+      var actual = projectService.create(projectRequest);
+
+      // then
+      verify(projectRepository).save(project);
+      verify(projectMapper).toProject(projectRequest);
+      verify(projectMapper).toProjectResponse(project);
+      assertEquals(expected, actual);
+    }
+  }
+
+  @Nested
+  class GetAll {
+
+    @Test
+    void getAllTaskRelatedToProjectByProjectId() {
+      // given
+      var pageable = Pageable.ofSize(2);
+      var projectId = ProjectTestData.builder().build().buildProject().getId();
+      var tasks = List.of(TaskTestData.builder().build().buildTask());
+      var expectedResponses = List.of(TaskTestData.builder().build().buildTaskResponse());
+
+      var taskPage = new PageImpl<>(tasks, pageable, 2);
+
+      doReturn(taskPage).when(taskRepository).findTasksByProjectId(projectId, pageable);
+
+      IntStream.range(0, tasks.size())
+          .forEach(
+              i ->
+                  doReturn(expectedResponses.get(i)).when(taskMapper).toTaskResponse(tasks.get(i)));
+
+      // when
+      var actualResponses =
+          projectService.getAllTaskRelatedToProjectByProjectId(projectId, pageable).getContent();
+
+      // then
+      assertEquals(expectedResponses, actualResponses);
     }
 
-    @Nested
-    class GetAll {
+    @Test
+    void getAllShouldReturnListOfProjectResponse() {
+      // given
+      var pageable = Pageable.ofSize(2);
+      var projects = List.of(ProjectTestData.builder().build().buildProject());
+      var expectedResponses = List.of(ProjectTestData.builder().build().buildProjectResponse());
+      var projectPage = new PageImpl<>(projects, pageable, 2);
 
-        @Test
-        void getAllTaskRelatedToProjectByProjectId() {
-            //given
-            var pageable = Pageable.ofSize(2);
-            var projectId = ProjectTestData.builder().build().buildProject().getId();
-            var tasks = List.of(TaskTestData.builder().build().buildTask());
-            var expectedResponses = List.of(TaskTestData.builder().build().buildTaskResponse());
+      doReturn(projectPage).when(projectRepository).findAll(pageable);
 
-            var taskPage = new PageImpl<>(tasks, pageable, 2);
+      IntStream.range(0, projects.size())
+          .forEach(
+              i ->
+                  doReturn(expectedResponses.get(i))
+                      .when(projectMapper)
+                      .toProjectResponse(projects.get(i)));
 
-            doReturn(taskPage)
-                    .when(taskRepository).findTasksByProjectId(projectId, pageable);
+      // when
+      var actualResponses = projectService.getAll(pageable).getContent();
 
-            IntStream.range(0, tasks.size())
-                    .forEach(i -> doReturn(expectedResponses.get(i))
-                            .when(taskMapper).toTaskResponse(tasks.get(i)));
+      // then
+      assertEquals(expectedResponses, actualResponses);
+    }
+  }
 
-            // when
-            var actualResponses = projectService
-                    .getAllTaskRelatedToProjectByProjectId(projectId, pageable).getContent();
+  @Nested
+  class GetById {
+    @Test
+    void getByIdShouldReturnExpectedProjectResponse() {
+      // given
+      var project = ProjectTestData.builder().build().buildProject();
+      var expected = ProjectTestData.builder().build().buildProjectResponse();
 
-            // then
-            assertEquals(expectedResponses, actualResponses);
-        }
+      when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
+      when(projectMapper.toProjectResponse(project)).thenReturn(expected);
 
-        @Test
-        void getAllShouldReturnListOfProjectResponse() {
-            // given
-            var pageable = Pageable.ofSize(2);
-            var projects = List.of(ProjectTestData.builder().build().buildProject());
-            var expectedResponses = List.of(ProjectTestData.builder().build().buildProjectResponse());
-            var projectPage = new PageImpl<>(projects, pageable, 2);
+      // when
+      var actual = projectService.getById(project.getId());
 
-            doReturn(projectPage)
-                    .when(projectRepository).findAll(pageable);
-
-            IntStream.range(0, projects.size())
-                    .forEach(i -> doReturn(expectedResponses.get(i))
-                            .when(projectMapper).toProjectResponse(projects.get(i)));
-
-            // when
-            var actualResponses = projectService.getAll(pageable).getContent();
-
-            // then
-            assertEquals(expectedResponses, actualResponses);
-        }
+      // then
+      assertEquals(expected, actual);
     }
 
-    @Nested
-    class GetById {
-        @Test
-        void getByIdShouldReturnExpectedProjectResponse() {
-            // given
-            var project = ProjectTestData.builder().build().buildProject();
-            var expected = ProjectTestData.builder().build().buildProjectResponse();
+    @Test
+    void getByIdShouldThrowNotFoundException() {
+      // given
+      var id = -1L;
+      // when
+      var exception = assertThrows(EntityNotFoundException.class, () -> projectService.getById(id));
 
-            when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
-            when(projectMapper.toProjectResponse(project)).thenReturn(expected);
-
-            // when
-            var actual = projectService.getById(project.getId());
-
-            // then
-            assertEquals(expected, actual);
-        }
-
-        @Test
-        void getByIdShouldThrowNotFoundException() {
-            // given
-            var id = -1L;
-            // when
-            var exception = assertThrows(EntityNotFoundException.class,
-                    () -> projectService.getById(id));
-
-            // then
-            assertEquals("Project with ID -1 was not found", exception.getMessage());
-        }
+      // then
+      assertEquals(ERROR_MESSAGE, exception.getMessage());
     }
+  }
 
-    @Nested
-    class Update {
-        @Test
-        void updateShouldReturnProjectResponse() {
-            // given
-            var projectRequest = ProjectTestData.builder().build().buildProjectRequest();
-            var expectedResponse = ProjectTestData.builder().build().buildProjectResponse();
-            var project = ProjectTestData.builder().build().buildProject();
-            var userProfile = UserProfileTestData.builder().build().buildUserProfile();
+  @Nested
+  class Update {
+    @Test
+    void updateShouldReturnProjectResponse() {
+      // given
+      var projectRequest = ProjectTestData.builder().build().buildProjectRequest();
+      var expectedResponse = ProjectTestData.builder().build().buildProjectResponse();
+      var project = ProjectTestData.builder().build().buildProject();
+      var userProfile = UserProfileTestData.builder().build().buildUserProfile();
 
-            when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
-            when(userProfileRepository.findById(projectRequest.owner())).thenReturn(Optional.of(userProfile));
+      when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
+      when(userProfileRepository.findById(projectRequest.owner()))
+          .thenReturn(Optional.of(userProfile));
 
-            when(projectRepository.save(project)).thenReturn(project);
-            when(projectMapper.toProjectResponse(project)).thenReturn(expectedResponse);
+      when(projectRepository.save(project)).thenReturn(project);
+      when(projectMapper.toProjectResponse(project)).thenReturn(expectedResponse);
 
-            // when
-            var actual = projectService.update(1L, projectRequest);
+      // when
+      var actual = projectService.update(1L, projectRequest);
 
-            // then
-            assertEquals(expectedResponse, actual);
-        }
+      // then
+      assertEquals(expectedResponse, actual);
     }
+  }
 
-    @Nested
-    class Delete {
-        @Test
-        void deleteShouldCallDaoDeleteMethod() {
-            // given
-            var id = 1L;
+  @Nested
+  class Delete {
+    @Test
+    void deleteShouldCallDaoDeleteMethod() {
+      // given
+      var id = 1L;
 
-            doNothing()
-                    .when(projectRepository).deleteById(id);
+      doNothing().when(projectRepository).deleteById(id);
 
-            assertThatNoException()
-                    .isThrownBy(() -> projectService.delete(id));
-        }
+      assertThatNoException().isThrownBy(() -> projectService.delete(id));
     }
+  }
 }
