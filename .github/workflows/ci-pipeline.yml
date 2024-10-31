@@ -24,10 +24,10 @@ jobs:
         run: chmod +x gradlew  # Установка прав на выполнение для gradlew.
 
       - name: Build with Gradle
-        run: ./gradlew build --refresh-dependencies  # Сборка проекта с помощью Gradle и обновление зависимостей.
+        run: ./gradlew build --refresh-dependencies --info  # Сборка проекта с помощью Gradle и обновление зависимостей с подробной информацией.
 
       - name: Run tests
-        run: ./gradlew test  # Запуск тестов.
+        run: ./gradlew test --info  # Запуск тестов с подробной информацией.
 
       - name: Build with debug info
         run: ./gradlew build --info  # Запуск сборки с подробной информацией, чтобы видеть детали процесса.
