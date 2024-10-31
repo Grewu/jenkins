@@ -24,10 +24,7 @@ jobs:
         run: chmod +x gradlew  # Установка прав на выполнение для gradlew.
 
       - name: Publish to Maven Local
-        run: ../gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий.
-
-      - name: Publish to Maven Local 2
-        run: ../gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий.
+        run: ./gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий.
 
       - name: Build with Gradle
         run: ./gradlew build --refresh-dependencies --info  # Сборка проекта с помощью Gradle и обновление зависимостей с подробной информацией.
