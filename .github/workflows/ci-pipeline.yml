@@ -29,5 +29,5 @@ jobs:
       - name: Run tests
         run: ./gradlew test --info  # Запуск тестов с подробной информацией.
 
-      - name: Build with debug info
-        run: ./gradlew build --info  # Запуск сборки с подробной информацией, чтобы видеть детали процесса.
+      - name: Publish to Maven Local (optional)
+        run: ./gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий, если это нужно.
