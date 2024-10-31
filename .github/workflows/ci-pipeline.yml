@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - spring-boot  # Ветки для запуска CI
+      - spring-boot
   pull_request:
     branches:
       - main
@@ -29,6 +29,9 @@ jobs:
 
       - name: Publish logging-starter to Maven Local
         run: ./gradlew :logging-starter:publishToMavenLocal  # Публикация logging-starter в локальный Maven-репозиторий
+
+      - name: Publish exception-handling-starter to Maven Local
+        run: ./gradlew :exception-handling-starter:publishToMavenLocal  # Публикация exception-handling-starter в локальный Maven-репозиторий
 
       - name: Build with Gradle
         run: ./gradlew build --refresh-dependencies --info
