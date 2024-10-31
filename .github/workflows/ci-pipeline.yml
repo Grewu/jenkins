@@ -19,6 +19,9 @@ jobs:
           java-version: '17'  # ”кажите версию Java.
           distribution: 'temurin'  # ”кажите дистрибуцию JDK (например, 'temurin' дл€ Adoptium).
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew  # ”становка прав на выполнение дл€ gradlew.
+
       - name: Build with Gradle
         run: ./gradlew build  # —борка проекта с помощью Gradle.
 
