@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # Проверка кода из репозитория.
+        uses: actions/checkout@v3  # Обновленная версия для проверки кода из репозитория.
 
       - name: Set up JDK
-        uses: actions/setup-java@v2  # Установка JDK.
+        uses: actions/setup-java@v3  # Обновленная версия для установки JDK.
         with:
           java-version: '17'  # Укажите версию Java.
           distribution: 'temurin'  # Укажите дистрибутив (temurin, zulu и т.д.)
@@ -30,4 +30,5 @@ jobs:
         run: ./gradlew test --info  # Запуск тестов с подробной информацией.
 
       - name: Publish to Maven Local (optional)
+        if: success()  # Условие, при котором выполняется публикация, только если сборка прошла успешно
         run: ./gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий, если это нужно.
