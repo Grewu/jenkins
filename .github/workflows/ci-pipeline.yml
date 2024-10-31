@@ -32,6 +32,6 @@ jobs:
       - name: Run tests
         run: ./gradlew test --info  # Запуск тестов с подробной информацией.
 
-      - name: Clean up (optional)
+      - name: Clean up
         if: success()  # Удаление временных файлов или очистка кэша, если это необходимо
-        run: ./gradlew clean  # Очистка проекта после сборки и тестирования
+        run: ./gradlew clean  # Очистка проекта после сборки и тестирования.
