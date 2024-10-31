@@ -32,3 +32,7 @@ jobs:
       - name: Publish to Maven Local (optional)
         if: success()  # Условие, при котором выполняется публикация, только если сборка прошла успешно
         run: ./gradlew publishToMavenLocal  # Публикация артефактов в локальный Maven-репозиторий, если это нужно.
+
+      - name: Clean up (optional)
+        if: success()  # Удаление временных файлов или очистка кэша, если это необходимо
+        run: ./gradlew clean  # Очистка проекта после сборки и тестирования
