@@ -28,7 +28,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Start services using Docker Compose
-        run: docker-compose up -d
+        run: docker-compose -f docker-compose.yml up -d
 
       - name: Publish logging-starter to Maven Local
         run: ./gradlew :logging-starter:publishToMavenLocal
@@ -40,10 +40,6 @@ jobs:
         run: ./gradlew build --refresh-dependencies --info
 
       - name: Run tests
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
         run: ./gradlew test --info
 
       - name: Stop Docker Compose services
