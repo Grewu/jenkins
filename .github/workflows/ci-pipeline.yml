@@ -42,10 +42,6 @@ jobs:
       - name: Run tests
         run: ./gradlew test --info
 
-      - name: Stop Docker Compose services
-        if: always()
-        run: docker-compose down  # Останавливает и удаляет контейнеры
-
       - name: Clean up (optional)
         if: success()
         run: ./gradlew clean
