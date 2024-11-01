@@ -30,13 +30,6 @@ jobs:
       - name: Start services using Docker Compose
         run: docker-compose up -d  # Запускает все сервисы, указанные в docker-compose.yml
 
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          until docker-compose exec -T postgres pg_isready -U postgres; do
-            echo "Waiting for PostgreSQL to be ready..."
-            sleep 5
-          done
-
       - name: Publish logging-starter to Maven Local
         run: ./gradlew :logging-starter:publishToMavenLocal
 
