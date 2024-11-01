@@ -27,15 +27,14 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Publish logging-starter to Maven Local
+        run: ./gradlew :logging-starter:publishToMavenLocal
+
+      - name: Publish exception-handling-starter to Maven Local
+        run: ./gradlew :exception-handling-starter:publishToMavenLocal
+
       - name: Build with Gradle
         run: ./gradlew build --refresh-dependencies --info
-
-      - name: Verify JAR file exists
-        run: |
-          if [ ! -f build/libs/config-1.0.0.jar ]; then
-            echo "JAR file not found!"
-            exit 1
-          fi
 
       - name: Install Docker Compose
         run: |
@@ -44,12 +43,6 @@ jobs:
 
       - name: Start services using Docker Compose
         run: docker-compose -f docker-compose.yml up -d
-
-      - name: Publish logging-starter to Maven Local
-        run: ./gradlew :logging-starter:publishToMavenLocal
-
-      - name: Publish exception-handling-starter to Maven Local
-        run: ./gradlew :exception-handling-starter:publishToMavenLocal
 
       - name: Run tests
         run: ./gradlew test --info
