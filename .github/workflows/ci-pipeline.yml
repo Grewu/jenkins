@@ -28,7 +28,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Start services using Docker Compose
-        run: docker-compose up -d  # Запускает все сервисы, указанные в docker-compose.yml
+        run: docker-compose up -d
 
       - name: Publish logging-starter to Maven Local
         run: ./gradlew :logging-starter:publishToMavenLocal
