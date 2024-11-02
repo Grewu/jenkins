@@ -1,5 +1,5 @@
 plugins {
-//    id 'jacoco'
+    id 'jacoco'
     id 'java-library'
     id 'maven-publish'
     id "com.diffplug.spotless" version "7.0.0.BETA4"
@@ -46,7 +46,7 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
-//    finalizedBy jacocoTestReport
+    finalizedBy jacocoTestReport
 }
 
 tasks.named("build") {
@@ -65,14 +65,14 @@ spotless {
     }
 }
 
-//jacoco {
-//    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
-//}
-//
-//jacocoTestReport {
-//    reports {
-//        xml.required = false
-//        csv.required = false
-//        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
-//    }
-//}
+jacoco {
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
