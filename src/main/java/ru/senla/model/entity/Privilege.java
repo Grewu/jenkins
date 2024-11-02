@@ -17,7 +17,6 @@ import ru.senla.model.entity.enums.PrivilegeType;
 @Entity
 @Table(name = "privileges")
 public class Privilege {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

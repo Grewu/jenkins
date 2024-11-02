@@ -21,7 +21,6 @@ import ru.senla.model.entity.enums.PositionType;
 @AllArgsConstructor
 @Table(name = "positions")
 public class Position {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

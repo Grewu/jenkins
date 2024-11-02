@@ -97,6 +97,10 @@ tasks.build {
     dependsOn 'spotlessApply'
 }
 
+build.doLast {
+    delete fileTree (dir: "${buildDir("classes")}", include: "**/JiBX_bindings*.class")
+}
+
 tasks.compileJava {
     options.compilerArgs = [
             '-Amapstruct.defaultComponentModel=spring',
