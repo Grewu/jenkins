@@ -43,7 +43,7 @@ jobs:
 
       - name: Start services using Docker Compose
         env:
-          SPRING_PROFILES_ACTIVE: prod  # Устанавливаем профиль prod
+          SPRING_PROFILES_ACTIVE: prod
         run: docker-compose -f docker-compose.yml up -d
 
       - name: Run tests
