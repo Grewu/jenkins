@@ -23,6 +23,8 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+    - name: Start services using Docker Compose
+        run: docker-compose -f docker-compose.yml up -d
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -35,9 +37,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
-
-      - name: Start services using Docker Compose
-        run: docker-compose -f docker-compose.yml up -d
 
       - name: Run tests
         env:
