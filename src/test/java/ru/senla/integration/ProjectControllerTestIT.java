@@ -5,7 +5,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +26,7 @@ import ru.senla.util.PostgresqlTestContainer;
 @AutoConfigureMockMvc
 class ProjectControllerTestIT extends PostgresqlTestContainer {
   @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
+
   @Autowired private ProjectService projectService;
 
   private static final String URL = "/api/v0/projects";
@@ -47,15 +46,15 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                              "name": "name",
-                                              "projectCode": "projectCode",
-                                              "description": "description",
-                                              "startDate": "2024-09-30T12:00:00",
-                                              "endDate": "2024-09-30T12:00:00",
-                                              "owner": 1
-                                            }
-                                            """);
+                            {
+                                "name": "name",
+                                "projectCode": "projectCode",
+                                "description": "description",
+                                "startDate": "2024-09-30T12:00:00",
+                                "endDate": "2024-09-30T12:00:00",
+                                "owner": 1
+                            }
+                            """);
 
       // when
       mockMvc
@@ -68,15 +67,15 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
               content()
                   .json(
                       """
-                                                       {
-                                                         "name": "name",
-                                                         "projectCode": "projectCode",
-                                                         "description": "description",
-                                                         "startDate": "2024-09-30T12:00:00",
-                                                         "endDate": "2024-09-30T12:00:00",
-                                                         "owner": 1
-                                                       }
-                                                    """));
+                                    {
+                                        "name": "name",
+                                        "projectCode": "projectCode",
+                                        "description": "description",
+                                        "startDate": "2024-09-30T12:00:00",
+                                        "endDate": "2024-09-30T12:00:00",
+                                        "owner": 1
+                                    }
+                                    """));
 
       assertThatCode(() -> projectService.create(projectRequest)).doesNotThrowAnyException();
     }
@@ -89,16 +88,16 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                             {
-                                                 "id": 1,
-                                                 "name": "name",
-                                                 "projectCode": "projectCode",
-                                                 "description": "description",
-                                                 "startDate": "2024-09-30T12:00:00",
-                                                 "endDate": "2024-09-30T12:00:00",
-                                                 "owner": 1
-                                            }
-                                             """);
+                            {
+                                "id": 1,
+                                "name": "name",
+                                "projectCode": "projectCode",
+                                "description": "description",
+                                "startDate": "2024-09-30T12:00:00",
+                                "endDate": "2024-09-30T12:00:00",
+                                "owner": 1
+                            }
+                            """);
 
       // when
       mockMvc
@@ -143,7 +142,7 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
               .toList();
 
       IntStream.range(0, actualResponse.size())
-          .forEach((i) -> assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i)));
+          .forEach(i -> assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i)));
     }
 
     @Test
@@ -171,7 +170,7 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
       var actualResponse = projectService.getAll(pageable).stream().toList();
 
       IntStream.range(0, actualResponse.size())
-          .forEach((i) -> assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i)));
+          .forEach(i -> assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i)));
     }
 
     @Test
@@ -203,16 +202,17 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
               content()
                   .json(
                       """
-                                                      {
-                                                        "id": 1,
-                                                        "name": "name",
-                                                        "projectCode": "projectCode",
-                                                        "description": "description",
-                                                        "startDate": "2024-09-30T12:00:00",
-                                                        "endDate": "2024-09-30T12:00:00",
-                                                        "owner": 1
-                                                      }
-                                                    """));
+                                    {
+                                        "id": 1,
+                                        "name": "name",
+                                        "projectCode": "projectCode",
+                                        "description": "description",
+                                        "startDate": "2024-09-30T12:00:00",
+                                        "endDate": "2024-09-30T12:00:00",
+                                        "owner": 1
+                                    }
+                                    """));
+
       assertThatCode(() -> projectService.getById(projectId)).doesNotThrowAnyException();
 
       var actualResponse = projectService.getById(projectId);
@@ -258,15 +258,15 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "name": "Updated Project",
-                                                "projectCode": "projectCode",
-                                                "description": "description",
-                                                "startDate": "2024-09-30T12:00:00",
-                                                "endDate": "2024-09-30T12:00:00",
-                                                "owner": 1
-                                            }
-                                            """);
+                            {
+                                "name": "Updated Project",
+                                "projectCode": "projectCode",
+                                "description": "description",
+                                "startDate": "2024-09-30T12:00:00",
+                                "endDate": "2024-09-30T12:00:00",
+                                "owner": 1
+                            }
+                            """);
 
       // when
       mockMvc
@@ -278,16 +278,16 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
               content()
                   .json(
                       """
-                                                    {
-                                                      "id": 1,
-                                                      "name": "Updated Project",
-                                                      "projectCode": "projectCode",
-                                                      "description": "description",
-                                                      "startDate": "2024-09-30T12:00:00",
-                                                      "endDate": "2024-09-30T12:00:00",
-                                                      "owner": 1
-                                                    }
-                                                    """));
+                                    {
+                                        "id": 1,
+                                        "name": "Updated Project",
+                                        "projectCode": "projectCode",
+                                        "description": "description",
+                                        "startDate": "2024-09-30T12:00:00",
+                                        "endDate": "2024-09-30T12:00:00",
+                                        "owner": 1
+                                    }
+                                    """));
 
       assertThatCode(() -> projectService.update(projectId, projectRequest))
           .doesNotThrowAnyException();
@@ -301,12 +301,31 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
     void updateShouldReturnForbidden() throws Exception {
       // given
       var projectId = 1L;
+      var projectRequest = ProjectTestData.builder().build().buildProjectRequest();
+
+      var requestBuilder =
+          put(URL_WITH_PARAMETER_ID, projectId)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(
+                  """
+                            {
+                                "name": "name",
+                                "projectCode": "projectCode",
+                                "description": "description",
+                                "startDate": "2024-09-30T12:00:00",
+                                "endDate": "2024-09-30T12:00:00",
+                                "owner": 1
+                            }
+                            """);
 
       // when
       mockMvc
-          .perform(put(URL_WITH_PARAMETER_ID, projectId))
+          .perform(requestBuilder)
           // then
           .andExpect(status().isForbidden());
+
+      assertThatCode(() -> projectService.update(projectId, projectRequest))
+          .doesNotThrowAnyException();
     }
   }
 
@@ -320,7 +339,7 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
 
       // when
       mockMvc
-          .perform(delete(URL_WITH_PARAMETER_ID, projectId).contentType(MediaType.APPLICATION_JSON))
+          .perform(delete(URL_WITH_PARAMETER_ID, projectId))
           // then
           .andExpect(status().isNoContent());
 
@@ -334,9 +353,11 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
 
       // when
       mockMvc
-          .perform(delete(URL_WITH_PARAMETER_ID, projectId).contentType(MediaType.APPLICATION_JSON))
+          .perform(delete(URL_WITH_PARAMETER_ID, projectId))
           // then
           .andExpect(status().isForbidden());
+
+      assertThatCode(() -> projectService.delete(projectId)).doesNotThrowAnyException();
     }
   }
 }

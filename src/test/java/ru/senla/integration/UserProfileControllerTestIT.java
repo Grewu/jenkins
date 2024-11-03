@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,7 +25,6 @@ import ru.senla.util.PostgresqlTestContainer;
 @AutoConfigureMockMvc
 class UserProfileControllerTestIT extends PostgresqlTestContainer {
   @Autowired private MockMvc mockMvc;
-
   @Autowired private UserProfileService userProfileService;
 
   private static final String URL = "/api/v0/user_profiles";
@@ -39,39 +37,24 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     void createShouldReturnUserProfileResponse() throws Exception {
       // given
       var userProfileRequest = UserProfileTestData.builder().build().buildUserProfileRequest();
-      var requestBuilder =
-          post(URL)
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(
-                  """
-                            {
-                                "firstName": "firstName",
-                                "lastName": "lastName",
-                                "position": 1,
-                                "department": 1,
-                                "user": 1
-                            }
-                            """);
+      var requestBody =
+          """
+                    {
+                        "firstName": "firstName",
+                        "lastName": "lastName",
+                        "position": 1,
+                        "department": 1,
+                        "user": 1
+                    }
+                    """;
 
       // when
       mockMvc
-          .perform(
-              requestBuilder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+          .perform(post(URL).contentType(MediaType.APPLICATION_JSON).content(requestBody))
           // then
-          .andExpectAll(
-              status().isCreated(),
-              content().contentType(MediaType.APPLICATION_JSON),
-              content()
-                  .json(
-                      """
-                                    {
-                                        "firstName": "firstName",
-                                        "lastName": "lastName",
-                                        "position": 1,
-                                        "department": 1,
-                                        "user": 1
-                                    }
-                                    """))
+          .andExpect(status().isCreated())
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(content().json(requestBody))
           .andDo(print());
 
       assertThatCode(() -> userProfileService.create(userProfileRequest))
@@ -81,24 +64,20 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @Test
     void createShouldReturnForbidden() throws Exception {
       // given
-      var requestBuilder =
-          post(URL)
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(
-                  """
-                            {
-                                "firstName": "firstName",
-                                "lastName": "lastName",
-                                "positionId": 1,
-                                "departmentId": 1,
-                                "userId": 1
-                            }
-                            """);
+      var requestBody =
+          """
+                    {
+                        "firstName": "firstName",
+                        "lastName": "lastName",
+                        "positionId": 1,
+                        "departmentId": 1,
+                        "userId": 1
+                    }
+                    """;
 
       // when
       mockMvc
-          .perform(
-              requestBuilder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+          .perform(post(URL).contentType(MediaType.APPLICATION_JSON).content(requestBody))
           // then
           .andExpect(status().isForbidden());
     }
@@ -122,7 +101,8 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
       mockMvc
           .perform(get(URL).contentType(MediaType.APPLICATION_JSON))
           // then
-          .andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().isOk())
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
           .andExpect(jsonPath("$.content").isNotEmpty())
           .andExpect(jsonPath("$.content.size()").value(expectedResponses.size()));
 
@@ -131,7 +111,7 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
       var actualResponse = userProfileService.getAll(pageable).stream().toList();
 
       IntStream.range(0, actualResponse.size())
-          .forEach((i) -> assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i)));
+          .forEach(i -> assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i)));
     }
 
     @Test
@@ -158,21 +138,22 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
           .perform(
               get(URL_WITH_PARAMETER_ID, userProfileId).contentType(MediaType.APPLICATION_JSON))
           // then
-          .andExpectAll(
-              status().isOk(),
-              content().contentType(MediaType.APPLICATION_JSON),
+          .andExpect(status().isOk())
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(
               content()
                   .json(
                       """
-                                    {
-                                        "id": 1,
-                                        "firstName": "firstName",
-                                        "lastName": "lastName",
-                                        "position": 1,
-                                        "department": 1,
-                                        "user": 1
-                                    }
-                                    """));
+                                {
+                                    "id": 1,
+                                    "firstName": "firstName",
+                                    "lastName": "lastName",
+                                    "position": 1,
+                                    "department": 1,
+                                    "user": 1
+                                }
+                            """));
+
       assertThatCode(() -> userProfileService.getById(userProfileId)).doesNotThrowAnyException();
     }
 
@@ -214,45 +195,44 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
               .build()
               .buildUserProfileResponse();
 
-      var requestBuilder =
-          put(URL_WITH_PARAMETER_ID, userProfileId)
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(
-                  """
-                              {
-                                 "firstName": "UpdatedName",
-                                 "lastName": "UpdatedLastName",
-                                 "position": 1,
-                                 "department": 1,
-                                 "user": 1
-                              }
-                            """);
+      var requestBody =
+          """
+                    {
+                        "firstName": "UpdatedName",
+                        "lastName": "UpdatedLastName",
+                        "position": 1,
+                        "department": 1,
+                        "user": 1
+                    }
+                    """;
 
       // when
       mockMvc
-          .perform(requestBuilder)
+          .perform(
+              put(URL_WITH_PARAMETER_ID, userProfileId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(requestBody))
           // then
-          .andExpectAll(
-              status().isOk(),
-              content().contentType(MediaType.APPLICATION_JSON),
+          .andExpect(status().isOk())
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(
               content()
                   .json(
                       """
-                                     {
-                                       "id": 1,
-                                       "firstName": "UpdatedName",
-                                       "lastName": "UpdatedLastName",
-                                       "position": 1,
-                                       "department": 1,
-                                       "user": 1
-                                      }
-                                    """));
+                                {
+                                    "id": 1,
+                                    "firstName": "UpdatedName",
+                                    "lastName": "UpdatedLastName",
+                                    "position": 1,
+                                    "department": 1,
+                                    "user": 1
+                                }
+                            """));
 
       assertThatCode(() -> userProfileService.update(userProfileId, userProfileRequest))
           .doesNotThrowAnyException();
 
       var actualResponse = userProfileService.getById(userProfileId);
-
       assertThat(actualResponse).isEqualTo(expectedResponse);
     }
 
@@ -263,7 +243,8 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
 
       // when
       mockMvc
-          .perform(put(URL_WITH_PARAMETER_ID, userProfileId))
+          .perform(
+              put(URL_WITH_PARAMETER_ID, userProfileId).contentType(MediaType.APPLICATION_JSON))
           // then
           .andExpect(status().isForbidden());
     }

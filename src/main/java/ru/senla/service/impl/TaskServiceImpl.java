@@ -148,12 +148,13 @@ public class TaskServiceImpl implements TaskService {
     var userProfile =
         userProfileRepository
             .findById(taskRequest.assignedTo())
-            .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
+            .orElseThrow(
+                () -> new EntityNotFoundException(UserProfile.class, taskRequest.assignedTo()));
 
     var project =
         projectRepository
             .findById(taskRequest.project())
-            .orElseThrow(() -> new EntityNotFoundException(Project.class, id));
+            .orElseThrow(() -> new EntityNotFoundException(Project.class, taskRequest.project()));
 
     currentTask.setName(taskRequest.name());
     currentTask.setAssignedTo(userProfile);

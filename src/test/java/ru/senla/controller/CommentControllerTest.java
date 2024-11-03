@@ -52,13 +52,13 @@ class CommentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "task": 1,
-                                                "usersProfile": 1,
-                                                "commentText": "commentText",
-                                                "createdAt": "2024-09-30T12:00:00"
-                                            }
-                                            """);
+                                      {
+                                          "task": 1,
+                                          "usersProfile": 1,
+                                          "commentText": "commentText",
+                                          "createdAt": "2024-09-30T12:00:00"
+                                      }
+                                      """);
 
       // when
       mockMvc
@@ -70,13 +70,13 @@ class CommentControllerTest {
               content()
                   .json(
                       """
-                                                    {
-                                                             "task": 1,
-                                                             "usersProfile": 1,
-                                                             "commentText": "commentText",
-                                                             "createdAt": "2024-09-30T12:00:00"
-                                                    }
-                                                    """));
+                                              {
+                                                       "task": 1,
+                                                       "usersProfile": 1,
+                                                       "commentText": "commentText",
+                                                       "createdAt": "2024-09-30T12:00:00"
+                                              }
+                                              """));
 
       verify(commentService).create(any());
     }
@@ -89,13 +89,13 @@ class CommentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "task": 1,
-                                                "usersProfile": 1,
-                                                "commentText": "commentText",
-                                                "createdAt": "2024-09-30T12:00:00"
-                                            }
-                                            """);
+                                      {
+                                          "task": 1,
+                                          "usersProfile": 1,
+                                          "commentText": "commentText",
+                                          "createdAt": "2024-09-30T12:00:00"
+                                      }
+                                      """);
 
       // when
       mockMvc
@@ -164,13 +164,13 @@ class CommentControllerTest {
               content()
                   .json(
                       """
-                                                    {
-                                                       "task": 1,
-                                                       "usersProfile": 1,
-                                                       "commentText": "commentText",
-                                                       "createdAt": "2024-09-30T12:00:00"
-                                                    }
-                                                    """));
+                                              {
+                                                 "task": 1,
+                                                 "usersProfile": 1,
+                                                 "commentText": "commentText",
+                                                 "createdAt": "2024-09-30T12:00:00"
+                                              }
+                                              """));
       verify(commentService).getById(any());
     }
 
@@ -226,13 +226,13 @@ class CommentControllerTest {
               .content(
                   String.format(
                       """
-                                                    {
-                                                        "task": 1,
-                                                        "usersProfile": 1,
-                                                        "commentText": "%s",
-                                                        "createdAt": "%s"
-                                                    }
-                                                    """,
+                                              {
+                                                  "task": 1,
+                                                  "usersProfile": 1,
+                                                  "commentText": "%s",
+                                                  "createdAt": "%s"
+                                              }
+                                              """,
                       updatedCommentText, createdAt));
 
       // when
@@ -246,13 +246,13 @@ class CommentControllerTest {
                   .json(
                       String.format(
                           """
-                                                            {
-                                                                 "task": 1,
-                                                                 "usersProfile": 1,
-                                                                 "commentText": "%s",
-                                                                 "createdAt": "%s"
-                                                            }
-                                                            """,
+                                                      {
+                                                           "task": 1,
+                                                           "usersProfile": 1,
+                                                           "commentText": "%s",
+                                                           "createdAt": "%s"
+                                                      }
+                                                      """,
                           updatedCommentText, createdAt)));
 
       verify(commentService).update(any(), any());

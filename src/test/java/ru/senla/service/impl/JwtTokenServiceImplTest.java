@@ -45,8 +45,6 @@ class JwtTokenServiceImplTest {
 
   @InjectMocks private UserServiceImpl userService;
 
-  private static final String INVALID_TOKEN = "invalid-token";
-
   @Test
   void generateTokenShouldReturnValidToken() {
     // given

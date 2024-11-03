@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.senla.exception.EntityAlreadyExistsException;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.exception.InvalidEmailException;
 import ru.senla.exception.InvalidPasswordException;
@@ -28,13 +29,18 @@ public class ControllerFake {
   }
 
   @PostMapping("/token")
-  ResponseEntity<Void> InvalidTokenException() {
+  ResponseEntity<Void> invalidTokenException() {
     throw new InvalidTokenException();
   }
 
   @PostMapping("/password/{password}")
-  ResponseEntity<Void> InvalidPasswordException(@PathVariable String password) {
+  ResponseEntity<Void> invalidPasswordException(@PathVariable String password) {
     throw new InvalidPasswordException(password);
+  }
+
+  @PostMapping("/entity-exist/{id}")
+  ResponseEntity<DtoFake> invalidEntityAlreadyExistsException(@PathVariable Long id) {
+    throw new EntityAlreadyExistsException(DtoFake.class, 1L);
   }
 
   @PostMapping("/valid")

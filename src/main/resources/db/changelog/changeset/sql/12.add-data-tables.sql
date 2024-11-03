@@ -15,23 +15,23 @@ VALUES (1, 1),
        (2, 1),
        (3, 1);
 
-INSERT INTO departments (id, name)
-VALUES (1, 'DEVELOPERS'),
-       (2, 'MANAGERS'),
-       (3, 'MARKETING'),
-       (4, 'HR');
+INSERT INTO departments (name)
+VALUES ('DEVELOPERS'),
+       ('MANAGERS'),
+       ('MARKETING'),
+       ('HR');
 
-INSERT INTO positions (id, name)
-VALUES (1, 'MANAGER'),
-       (2, 'DEVELOPER'),
-       (3, 'MARKETING_SPECIALIST'),
-       (4, 'HR');
+INSERT INTO positions (name)
+VALUES ('MANAGER'),
+       ('DEVELOPER'),
+       ('MARKETING_SPECIALIST'),
+       ('HR');
 
 INSERT INTO users (email, password, role_id)
 VALUES ('pavelgurevichwork@gmail.com', '$2a$10$BS7udr3QYwyUkX4w3p2V.Ovjc/kWnjMJMrSTu9.XFzrHbWuDLasjK', 1),
        ('pavelgurevich97@gmail.com', '$2b$12$QQMT.3IZJEK2SDCnnWlz8erjeUABxfQ45/OYd4hE6ErxOf6lC2efe', 2),
        ('guest@example.com', '$2a$10$lpvBiZ9Vp/caYDQBSpeItuxglzf/Ukx4LRnTTEjw4mmR.iG0.Y67u', 3),
-       ('anotheruser@example.com', '$2a$10$kSsePSg1z1uGyt14p97Bp.VmN1mkCpuV2Yykiv4IUI6RJqVIt4que', 4);
+       ('anotheruser@example.com', '$2a$10$kSsePSg1z1uGyt14p97Bp.VmN1mkCpuV2Yykiv4IUI6RJqVIt4que', 3);
 
 INSERT INTO users_profiles (first_name, last_name, position_id, department_id, user_id)
 VALUES ('Alice', 'Smith', 2, 1, 1),

@@ -15,23 +15,24 @@ VALUES (1, 1),
        (2, 1),
        (3, 1);
 
-INSERT INTO departments (id, name)
-VALUES (1, 'DEVELOPERS'),
-       (2, 'MANAGERS'),
-       (3, 'MARKETING'),
-       (4, 'HR');
+INSERT INTO departments (name)
+VALUES ('DEVELOPERS'),
+       ('MANAGERS'),
+       ('MARKETING'),
+       ('HR');
 
-INSERT INTO positions (id, name)
-VALUES (1, 'MANAGER'),
-       (2, 'DEVELOPER'),
-       (3, 'MARKETING_SPECIALIST'),
-       (4, 'HR');
+INSERT INTO positions (name)
+VALUES ('MANAGER'),
+       ('DEVELOPER'),
+       ('MARKETING_SPECIALIST'),
+       ('HR');
 
-INSERT INTO users (email, password, role_id)
-VALUES ('pavelgurevichwork@gmail.com', 'password', 1),
-       ('pavelgurevich97@gmail.com', 'password', 2),
-       ('guest@example.com', 'password', 3),
-       ('anotheruser@example.com', 'password', 4);
+INSERT INTO users (id, email, password, role_id)
+VALUES
+    (1, 'user@example.com', '$2b$12$7K9Jj/SFX.un9yRyUDDMeel.fKmctqWf7SPVwOotCpFNn1pk4xCoO', 1),
+    (2, 'john.doe@example.com', '$2b$12$7K9Jj/SFX.un9yRyUDDMeel.fKmctqWf7SPVwOotCpFNn1pk4xCoO', 2),
+    (3, 'jane.smith@example.com', '$2b$12$7K9Jj/SFX.un9yRyUDDMeel.fKmctqWf7SPVwOotCpFNn1pk4xCoO', 3),
+    (4, 'alice.brown@example.com', '$2b$12$7K9Jj/SFX.un9yRyUDDMeel.fKmctqWf7SPVwOotCpFNn1pk4xCoO', 2);
 
 INSERT INTO users_profiles (first_name, last_name, position_id, department_id, user_id)
 VALUES ('firstName', 'lastName', 1, 1, 1),

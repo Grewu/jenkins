@@ -1,17 +1,14 @@
 package ru.senla.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.*;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import ru.senla.config.ExceptionHandlerConfig;
-import ru.senla.exception.EntityNotFoundException;
-import ru.senla.exception.InvalidEmailException;
-import ru.senla.exception.InvalidPasswordException;
-import ru.senla.exception.InvalidTokenException;
+import ru.senla.exception.*;
 import ru.senla.util.ControllerFake;
 import ru.senla.util.MockEntity;
 
@@ -20,58 +17,79 @@ import ru.senla.util.MockEntity;
 @TestPropertySource(properties = "spring.exception.handling.enabled=true")
 class GlobalHandlerAdviceTest {
 
-  private final GlobalHandlerAdvice globalHandlerAdvice = new GlobalHandlerAdvice();
+  private static final Long MOCK_ENTITY_ID = 1L;
+  private static final String INVALID_EMAIL = "invalidEmail";
+  private static final String INVALID_PASSWORD = "invalidPassword";
+  private static final String ENTITY_NOT_FOUND_MESSAGE =
+      "MockEntity with ID " + MOCK_ENTITY_ID + " was not found";
+  private static final String INVALID_EMAIL_MESSAGE = "Invalid email: " + INVALID_EMAIL;
+  private static final String INVALID_TOKEN_MESSAGE = "Invalid token";
+  private static final String INVALID_PASSWORD_MESSAGE = "Invalid password: " + INVALID_PASSWORD;
+  private static final String ENTITY_ALREADY_EXISTS_MESSAGE =
+      "MockEntity with ID " + MOCK_ENTITY_ID + " already exists";
+
+  private final GlobalHandlerAdvice handlerAdvice = new GlobalHandlerAdvice();
 
   @Test
-  void handleEntityNotFoundException() {
-    var entityNotFoundException = new EntityNotFoundException(MockEntity.class, 1L);
-    var handle = globalHandlerAdvice.handle(entityNotFoundException);
+  void handleEntityNotFoundException_shouldReturnNotFoundStatus() {
+    var exception = new EntityNotFoundException(MockEntity.class, MOCK_ENTITY_ID);
+    var response = handlerAdvice.handle(exception);
 
-    assertThat(handle)
-        .hasFieldOrPropertyWithValue("statusCode", HttpStatus.NOT_FOUND)
+    assertThat(response)
+        .hasFieldOrPropertyWithValue("statusCode", NOT_FOUND)
         .extracting("body")
-        .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND)
-        .hasFieldOrPropertyWithValue("message", "MockEntity with ID 1 was not found");
+        .hasFieldOrPropertyWithValue("status", NOT_FOUND)
+        .hasFieldOrPropertyWithValue("message", ENTITY_NOT_FOUND_MESSAGE);
   }
 
   @Test
-  void handleInvalidEmailException() {
-    var invalidEmail = "invalidEmail";
-    var invalidEmailException = new InvalidEmailException(invalidEmail);
+  void handleInvalidEmailException_shouldReturnUnauthorizedStatus() {
+    var exception = new InvalidEmailException(INVALID_EMAIL);
 
-    var handle = globalHandlerAdvice.handle(invalidEmailException);
+    var response = handlerAdvice.handle(exception);
 
-    assertThat(handle)
-        .hasFieldOrPropertyWithValue("statusCode", HttpStatus.UNAUTHORIZED)
+    assertThat(response)
+        .hasFieldOrPropertyWithValue("statusCode", UNAUTHORIZED)
         .extracting("body")
-        .hasFieldOrPropertyWithValue("status", HttpStatus.UNAUTHORIZED)
-        .hasFieldOrPropertyWithValue("message", "Invalid email: invalidEmail");
+        .hasFieldOrPropertyWithValue("status", UNAUTHORIZED)
+        .hasFieldOrPropertyWithValue("message", INVALID_EMAIL_MESSAGE);
   }
 
   @Test
-  void handleInvalidTokenException() {
-    var invalidTokenException = new InvalidTokenException();
+  void handleInvalidTokenException_shouldReturnUnauthorizedStatus() {
+    var exception = new InvalidTokenException();
+    var response = handlerAdvice.handle(exception);
 
-    var handle = globalHandlerAdvice.handle(invalidTokenException);
-
-    assertThat(handle)
-        .hasFieldOrPropertyWithValue("statusCode", HttpStatus.UNAUTHORIZED)
+    assertThat(response)
+        .hasFieldOrPropertyWithValue("statusCode", UNAUTHORIZED)
         .extracting("body")
-        .hasFieldOrPropertyWithValue("status", HttpStatus.UNAUTHORIZED)
-        .hasFieldOrPropertyWithValue("message", "Invalid token");
+        .hasFieldOrPropertyWithValue("status", UNAUTHORIZED)
+        .hasFieldOrPropertyWithValue("message", INVALID_TOKEN_MESSAGE);
   }
 
   @Test
-  void handleInvalidPasswordException() {
-    var invalidPassword = "invalidPassword";
-    var invalidPasswordException = new InvalidPasswordException(invalidPassword);
+  void handleInvalidPasswordException_shouldReturnUnauthorizedStatus() {
+    var exception = new InvalidPasswordException(INVALID_PASSWORD);
 
-    var handle = globalHandlerAdvice.handle(invalidPasswordException);
+    var response = handlerAdvice.handle(exception);
 
-    assertThat(handle)
-        .hasFieldOrPropertyWithValue("statusCode", HttpStatus.UNAUTHORIZED)
+    assertThat(response)
+        .hasFieldOrPropertyWithValue("statusCode", UNAUTHORIZED)
         .extracting("body")
-        .hasFieldOrPropertyWithValue("status", HttpStatus.UNAUTHORIZED)
-        .hasFieldOrPropertyWithValue("message", "Invalid password: invalidPassword");
+        .hasFieldOrPropertyWithValue("status", UNAUTHORIZED)
+        .hasFieldOrPropertyWithValue("message", INVALID_PASSWORD_MESSAGE);
+  }
+
+  @Test
+  void handleEntityAlreadyExistsException_shouldReturnConflictStatus() {
+    var exception = new EntityAlreadyExistsException(MockEntity.class, MOCK_ENTITY_ID);
+
+    var response = handlerAdvice.handle(exception);
+
+    assertThat(response)
+        .hasFieldOrPropertyWithValue("statusCode", CONFLICT)
+        .extracting("body")
+        .hasFieldOrPropertyWithValue("status", CONFLICT)
+        .hasFieldOrPropertyWithValue("message", ENTITY_ALREADY_EXISTS_MESSAGE);
   }
 }

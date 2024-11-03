@@ -77,12 +77,15 @@ public class TaskHistoryServiceImpl implements TaskHistoryService {
   @Override
   @Transactional
   public TaskHistoryResponse update(Long id, TaskHistoryRequest taskHistoryRequest) {
-    return taskHistoryRepository
-        .findById(id)
-        .map(currentHistory -> taskHistoryMapper.update(taskHistoryRequest, currentHistory))
-        .map(taskHistoryRepository::save)
-        .map(taskHistoryMapper::toTaskHistoryResponse)
-        .orElseThrow(() -> new EntityNotFoundException(TaskHistory.class, id));
+    var currentTask =
+        taskHistoryRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException(TaskHistory.class, id));
+    currentTask.setName(taskHistoryRequest.name());
+    currentTask.setChangedDescription(taskHistoryRequest.changedDescription());
+    var updatedTask = taskHistoryMapper.update(taskHistoryRequest, currentTask);
+    taskHistoryRepository.save(updatedTask);
+    return taskHistoryMapper.toTaskHistoryResponse(updatedTask);
   }
 
   /**

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.senla.exception.EntityAlreadyExistsException;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.PositionMapper;
 import ru.senla.model.dto.request.PositionRequest;
@@ -34,6 +35,9 @@ public class PositionServiceImpl implements PositionService {
   @Override
   @Transactional
   public PositionResponse create(PositionRequest positionRequest) {
+    if (positionRepository.existsByName(positionRequest.name())) {
+      throw new EntityAlreadyExistsException(Position.class, positionRequest.name().name());
+    }
     var position = positionMapper.toPosition(positionRequest);
     return positionMapper.toPositionResponse(positionRepository.save(position));
   }
@@ -75,6 +79,9 @@ public class PositionServiceImpl implements PositionService {
   @Override
   @Transactional
   public PositionResponse update(Long id, PositionRequest positionRequest) {
+    if (positionRepository.existsByName(positionRequest.name())) {
+      throw new EntityAlreadyExistsException(Position.class, positionRequest.name().name());
+    }
     return positionRepository
         .findById(id)
         .map(current -> positionMapper.update(positionRequest, current))

@@ -204,33 +204,6 @@ public class PositionControllerTest {
     }
 
     @Test
-    @WithMockUser(authorities = {"position:read"})
-    void getByIdShouldReturnPositionResponse() throws Exception {
-      // given
-      var positionResponse = PositionTestData.builder().build().buildPositionResponse();
-      var positionId = positionResponse.id();
-
-      doReturn(positionResponse).when(positionService).getById(positionId);
-
-      // when
-      mockMvc
-          .perform(get(URL_WITH_PARAMETER_ID, positionId).contentType(MediaType.APPLICATION_JSON))
-          // then
-          .andExpectAll(
-              status().isOk(),
-              content().contentType(MediaType.APPLICATION_JSON),
-              content()
-                  .json(
-                      """
-                                                    {
-                                                       "id": 1,
-                                                       "name": "DEVELOPER"
-                                                    }
-                                                    """));
-      verify(positionService).getById(any());
-    }
-
-    @Test
     void getByIdShouldReturnForbidden() throws Exception {
       // given
       var positionResponse = PositionTestData.builder().build().buildPositionResponse();

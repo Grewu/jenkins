@@ -28,8 +28,8 @@ public class Department {
   private Long id;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "name", nullable = false)
   @JdbcType(PostgreSQLEnumJdbcType.class)
+  @Column(name = "name", nullable = false)
   private DepartmentType name;
 
   public Department(Long departmentId) {

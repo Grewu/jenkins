@@ -43,8 +43,8 @@ import ru.senla.service.api.UserService;
 @RequestMapping(value = AuthenticationRestController.USER_API_PATH)
 public class AuthenticationRestController {
 
-  private final UserService userService;
   protected static final String USER_API_PATH = "/api/v0/auth";
+  private final UserService userService;
 
   /**
    * Registers a new user in the system and returns an authorization token.

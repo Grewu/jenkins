@@ -28,6 +28,7 @@ import ru.senla.service.api.DepartmentService;
 @SpringBootTest
 @AutoConfigureMockMvc
 class DepartmentControllerTest {
+
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @MockBean private DepartmentService departmentService;
@@ -42,7 +43,6 @@ class DepartmentControllerTest {
     @CsvSource({"DEVELOPERS, 1", "DESIGN, 2", "FINANCE, 3"})
     @WithMockUser(authorities = {"department:write"})
     void createShouldReturnDepartmentResponse(String name, Long id) throws Exception {
-      // given
       var departmentRequest =
           DepartmentTestData.builder()
               .withName(DepartmentType.valueOf(name))
@@ -62,17 +62,13 @@ class DepartmentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "name": "%s"
-                                            }
-                                            """
+              {
+                  "name": "%s"
+              }
+              """
                       .formatted(name));
 
-      // when
-      mockMvc
-          .perform(requestBuilder)
-          // then
-          .andExpect(status().isCreated());
+      mockMvc.perform(requestBuilder).andExpect(status().isCreated());
 
       verify(departmentService).create(departmentRequest);
     }
@@ -80,7 +76,6 @@ class DepartmentControllerTest {
     @Test
     @WithMockUser(authorities = {"department:write"})
     void createShouldReturnDepartmentResponse() throws Exception {
-      // given
       var departmentRequest = DepartmentTestData.builder().build().buildDepartmentRequest();
       var expectedResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
 
@@ -91,48 +86,41 @@ class DepartmentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "name": "DEVELOPERS"
-                                            }
-                                            """);
+              {
+                  "name": "DEVELOPERS"
+              }
+              """);
 
-      // when
       mockMvc
           .perform(requestBuilder)
-          // then
           .andExpectAll(
               status().isCreated(),
               content().contentType(MediaType.APPLICATION_JSON),
               content()
                   .json(
                       """
-                                                     {
-                                                         "id": 1,
-                                                         "name": "DEVELOPERS"
-                                                     }
-                                                    """));
+                  {
+                      "id": 1,
+                      "name": "DEVELOPERS"
+                  }
+                  """));
 
       verify(departmentService).create(any());
     }
 
     @Test
     void createShouldReturnForbidden() throws Exception {
-      // given
       var requestBuilder =
           post(URL)
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "name": "DEVELOPERS"
-                                            }
-                                            """);
+              {
+                  "name": "DEVELOPERS"
+              }
+              """);
 
-      // when
-      mockMvc
-          .perform(requestBuilder)
-          // then
-          .andExpect(status().isForbidden());
+      mockMvc.perform(requestBuilder).andExpect(status().isForbidden());
 
       verify(departmentService, never()).create(any());
     }
@@ -143,7 +131,6 @@ class DepartmentControllerTest {
     @Test
     @WithMockUser(authorities = {"department:read", "user_profile:read"})
     void getAllShouldReturnListOfUsersProfilesResponseByDepartmentId() throws Exception {
-      // given
       var pageable = Pageable.ofSize(2);
       var departmentId = DepartmentTestData.builder().build().buildDepartment().getId();
       var expectedResponses =
@@ -155,12 +142,10 @@ class DepartmentControllerTest {
       when(departmentService.getAllUsersProfileByDepartmentId(anyLong(), any(Pageable.class)))
           .thenReturn(expectedPage);
 
-      // when
       mockMvc
           .perform(
               get(URL_WITH_DEPARTMENT_ID_USERS, departmentId)
                   .contentType(MediaType.APPLICATION_JSON))
-          // then
           .andExpect(status().isOk())
           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
           .andExpect(content().json(objectMapper.writeValueAsString(expectedPage)));
@@ -169,7 +154,6 @@ class DepartmentControllerTest {
     @Test
     @WithMockUser(authorities = {"department:read"})
     void getAllShouldReturnListOfDepartmentResponses() throws Exception {
-      // given
       var pageable = Pageable.ofSize(2);
       var expectedResponses =
           List.of(
@@ -179,10 +163,8 @@ class DepartmentControllerTest {
 
       when(departmentService.getAll(any(Pageable.class))).thenReturn(expectedPage);
 
-      // when
       mockMvc
           .perform(get(URL).contentType(MediaType.APPLICATION_JSON))
-          // then
           .andExpect(status().isOk())
           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
           .andExpect(content().json(objectMapper.writeValueAsString(expectedPage)));
@@ -190,12 +172,9 @@ class DepartmentControllerTest {
 
     @Test
     void getAllShouldReturnForbidden() throws Exception {
-      // given
       var pageable = Pageable.ofSize(2);
-      // when
       mockMvc
           .perform(get(URL).contentType(MediaType.APPLICATION_JSON))
-          // then
           .andExpect(status().isForbidden());
 
       verify(departmentService, never()).getAll(pageable);
@@ -208,7 +187,6 @@ class DepartmentControllerTest {
     @CsvSource({"1, DEVELOPERS", "2, MANAGERS", "3, MARKETING"})
     @WithMockUser(authorities = {"department:read"})
     void getByIdShouldReturnDepartmentResponse(Long id, String expectedName) throws Exception {
-      // given
       var expectedResponse =
           DepartmentTestData.builder()
               .withId(id)
@@ -218,10 +196,8 @@ class DepartmentControllerTest {
 
       doReturn(expectedResponse).when(departmentService).getById(id);
 
-      // when
       mockMvc
           .perform(get(URL_WITH_PARAMETER_ID, id).contentType(MediaType.APPLICATION_JSON))
-          // then
           .andExpect(status().isOk());
 
       verify(departmentService).getById(id);
@@ -230,42 +206,37 @@ class DepartmentControllerTest {
     @Test
     @WithMockUser(authorities = {"department:read"})
     void getByIdShouldReturnDepartmentResponse() throws Exception {
-      // given
       var departmentResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
       var departmentId = departmentResponse.id();
 
       doReturn(departmentResponse).when(departmentService).getById(departmentId);
 
-      // when
       mockMvc
           .perform(get(URL_WITH_PARAMETER_ID, departmentId).contentType(MediaType.APPLICATION_JSON))
-          // then
           .andExpectAll(
               status().isOk(),
               content().contentType(MediaType.APPLICATION_JSON),
               content()
                   .json(
                       """
-                                                    {
-                                                       "id": 1,
-                                                       "name": "DEVELOPERS"
-                                                    }
-                                                    """));
+                  {
+                      "id": 1,
+                      "name": "DEVELOPERS"
+                  }
+                  """));
+
       verify(departmentService).getById(any());
     }
 
     @Test
     void getByIdShouldReturnForbidden() throws Exception {
-      // given
       var departmentResponse = DepartmentTestData.builder().build().buildDepartmentResponse();
       var departmentId = departmentResponse.id();
 
       doReturn(departmentResponse).when(departmentService).getById(departmentId);
 
-      // when
       mockMvc
           .perform(get(URL_WITH_PARAMETER_ID, departmentId).contentType(MediaType.APPLICATION_JSON))
-          // then
           .andExpect(status().isForbidden());
 
       verify(departmentService, never()).getById(any());
@@ -277,14 +248,12 @@ class DepartmentControllerTest {
     @Test
     @WithMockUser(authorities = {"department:write"})
     void updateShouldReturnUpdatedDepartmentResponse() throws Exception {
-      // given
       var departmentId = 1L;
       var departmentRequest =
           DepartmentTestData.builder()
               .withName(DepartmentType.DEVELOPERS)
               .build()
               .buildDepartmentRequest();
-
       var updatedResponse =
           DepartmentTestData.builder()
               .withId(departmentId)
@@ -299,47 +268,42 @@ class DepartmentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "name": "DEVELOPERS"
-                                            }
-                                            """);
+              {
+                  "name": "DEVELOPERS"
+              }
+              """);
 
-      // when
       mockMvc
           .perform(requestBuilder)
-          // then
           .andExpectAll(
               status().isOk(),
               content().contentType(MediaType.APPLICATION_JSON),
               content()
                   .json(
                       """
-                                                    {
-                                                         "id": 1,
-                                                         "name": "DEVELOPERS"
-                                                    }
-                                                    """));
+                  {
+                      "id": 1,
+                      "name": "DEVELOPERS"
+                  }
+                  """));
 
       verify(departmentService).update(any(), any());
     }
 
     @Test
     void updateShouldReturnForbidden() throws Exception {
-      // given
       var departmentId = 1L;
 
-      // when
       mockMvc
           .perform(
               put(URL_WITH_PARAMETER_ID, departmentId)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(
                       """
-                                                    {
-                                                        "name": "Updated Department"
-                                                    }
-                                                    """))
-          // then
+              {
+                  "name": "Updated Department"
+              }
+              """))
           .andExpect(status().isForbidden());
 
       verify(departmentService, never()).update(any(), any());
@@ -351,32 +315,28 @@ class DepartmentControllerTest {
     @Test
     @WithMockUser(authorities = {"department:delete"})
     void deleteShouldReturnNoContent() throws Exception {
-      // given
-      var departmentId = 1L;
+      var departmentId = DepartmentTestData.builder().build().buildDepartmentResponse().id();
 
-      // when
+      doNothing().when(departmentService).delete(departmentId);
+
       mockMvc
           .perform(
               delete(URL_WITH_PARAMETER_ID, departmentId).contentType(MediaType.APPLICATION_JSON))
-          // then
           .andExpect(status().isNoContent());
 
-      verify(departmentService).delete(departmentId);
+      verify(departmentService).delete(any());
     }
 
     @Test
     void deleteShouldReturnForbidden() throws Exception {
-      // given
-      var departmentId = 1L;
+      var departmentId = DepartmentTestData.builder().build().buildDepartmentResponse().id();
 
-      // when
       mockMvc
           .perform(
               delete(URL_WITH_PARAMETER_ID, departmentId).contentType(MediaType.APPLICATION_JSON))
-          // then
           .andExpect(status().isForbidden());
 
-      verify(departmentService, never()).delete(departmentId);
+      verify(departmentService, never()).delete(any());
     }
   }
 }

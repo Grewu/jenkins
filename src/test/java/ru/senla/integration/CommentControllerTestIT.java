@@ -37,6 +37,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
   @Nested
   class Create {
+
     @Test
     @WithMockUser(authorities = {"comments:write"})
     void createShouldReturnCommentResponse() throws Exception {
@@ -47,13 +48,13 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "task": 1,
-                                                "usersProfile": 1,
-                                                "commentText": "commentText",
-                                                "createdAt": "2024-09-30T12:00:00"
-                                            }
-                                            """);
+                            {
+                                "task": 1,
+                                "usersProfile": 1,
+                                "commentText": "commentText",
+                                "createdAt": "2024-09-30T12:00:00"
+                            }
+                            """);
 
       // when
       mockMvc
@@ -66,13 +67,13 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
               content()
                   .json(
                       """
-                                                    {
-                                                             "task": 1,
-                                                             "usersProfile": 1,
-                                                             "commentText": "commentText",
-                                                             "createdAt": "2024-09-30T12:00:00"
-                                                    }
-                                                    """));
+                                    {
+                                        "task": 1,
+                                        "usersProfile": 1,
+                                        "commentText": "commentText",
+                                        "createdAt": "2024-09-30T12:00:00"
+                                    }
+                                    """));
 
       assertThatCode(() -> commentService.create(commentRequest)).doesNotThrowAnyException();
     }
@@ -85,13 +86,13 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
               .contentType(MediaType.APPLICATION_JSON)
               .content(
                   """
-                                            {
-                                                "task": 1,
-                                                "usersProfile": 1,
-                                                "commentText": "commentText",
-                                                "createdAt": "2024-09-30T12:00:00"
-                                            }
-                                            """);
+                            {
+                                "task": 1,
+                                "usersProfile": 1,
+                                "commentText": "commentText",
+                                "createdAt": "2024-09-30T12:00:00"
+                            }
+                            """);
 
       // when
       mockMvc
@@ -104,6 +105,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
   @Nested
   class GetAll {
+
     @Test
     @WithMockUser(authorities = {"comments:read"})
     void getAllShouldReturnListOfCommentResponses() throws Exception {
@@ -130,7 +132,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
       var actualResponse = commentService.getAll(pageable).stream().toList();
 
       IntStream.range(0, actualResponse.size())
-          .forEach((i) -> assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i)));
+          .forEach(i -> assertThat(actualResponse.get(i)).isEqualTo(expectedResponses.get(i)));
     }
 
     @Test
@@ -145,6 +147,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
   @Nested
   class GetByID {
+
     @Test
     @WithMockUser(authorities = {"comments:read"})
     void getByIdShouldReturnCommentResponse() throws Exception {
@@ -162,13 +165,14 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
               content()
                   .json(
                       """
-                                                    {
-                                                       "task": 1,
-                                                       "usersProfile": 1,
-                                                       "commentText": "commentText",
-                                                       "createdAt": "2024-09-30T12:00:00"
-                                                    }
-                                                    """));
+                                    {
+                                        "task": 1,
+                                        "usersProfile": 1,
+                                        "commentText": "commentText",
+                                        "createdAt": "2024-09-30T12:00:00"
+                                    }
+                                    """));
+
       assertThatCode(() -> commentService.getById(commentId)).doesNotThrowAnyException();
 
       var actualResponse = commentService.getById(commentId);
@@ -194,6 +198,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
   @Nested
   class Update {
+
     @ParameterizedTest
     @CsvSource({
       "1, 'Updated comment 1', '2024-09-30T12:00:00'",
@@ -224,13 +229,13 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
               .content(
                   String.format(
                       """
-                                                    {
-                                                        "task": 1,
-                                                        "usersProfile": 1,
-                                                        "commentText": "%s",
-                                                        "createdAt": "%s"
-                                                    }
-                                                    """,
+                            {
+                                "task": 1,
+                                "usersProfile": 1,
+                                "commentText": "%s",
+                                "createdAt": "%s"
+                            }
+                            """,
                       updatedCommentText, createdAt));
 
       // when
@@ -244,13 +249,13 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
                   .json(
                       String.format(
                           """
-                                                            {
-                                                                 "task": 1,
-                                                                 "usersProfile": 1,
-                                                                 "commentText": "%s",
-                                                                 "createdAt": "%s"
-                                                            }
-                                                            """,
+                                    {
+                                        "task": 1,
+                                        "usersProfile": 1,
+                                        "commentText": "%s",
+                                        "createdAt": "%s"
+                                    }
+                                    """,
                           updatedCommentText, createdAt)));
 
       assertThatCode(() -> commentService.update(commentId, commentRequest))
@@ -276,6 +281,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
 
   @Nested
   class Delete {
+
     @Test
     @WithMockUser(authorities = {"comments:delete"})
     void deleteShouldReturnNoContent() throws Exception {

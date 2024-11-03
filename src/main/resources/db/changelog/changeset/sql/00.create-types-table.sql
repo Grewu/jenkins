@@ -23,8 +23,20 @@ CREATE TYPE positions_type AS ENUM (
     'MANAGER',
     'DEVELOPER',
     'MARKETING_SPECIALIST',
-    'HR'
+    'HR',
+    'SALESPERSON',
+    'ANALYST',
+    'ENGINEER',
+    'DESIGNER',
+    'PRODUCT_OWNER',
+    'QA_ENGINEER',
+    'SUPPORT_SPECIALIST',
+    'FINANCIAL_OFFICER',
+    'CONSULTANT',
+    'RECRUITER',
+    'DATA_SCIENTIST'
     );
+
 CREATE TYPE status_type AS ENUM (
     'IN_PROGRESS',
     'NOT_STARTED',

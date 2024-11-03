@@ -29,12 +29,22 @@ public class GlobalHandlerAdviceTestIT {
   @Autowired private ObjectMapper mapper;
 
   private static final String URL = "/fake";
+  private static final String URL_ENTITY_NOT_FOUND = URL + "/entity/{id}";
+  private static final String URL_EMAIL = URL + "/email/{email}";
+  private static final String URL_TOKEN = URL + "/token";
+  private static final String URL_PASSWORD = URL + "/password/{password}";
+  private static final String URL_VALID = URL + "/valid";
+  private static final String URL_ENTITY_EXIST = URL + "/entity-exist/{id}";
 
   private static final String NOT_FOUND_MESSAGE = "DtoFake with ID %d was not found";
   private static final String INVALID_EMAIL_MESSAGE = "Invalid email: %s";
   private static final String INVALID_TOKEN_MESSAGE = "Invalid token";
   private static final String INVALID_PASSWORD_MESSAGE = "Invalid password: %s";
+  private static final String ENTITY_EXIST_MESSAGE = "DtoFake with ID %s already exists";
   private static final String BAD_REQUEST_MESSAGE = "id = must be greater than 0";
+
+  private static final String INVALID_EMAIL = "invalidEmail";
+  private static final String INVALID_PASSWORD = "invalidPassword";
 
   @Test
   void handleEntityNotFoundException() throws Exception {
@@ -43,7 +53,7 @@ public class GlobalHandlerAdviceTestIT {
         new ExceptionMessage(HttpStatus.NOT_FOUND, String.format(NOT_FOUND_MESSAGE, id));
 
     mockMvc
-        .perform(get(URL + "/entity/{id}", 1L))
+        .perform(get(URL_ENTITY_NOT_FOUND, id))
         .andExpectAll(
             status().isNotFound(),
             content().contentType(MediaType.APPLICATION_JSON),
@@ -52,13 +62,13 @@ public class GlobalHandlerAdviceTestIT {
 
   @Test
   void handleInvalidEmailException() throws Exception {
-    var invalidEmail = "invalidEmail";
+
     var exceptionMessage =
         new ExceptionMessage(
-            HttpStatus.UNAUTHORIZED, String.format(INVALID_EMAIL_MESSAGE, invalidEmail));
+            HttpStatus.UNAUTHORIZED, String.format(INVALID_EMAIL_MESSAGE, INVALID_EMAIL));
 
     mockMvc
-        .perform(get(URL + "/email/{email}", invalidEmail))
+        .perform(get(URL_EMAIL, INVALID_EMAIL))
         .andExpectAll(
             status().isUnauthorized(),
             content().contentType(MediaType.APPLICATION_JSON),
@@ -70,7 +80,7 @@ public class GlobalHandlerAdviceTestIT {
     var exceptionMessage = new ExceptionMessage(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
 
     mockMvc
-        .perform(post(URL + "/token"))
+        .perform(post(URL_TOKEN))
         .andExpectAll(
             status().isUnauthorized(),
             content().contentType(MediaType.APPLICATION_JSON),
@@ -79,13 +89,13 @@ public class GlobalHandlerAdviceTestIT {
 
   @Test
   void handleInvalidPasswordException() throws Exception {
-    var invalidPassword = "invalidPassword";
+
     var exceptionMessage =
         new ExceptionMessage(
-            HttpStatus.UNAUTHORIZED, String.format(INVALID_PASSWORD_MESSAGE, invalidPassword));
+            HttpStatus.UNAUTHORIZED, String.format(INVALID_PASSWORD_MESSAGE, INVALID_PASSWORD));
 
     mockMvc
-        .perform(post(URL + "/password/{password}", invalidPassword))
+        .perform(post(URL_PASSWORD, INVALID_PASSWORD))
         .andExpectAll(
             status().isUnauthorized(),
             content().contentType(MediaType.APPLICATION_JSON),
@@ -100,12 +110,26 @@ public class GlobalHandlerAdviceTestIT {
 
     mockMvc
         .perform(
-            post(URL + "/valid")
+            post(URL_VALID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dtoFake)))
         .andExpectAll(
             status().isBadRequest(),
             content().contentType(MediaType.APPLICATION_JSON),
             content().json(expectedJson));
+  }
+
+  @Test
+  void handleEntityAlreadyExistsException() throws Exception {
+    var id = 1L;
+    var exceptionMessage =
+        new ExceptionMessage(HttpStatus.CONFLICT, String.format(ENTITY_EXIST_MESSAGE, id));
+
+    mockMvc
+        .perform(post(URL_ENTITY_EXIST, id))
+        .andExpectAll(
+            status().isConflict(),
+            content().contentType(MediaType.APPLICATION_JSON),
+            content().json(mapper.writeValueAsString(exceptionMessage)));
   }
 }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.senla.exception.EntityAlreadyExistsException;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.DepartmentMapper;
 import ru.senla.mapper.UserProfileMapper;
@@ -51,6 +52,9 @@ public class DepartmentServiceImpl implements DepartmentService {
   @Override
   @Transactional
   public DepartmentResponse create(DepartmentRequest departmentRequest) {
+    if (departmentRepository.existsByName(departmentRequest.name())) {
+      throw new EntityAlreadyExistsException(Department.class, departmentRequest.name().name());
+    }
     var department = departmentMapper.toDepartment(departmentRequest);
     return departmentMapper.toDepartmentResponse(departmentRepository.save(department));
   }
@@ -92,6 +96,9 @@ public class DepartmentServiceImpl implements DepartmentService {
   @Override
   @Transactional
   public DepartmentResponse update(Long id, DepartmentRequest departmentRequest) {
+    if (departmentRepository.existsByName(departmentRequest.name())) {
+      throw new EntityAlreadyExistsException(Department.class, departmentRequest.name().name());
+    }
     return departmentRepository
         .findById(id)
         .map(current -> departmentMapper.update(departmentRequest, current))
