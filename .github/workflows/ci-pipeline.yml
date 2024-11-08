@@ -3,11 +3,9 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - main
       - spring-boot
   pull_request:
     branches:
-      - main
       - spring-boot
 
 jobs:
