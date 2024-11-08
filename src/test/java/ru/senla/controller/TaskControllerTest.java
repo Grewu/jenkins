@@ -26,14 +26,13 @@ import ru.senla.service.api.TaskService;
 @SpringBootTest
 @AutoConfigureMockMvc
 class TaskControllerTest {
-  @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
-  @MockBean private TaskService taskService;
-
   private static final String URL = "/api/v0/tasks";
   private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
   private static final String URL_WITH_FILTER = URL + "/filter";
   private static final String URL_WITH_TASK_ID = URL + "/{taskId}/history";
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+  @MockBean private TaskService taskService;
 
   @Nested
   class Create {

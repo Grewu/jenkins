@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import ru.senla.config.ExceptionHandlerConfig;
@@ -27,8 +28,7 @@ class GlobalHandlerAdviceTest {
   private static final String INVALID_PASSWORD_MESSAGE = "Invalid password: " + INVALID_PASSWORD;
   private static final String ENTITY_ALREADY_EXISTS_MESSAGE =
       "MockEntity with ID " + MOCK_ENTITY_ID + " already exists";
-
-  private final GlobalHandlerAdvice handlerAdvice = new GlobalHandlerAdvice();
+  @SpyBean private GlobalHandlerAdvice handlerAdvice;
 
   @Test
   void handleEntityNotFoundException_shouldReturnNotFoundStatus() {

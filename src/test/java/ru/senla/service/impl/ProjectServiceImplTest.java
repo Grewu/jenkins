@@ -28,7 +28,7 @@ import ru.senla.repository.api.UserProfileRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceImplTest {
-
+  private static final String ERROR_MESSAGE = "Project with ID -1 was not found";
   @Mock private ProjectMapper projectMapper;
   @Mock private TaskMapper taskMapper;
   @Mock private ProjectRepository projectRepository;
@@ -38,8 +38,6 @@ class ProjectServiceImplTest {
   @Mock private TaskRepository taskRepository;
 
   @InjectMocks private ProjectServiceImpl projectService;
-
-  private static final String ERROR_MESSAGE = "Project with ID -1 was not found";
 
   @Nested
   class Create {

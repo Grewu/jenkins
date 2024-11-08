@@ -25,12 +25,11 @@ import ru.senla.service.api.TaskHistoryService;
 @SpringBootTest
 @AutoConfigureMockMvc
 class TaskHistoryRestControllerTest {
+  private static final String URL = "/api/v0/task_history";
+  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @MockBean private TaskHistoryService taskHistoryService;
-
-  private static final String URL = "/api/v0/task_history";
-  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
 
   @Nested
   class GetAll {

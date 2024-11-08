@@ -18,14 +18,12 @@ import ru.senla.service.api.UserService;
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthenticationControllerTest {
-
-  @Autowired private MockMvc mockMvc;
-
-  @MockBean private UserService userService;
-
   private static final String URL_REGISTER = "/api/v0/auth/register";
   private static final String URL_AUTHENTICATE = "/api/v0/auth/authenticate";
   private static final String EXPECTED_TOKEN = "expectedToken";
+  @Autowired private MockMvc mockMvc;
+
+  @MockBean private UserService userService;
 
   @Test
   void registerShouldReturnAuthorizationToken() throws Exception {

@@ -23,12 +23,11 @@ import ru.senla.repository.api.PositionRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class PositionServiceImplTest {
+  private static final String ERROR_MESSAGE = "Position with ID -1 was not found";
   @Mock private PositionMapper positionMapper;
   @Mock private PositionRepository positionRepository;
 
   @InjectMocks private PositionServiceImpl positionService;
-
-  private static final String ERROR_MESSAGE = "Position with ID -1 was not found";
 
   @Nested
   class Create {

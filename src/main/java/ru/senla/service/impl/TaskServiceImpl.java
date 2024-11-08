@@ -1,7 +1,6 @@
 package ru.senla.service.impl;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -201,8 +200,7 @@ public class TaskServiceImpl implements TaskService {
   @Scheduled(cron = "${notification.cron}")
   public void sendDueDateReminders() {
     taskRepository
-        .findAllByDueDateBetween(
-            LocalDateTime.now(), LocalDateTime.now().plus(24, ChronoUnit.HOURS))
+        .findAllByDueDateBetween(LocalDateTime.now(), LocalDateTime.now().plusHours(24))
         .forEach(notificationService::sendNotification);
   }
 }

@@ -32,7 +32,7 @@ import ru.senla.repository.api.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class UserProfileServiceImplTest {
-
+  private static final String ERROR_MESSAGE = "UserProfile with ID -1 was not found";
   @Mock private UserProfileMapper userProfileMapper;
 
   @Mock private CommentMapper commentMapper;
@@ -48,8 +48,6 @@ class UserProfileServiceImplTest {
   @Mock private PositionRepository positionRepository;
 
   @InjectMocks private UserProfileServiceImpl userProfileService;
-
-  private static final String ERROR_MESSAGE = "UserProfile with ID -1 was not found";
 
   @Nested
   class Create {

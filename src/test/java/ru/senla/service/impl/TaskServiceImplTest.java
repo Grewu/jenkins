@@ -39,7 +39,7 @@ import ru.senla.repository.api.UserProfileRepository;
 
 @ExtendWith(MockitoExtension.class)
 class TaskServiceImplTest {
-
+  private static final String ERROR_MESSAGE = "Task with ID -1 was not found";
   @Mock private TaskMapper taskMapper;
 
   @Mock private TaskHistoryMapper taskHistoryMapper;
@@ -53,8 +53,6 @@ class TaskServiceImplTest {
   @Mock private ProjectRepository projectRepository;
 
   @InjectMocks private TaskServiceImpl taskService;
-
-  private static final String ERROR_MESSAGE = "Task with ID -1 was not found";
 
   @Nested
   class Create {

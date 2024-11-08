@@ -25,13 +25,13 @@ import ru.senla.util.PostgresqlTestContainer;
 @IntegrationTest
 @AutoConfigureMockMvc
 class ProjectControllerTestIT extends PostgresqlTestContainer {
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private ProjectService projectService;
-
   private static final String URL = "/api/v0/projects";
   private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
   private static final String URL_WITH_PROJECT_ID_TASKS = URL + "/{projectId}/tasks";
+
+  @Autowired private MockMvc mockMvc;
+
+  @Autowired private ProjectService projectService;
 
   @Nested
   class Create {

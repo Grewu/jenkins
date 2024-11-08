@@ -25,13 +25,12 @@ import ru.senla.service.api.UserProfileService;
 @SpringBootTest
 @AutoConfigureMockMvc
 class UserProfileControllerTest {
-  @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
-  @MockBean private UserProfileService userProfileService;
-
   private static final String URL = "/api/v0/user_profiles";
   private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
   private static final String URL_WITH_USERPROFILE_ID = URL + "/{userProfileId}/comments";
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+  @MockBean private UserProfileService userProfileService;
 
   @Nested
   class Create {

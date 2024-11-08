@@ -25,7 +25,10 @@ import ru.senla.service.api.TokenService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-
+  private static final String MOCKED_TOKEN = "MOCKED_TOKEN";
+  private static final String ENCODED_PASSWORD = "ENCODED_PASSWORD";
+  private static final String EXCEPTION_ERROR = "Database error";
+  private static final String INVALID_PASSWORD = "INVALID";
   @InjectMocks private UserServiceImpl userService;
 
   @Mock private UserMapper userMapper;
@@ -35,11 +38,6 @@ class UserServiceImplTest {
   @Mock private TokenService tokenService;
 
   @Mock private PasswordEncoder passwordEncoder;
-
-  private static final String MOCKED_TOKEN = "MOCKED_TOKEN";
-  private static final String ENCODED_PASSWORD = "ENCODED_PASSWORD";
-  private static final String EXCEPTION_ERROR = "Database error";
-  private static final String INVALID_PASSWORD = "INVALID";
 
   @Nested
   class GetAuthorizationToken {

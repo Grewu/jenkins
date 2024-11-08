@@ -19,15 +19,13 @@ import ru.senla.util.PostgresqlTestContainer;
 @IntegrationTest
 @AutoConfigureMockMvc
 class AuthenticationControllerTestIT extends PostgresqlTestContainer {
-
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private UserService userService;
-
   private static final String URL_REGISTER = "/api/v0/auth/register";
 
   private static final String JWT_REGEX =
       "^([a-zA-Z\\d_=]+)\\.([a-zA-Z\\d_=]+)\\.([a-zA-Z\\d_\\-+/=]*)";
+  @Autowired private MockMvc mockMvc;
+
+  @Autowired private UserService userService;
 
   @Test
   void registerShouldReturnAuthorizationToken() throws Exception {

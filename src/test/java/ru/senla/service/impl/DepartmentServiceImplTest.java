@@ -26,7 +26,7 @@ import ru.senla.repository.api.UserProfileRepository;
 
 @ExtendWith(MockitoExtension.class)
 class DepartmentServiceImplTest {
-
+  private static final String ERROR_MESSAGE = "Department with ID -1 was not found";
   @Mock private DepartmentMapper departmentMapper;
   @Mock private UserProfileMapper userProfileMapper;
 
@@ -35,8 +35,6 @@ class DepartmentServiceImplTest {
   @Mock private UserProfileRepository userProfileRepository;
 
   @InjectMocks private DepartmentServiceImpl departmentService;
-
-  private static final String ERROR_MESSAGE = "Department with ID -1 was not found";
 
   @Nested
   class Create {

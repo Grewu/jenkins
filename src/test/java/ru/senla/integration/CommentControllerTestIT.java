@@ -27,13 +27,11 @@ import ru.senla.util.PostgresqlTestContainer;
 @IntegrationTest
 @AutoConfigureMockMvc
 class CommentControllerTestIT extends PostgresqlTestContainer {
-
+  private static final String URL = "/api/v0/comments";
+  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
   @Autowired private MockMvc mockMvc;
 
   @Autowired private CommentService commentService;
-
-  private static final String URL = "/api/v0/comments";
-  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
 
   @Nested
   class Create {

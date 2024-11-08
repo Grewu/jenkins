@@ -28,14 +28,13 @@ import ru.senla.service.api.DepartmentService;
 @SpringBootTest
 @AutoConfigureMockMvc
 class DepartmentControllerTest {
+  private static final String URL = "/api/v0/departments";
+  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
+  private static final String URL_WITH_DEPARTMENT_ID_USERS = URL + "/{departmentId}/users";
 
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @MockBean private DepartmentService departmentService;
-
-  private static final String URL = "/api/v0/departments";
-  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
-  private static final String URL_WITH_DEPARTMENT_ID_USERS = URL + "/{departmentId}/users";
 
   @Nested
   class Create {

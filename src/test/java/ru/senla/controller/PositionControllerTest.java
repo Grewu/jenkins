@@ -28,12 +28,11 @@ import ru.senla.service.api.PositionService;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class PositionControllerTest {
+  private static final String URL = "/api/v0/positions";
+  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @MockBean private PositionService positionService;
-
-  private static final String URL = "/api/v0/positions";
-  private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
 
   @Nested
   class Create {

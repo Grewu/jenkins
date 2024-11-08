@@ -23,11 +23,6 @@ import ru.senla.util.DtoFake;
 @ContextConfiguration(classes = {ExceptionHandlerConfig.class, ControllerFake.class})
 @TestPropertySource(properties = "spring.exception.handling.enabled=true")
 public class GlobalHandlerAdviceTestIT {
-
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private ObjectMapper mapper;
-
   private static final String URL = "/fake";
   private static final String URL_ENTITY_NOT_FOUND = URL + "/entity/{id}";
   private static final String URL_EMAIL = URL + "/email/{email}";
@@ -45,6 +40,10 @@ public class GlobalHandlerAdviceTestIT {
 
   private static final String INVALID_EMAIL = "invalidEmail";
   private static final String INVALID_PASSWORD = "invalidPassword";
+
+  @Autowired private MockMvc mockMvc;
+
+  @Autowired private ObjectMapper mapper;
 
   @Test
   void handleEntityNotFoundException() throws Exception {

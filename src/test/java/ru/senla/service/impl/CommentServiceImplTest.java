@@ -27,7 +27,7 @@ import ru.senla.repository.api.UserProfileRepository;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceImplTest {
-
+  private static final String ERROR_MESSAGE = "Comment with ID -1 was not found";
   @Mock private CommentMapper commentMapper;
 
   @Mock private CommentRepository commentRepository;
@@ -37,8 +37,6 @@ class CommentServiceImplTest {
   @Mock private TaskRepository taskRepository;
 
   @InjectMocks private CommentServiceImpl commentService;
-
-  private static final String ERROR_MESSAGE = "Comment with ID -1 was not found";
 
   @Nested
   class Create {

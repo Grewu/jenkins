@@ -26,13 +26,12 @@ import ru.senla.service.api.ProjectService;
 @SpringBootTest
 @AutoConfigureMockMvc
 class ProjectControllerTest {
-  @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
-  @MockBean private ProjectService projectService;
-
   private static final String URL = "/api/v0/projects";
   private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
   private static final String URL_WITH_PROJECT_ID_TASKS = URL + "/{projectId}/tasks";
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+  @MockBean private ProjectService projectService;
 
   @Nested
   class Create {

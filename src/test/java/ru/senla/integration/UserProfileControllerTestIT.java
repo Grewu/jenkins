@@ -24,11 +24,11 @@ import ru.senla.util.PostgresqlTestContainer;
 @IntegrationTest
 @AutoConfigureMockMvc
 class UserProfileControllerTestIT extends PostgresqlTestContainer {
-  @Autowired private MockMvc mockMvc;
-  @Autowired private UserProfileService userProfileService;
-
   private static final String URL = "/api/v0/user_profiles";
   private static final String URL_WITH_PARAMETER_ID = URL + "/{id}";
+
+  @Autowired private MockMvc mockMvc;
+  @Autowired private UserProfileService userProfileService;
 
   @Nested
   class Create {

@@ -23,14 +23,12 @@ import ru.senla.repository.api.TaskHistoryRepository;
 
 @ExtendWith(MockitoExtension.class)
 class TaskHistoryServiceImplTest {
-
+  private static final String ERROR_MESSAGE = "TaskHistory with ID -1 was not found";
   @Mock private TaskHistoryMapper taskHistoryMapper;
 
   @Mock private TaskHistoryRepository taskHistoryRepository;
 
   @InjectMocks private TaskHistoryServiceImpl taskHistoryService;
-
-  private static final String ERROR_MESSAGE = "TaskHistory with ID -1 was not found";
 
   @Nested
   class Create {
