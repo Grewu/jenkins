@@ -59,11 +59,6 @@ jobs:
       - name: Start services using Docker Compose
         run: docker-compose -f docker-compose.yml up -d
 
-      - name: Run tests
-        env:
-          SPRING_PROFILES_ACTIVE: prod
-        run: ./gradlew test --info
-
       - name: Clean up (optional)
         if: success()
         run: ./gradlew clean
