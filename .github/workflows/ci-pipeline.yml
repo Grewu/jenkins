@@ -31,9 +31,6 @@ jobs:
       - name: Publish exception-handling-starter to Maven Local
         run: ./gradlew :exception-handling-starter:publishToMavenLocal
 
-      - name: Build with Gradle
-        run: ./gradlew build
-
       - name: Verify JAR file exists
         run: test -f build/libs/Senla-Course-1.0.0.jar
 
@@ -58,6 +55,9 @@ jobs:
 
       - name: Start services using Docker Compose
         run: docker-compose -f docker-compose.yml up -d
+
+      - name: Build with Gradle
+        run: ./gradlew build
 
       - name: Clean up (optional)
         if: success()
