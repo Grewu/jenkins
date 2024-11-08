@@ -36,8 +36,8 @@ class UserServiceImplTest {
 
   @Mock private PasswordEncoder passwordEncoder;
 
-  private static final String MOCKED_TOKEN = "mocked-token";
-  private static final String ENCODED_PASSWORD = "encodedPassword";
+  private static final String MOCKED_TOKEN = "MOCKED_TOKEN";
+  private static final String ENCODED_PASSWORD = "ENCODED_PASSWORD";
   private static final String EXCEPTION_ERROR = "Database error";
   private static final String INVALID_PASSWORD = "INVALID";
 
