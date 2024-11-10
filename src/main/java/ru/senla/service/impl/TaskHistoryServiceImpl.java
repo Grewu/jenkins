@@ -81,8 +81,10 @@ public class TaskHistoryServiceImpl implements TaskHistoryService {
         taskHistoryRepository
             .findById(id)
             .orElseThrow(() -> new EntityNotFoundException(TaskHistory.class, id));
+
     currentTask.setName(taskHistoryRequest.name());
     currentTask.setChangedDescription(taskHistoryRequest.changedDescription());
+
     var updatedTask = taskHistoryMapper.update(taskHistoryRequest, currentTask);
     taskHistoryRepository.save(updatedTask);
     return taskHistoryMapper.toTaskHistoryResponse(updatedTask);
@@ -96,6 +98,10 @@ public class TaskHistoryServiceImpl implements TaskHistoryService {
   @Override
   @Transactional
   public void delete(Long id) {
-    taskHistoryRepository.deleteById(id);
+    var taskHistory =
+        taskHistoryRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException(TaskHistory.class, id));
+    taskHistoryRepository.deleteById(taskHistory.getId());
   }
 }

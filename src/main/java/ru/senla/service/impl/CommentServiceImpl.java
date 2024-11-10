@@ -133,6 +133,10 @@ public class CommentServiceImpl implements CommentService {
   @Override
   @Transactional
   public void delete(Long id) {
-    commentRepository.deleteById(id);
+    var comment =
+        commentRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException(Comment.class, id));
+    commentRepository.deleteById(comment.getId());
   }
 }

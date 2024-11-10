@@ -1,6 +1,6 @@
 package ru.senla.service.impl;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.senla.data.PositionTestData;
+import ru.senla.exception.EntityAlreadyExistsException;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.PositionMapper;
 import ru.senla.repository.api.PositionRepository;
@@ -24,6 +25,8 @@ import ru.senla.repository.api.PositionRepository;
 @ExtendWith(MockitoExtension.class)
 public class PositionServiceImplTest {
   private static final String ERROR_MESSAGE = "Position with ID -1 was not found";
+  private static final String ERROR_MESSAGE_ENTITY_EXIST =
+      "Position with 'DEVELOPER' already exists";
   @Mock private PositionMapper positionMapper;
   @Mock private PositionRepository positionRepository;
 
@@ -50,6 +53,21 @@ public class PositionServiceImplTest {
       verify(positionMapper).toPosition(positionRequest);
       verify(positionMapper).toPositionResponse(position);
       assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    void updateShouldThrowEntityAlreadyExistsException() {
+      // given
+      var positionRequest = PositionTestData.builder().build().buildPositionRequest();
+      // when
+      when(positionRepository.existsByName(positionRequest.name())).thenReturn(Boolean.TRUE);
+
+      var exception =
+          assertThrows(
+              EntityAlreadyExistsException.class, () -> positionService.create(positionRequest));
+
+      // then
+      assertEquals(ERROR_MESSAGE_ENTITY_EXIST, exception.getMessage());
     }
   }
 
@@ -120,30 +138,49 @@ public class PositionServiceImplTest {
       var positionRequest = PositionTestData.builder().build().buildPositionRequest();
       var expectedResponse = PositionTestData.builder().build().buildPositionResponse();
       var position = PositionTestData.builder().build().buildPosition();
-
+      var id = PositionTestData.builder().build().buildPosition().getId();
       when(positionRepository.findById(position.getId())).thenReturn(Optional.of(position));
       when(positionMapper.update(positionRequest, position)).thenReturn(position);
       when(positionRepository.save(position)).thenReturn(position);
       when(positionMapper.toPositionResponse(position)).thenReturn(expectedResponse);
 
       // when
-      var actualResponse = positionService.update(1L, positionRequest);
+      var actualResponse = positionService.update(id, positionRequest);
 
       // then
       assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    void updateShouldThrowEntityAlreadyExistsException() {
+      // given
+      var positionRequest = PositionTestData.builder().build().buildPositionRequest();
+      var id = PositionTestData.builder().build().buildPosition().getId();
+      // when
+      when(positionRepository.existsByName(positionRequest.name())).thenReturn(Boolean.TRUE);
+
+      var exception =
+          assertThrows(
+              EntityAlreadyExistsException.class,
+              () -> positionService.update(id, positionRequest));
+
+      // then
+      assertEquals(ERROR_MESSAGE_ENTITY_EXIST, exception.getMessage());
     }
   }
 
   @Nested
   class Delete {
     @Test
-    void deleteShouldCallDaoDeleteMethod() {
+    void deleteShouldCallDaoDeleteMethodThrowEntityNotFoundException() {
       // given
-      var id = 1L;
-
-      doNothing().when(positionRepository).deleteById(id);
-
-      assertThatNoException().isThrownBy(() -> positionService.delete(id));
+      var id = PositionTestData.builder().build().buildPosition().getId();
+      var position = PositionTestData.builder().build().buildPosition();
+      // when
+      when(positionRepository.findById(position.getId())).thenReturn(Optional.of(position));
+      // then
+      assertThatThrownBy(() -> positionService.delete(id))
+          .isInstanceOf(EntityNotFoundException.class);
     }
   }
 }

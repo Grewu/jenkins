@@ -1,6 +1,6 @@
 package ru.senla.service.impl;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.senla.data.DepartmentTestData;
 import ru.senla.data.UserProfileTestData;
+import ru.senla.exception.EntityAlreadyExistsException;
 import ru.senla.exception.EntityNotFoundException;
 import ru.senla.mapper.DepartmentMapper;
 import ru.senla.mapper.UserProfileMapper;
@@ -27,6 +28,8 @@ import ru.senla.repository.api.UserProfileRepository;
 @ExtendWith(MockitoExtension.class)
 class DepartmentServiceImplTest {
   private static final String ERROR_MESSAGE = "Department with ID -1 was not found";
+  private static final String ERROR_MESSAGE_ENTITY_EXIST =
+      "Department with 'DEVELOPERS' already exists";
   @Mock private DepartmentMapper departmentMapper;
   @Mock private UserProfileMapper userProfileMapper;
 
@@ -57,6 +60,22 @@ class DepartmentServiceImplTest {
       verify(departmentMapper).toDepartment(departmentRequest);
       verify(departmentMapper).toDepartmentResponse(department);
       assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    void updateShouldThrowEntityAlreadyExistsException() {
+      // given
+      var departmentRequest = DepartmentTestData.builder().build().buildDepartmentRequest();
+      // when
+      when(departmentRepository.existsByName(departmentRequest.name())).thenReturn(Boolean.TRUE);
+
+      var exception =
+          assertThrows(
+              EntityAlreadyExistsException.class,
+              () -> departmentService.create(departmentRequest));
+
+      // then
+      assertEquals(ERROR_MESSAGE_ENTITY_EXIST, exception.getMessage());
     }
   }
 
@@ -170,18 +189,37 @@ class DepartmentServiceImplTest {
       // then
       assertEquals(expectedResponse, actualResponse);
     }
+
+    @Test
+    void updateShouldThrowEntityAlreadyExistsException() {
+      // given
+      var id = DepartmentTestData.builder().build().buildDepartment().getId();
+      var departmentRequest = DepartmentTestData.builder().build().buildDepartmentRequest();
+      // when
+      when(departmentRepository.existsByName(departmentRequest.name())).thenReturn(Boolean.TRUE);
+
+      var exception =
+          assertThrows(
+              EntityAlreadyExistsException.class,
+              () -> departmentService.update(id, departmentRequest));
+
+      // then
+      assertEquals(ERROR_MESSAGE_ENTITY_EXIST, exception.getMessage());
+    }
   }
 
   @Nested
   class Delete {
     @Test
-    void deleteShouldCallDaoDeleteMethod() {
+    void deleteShouldCallDaoDeleteMethodThrowEntityNotFoundException() {
       // given
-      var id = 1L;
-
-      doNothing().when(departmentRepository).deleteById(id);
-
-      assertThatNoException().isThrownBy(() -> departmentService.delete(id));
+      var id = DepartmentTestData.builder().build().buildDepartment().getId();
+      var department = DepartmentTestData.builder().build().buildDepartment();
+      // when
+      when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
+      // then
+      assertThatThrownBy(() -> departmentService.delete(id))
+          .isInstanceOf(EntityNotFoundException.class);
     }
   }
 }

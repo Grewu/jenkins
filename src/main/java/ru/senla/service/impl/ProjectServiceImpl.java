@@ -122,6 +122,10 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   @Transactional
   public void delete(Long id) {
-    projectRepository.deleteById(id);
+    var project =
+        projectRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException(Project.class, id));
+    projectRepository.deleteById(project.getId());
   }
 }

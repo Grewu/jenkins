@@ -123,7 +123,7 @@ class TaskHistoryServiceImplTest {
       var taskHistoryRequest = TaskHistoryTestData.builder().build().buildTaskHistoryRequest();
       var expected = TaskHistoryTestData.builder().build().buildTaskHistoryResponse();
       var taskHistory = TaskHistoryTestData.builder().build().buildTaskHistory();
-
+      var id = TaskHistoryTestData.builder().build().buildTaskHistory().getId();
       when(taskHistoryRepository.findById(taskHistory.getId()))
           .thenReturn(Optional.of(taskHistory));
       when(taskHistoryMapper.update(taskHistoryRequest, taskHistory)).thenReturn(taskHistory);
@@ -131,7 +131,7 @@ class TaskHistoryServiceImplTest {
       when(taskHistoryMapper.toTaskHistoryResponse(taskHistory)).thenReturn(expected);
 
       // when
-      var actual = taskHistoryService.update(1L, taskHistoryRequest);
+      var actual = taskHistoryService.update(id, taskHistoryRequest);
 
       // then
       assertEquals(expected, actual);
@@ -143,8 +143,11 @@ class TaskHistoryServiceImplTest {
     @Test
     void deleteShouldCallDaoDeleteMethod() {
       // given
-      var id = 1L;
+      var id = TaskHistoryTestData.builder().build().buildTaskHistory().getId();
+      var taskHistory = TaskHistoryTestData.builder().build().buildTaskHistory();
       // when
+      when(taskHistoryRepository.findById(taskHistory.getId()))
+          .thenReturn(Optional.of(taskHistory));
       doNothing().when(taskHistoryRepository).deleteById(id);
       // then
       assertThatNoException().isThrownBy(() -> taskHistoryService.delete(id));

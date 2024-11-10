@@ -71,6 +71,22 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   /**
+   * Retrieves all user profiles associated with a specific department in a paginated format.
+   *
+   * @param departmentId the ID of the department to retrieve user profiles for.
+   * @param pageable pagination information to control the number of user profiles returned.
+   * @return a Page of UserProfileResponse objects containing the user profiles associated with the
+   *     department.
+   */
+  @Override
+  public Page<UserProfileResponse> getAllUsersProfileByDepartmentId(
+      Long departmentId, Pageable pageable) {
+    return userProfileRepository
+        .findByDepartmentId(departmentId, pageable)
+        .map(userProfileMapper::toUserProfileResponse);
+  }
+
+  /**
    * Retrieves a specific department by its ID.
    *
    * @param id the ID of the department to retrieve.
@@ -115,22 +131,11 @@ public class DepartmentServiceImpl implements DepartmentService {
   @Override
   @Transactional
   public void delete(Long id) {
-    departmentRepository.deleteById(id);
-  }
-
-  /**
-   * Retrieves all user profiles associated with a specific department in a paginated format.
-   *
-   * @param departmentId the ID of the department to retrieve user profiles for.
-   * @param pageable pagination information to control the number of user profiles returned.
-   * @return a Page of UserProfileResponse objects containing the user profiles associated with the
-   *     department.
-   */
-  @Override
-  public Page<UserProfileResponse> getAllUsersProfileByDepartmentId(
-      Long departmentId, Pageable pageable) {
-    return userProfileRepository
-        .findByDepartmentId(departmentId, pageable)
-        .map(userProfileMapper::toUserProfileResponse);
+    var department =
+        departmentRepository
+            .findById(id)
+            .map(departmentMapper::toDepartmentResponse)
+            .orElseThrow(() -> new EntityNotFoundException(Department.class, id));
+    departmentRepository.deleteById(department.id());
   }
 }

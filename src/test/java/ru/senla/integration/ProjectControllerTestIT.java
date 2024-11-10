@@ -2,6 +2,7 @@ package ru.senla.integration;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -18,6 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.senla.data.ProjectTestData;
 import ru.senla.data.TaskTestData;
+import ru.senla.exception.EntityNotFoundException;
 import ru.senla.service.api.ProjectService;
 import ru.senla.util.IntegrationTest;
 import ru.senla.util.PostgresqlTestContainer;
@@ -242,16 +244,12 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
     @WithMockUser(authorities = {"project:write"})
     void updateShouldReturnUpdatedProjectResponse() throws Exception {
       // given
-      var projectId = 1L;
+      var projectId = ProjectTestData.builder().build().buildProject().getId();
       var projectRequest =
           ProjectTestData.builder().withName("Updated Project").build().buildProjectRequest();
 
       var expectedResponses =
-          ProjectTestData.builder()
-              .withId(projectId)
-              .withName("Updated Project")
-              .build()
-              .buildProjectResponse();
+          ProjectTestData.builder().withName("Updated Project").build().buildProjectResponse();
 
       var requestBuilder =
           put(URL_WITH_PARAMETER_ID, projectId)
@@ -300,7 +298,7 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
     @Test
     void updateShouldReturnForbidden() throws Exception {
       // given
-      var projectId = 1L;
+      var projectId = ProjectTestData.builder().build().buildProject().getId();
       var projectRequest = ProjectTestData.builder().build().buildProjectRequest();
 
       var requestBuilder =
@@ -335,7 +333,7 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
     @WithMockUser(authorities = {"project:delete"})
     void deleteShouldReturnNoContent() throws Exception {
       // given
-      var projectId = 1L;
+      var projectId = ProjectTestData.builder().build().buildProject().getId();
 
       // when
       mockMvc
@@ -343,13 +341,14 @@ class ProjectControllerTestIT extends PostgresqlTestContainer {
           // then
           .andExpect(status().isNoContent());
 
-      assertThatCode(() -> projectService.delete(projectId)).doesNotThrowAnyException();
+      assertThatThrownBy(() -> projectService.delete(projectId))
+          .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     void deleteShouldReturnForbidden() throws Exception {
       // given
-      var projectId = 1L;
+      var projectId = ProjectTestData.builder().build().buildProject().getId();
 
       // when
       mockMvc

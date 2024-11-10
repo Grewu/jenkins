@@ -98,6 +98,11 @@ public class PositionServiceImpl implements PositionService {
   @Override
   @Transactional
   public void delete(Long id) {
-    positionRepository.deleteById(id);
+    var position =
+        positionRepository
+            .findById(id)
+            .map(positionMapper::toPositionResponse)
+            .orElseThrow(() -> new EntityNotFoundException(Position.class, id));
+    positionRepository.deleteById(position.id());
   }
 }

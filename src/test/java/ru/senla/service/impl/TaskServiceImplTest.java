@@ -217,7 +217,7 @@ class TaskServiceImplTest {
       when(taskHistoryRepository.save(taskHistory)).thenReturn(taskHistory);
 
       // when
-      var actual = taskService.update(1L, taskRequest);
+      var actual = taskService.update(task.getId(), taskRequest);
 
       // then
       assertEquals(expected, actual);
@@ -226,13 +226,29 @@ class TaskServiceImplTest {
 
   @Nested
   class Delete {
+    @BeforeEach
+    void setUp() {
+      var securityContext = mock(SecurityContext.class);
+      var authentication = mock(Authentication.class);
+
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getPrincipal()).thenReturn(new User());
+
+      SecurityContextHolder.setContext(securityContext);
+    }
+
     @Test
     void deleteShouldCallDaoDeleteMethod() {
       // given
-      var id = 1L;
-
+      var task = TaskTestData.builder().build().buildTask();
+      var id = TaskTestData.builder().build().buildTask().getId();
+      var taskHistory = TaskHistoryTestData.builder().build().buildTaskHistory();
+      // when
+      when(taskRepository.findById(task.getId())).thenReturn(Optional.of(task));
+      when(taskHistoryMapper.toTaskHistory(any(TaskHistoryRequest.class))).thenReturn(taskHistory);
+      when(taskHistoryRepository.save(taskHistory)).thenReturn(taskHistory);
       doNothing().when(taskRepository).deleteById(id);
-
+      // then
       assertThatNoException().isThrownBy(() -> taskService.delete(id));
     }
   }

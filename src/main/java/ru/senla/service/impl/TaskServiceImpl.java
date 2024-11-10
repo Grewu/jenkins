@@ -19,6 +19,7 @@ import ru.senla.model.entity.Project;
 import ru.senla.model.entity.Task;
 import ru.senla.model.entity.User;
 import ru.senla.model.entity.UserProfile;
+import ru.senla.model.entity.enums.EnumActionDescription;
 import ru.senla.model.filter.TaskFilter;
 import ru.senla.repository.api.ProjectRepository;
 import ru.senla.repository.api.TaskHistoryRepository;
@@ -69,7 +70,7 @@ public class TaskServiceImpl implements TaskService {
             task.getPriority(),
             task.getCreatedBy().getId(),
             LocalDateTime.now(),
-            "Task was created");
+            EnumActionDescription.ENTITY_CREATED.getDescription(Task.class));
 
     var taskHistory = taskHistoryMapper.toTaskHistory(taskHistoryRequest);
     taskHistoryRepository.save(taskHistory);
@@ -177,7 +178,7 @@ public class TaskServiceImpl implements TaskService {
             currentTask.getPriority(),
             ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId(),
             LocalDateTime.now(),
-            "Task was updated");
+            EnumActionDescription.ENTITY_UPDATED.getDescription(Task.class));
 
     var taskHistory = taskHistoryMapper.toTaskHistory(taskHistoryRequest);
     taskHistoryRepository.save(taskHistory);
@@ -193,6 +194,25 @@ public class TaskServiceImpl implements TaskService {
   @Override
   @Transactional
   public void delete(Long id) {
+    var currentTask =
+        taskRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Task.class, id));
+    var taskHistoryRequest =
+        new TaskHistoryRequest(
+            currentTask.getId(),
+            currentTask.getName(),
+            currentTask.getProject().getId(),
+            currentTask.getAssignedTo().getId(),
+            currentTask.getCreatedBy().getId(),
+            currentTask.getDueDate(),
+            currentTask.getStatus(),
+            currentTask.getPriority(),
+            ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId(),
+            LocalDateTime.now(),
+            EnumActionDescription.ENTITY_DELETED.getDescription(Task.class));
+
+    var taskHistory = taskHistoryMapper.toTaskHistory(taskHistoryRequest);
+    taskHistoryRepository.save(taskHistory);
+
     taskRepository.deleteById(id);
   }
 

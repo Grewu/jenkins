@@ -155,7 +155,7 @@ class ProjectServiceImplTest {
       var expectedResponse = ProjectTestData.builder().build().buildProjectResponse();
       var project = ProjectTestData.builder().build().buildProject();
       var userProfile = UserProfileTestData.builder().build().buildUserProfile();
-
+      var id = ProjectTestData.builder().build().buildProject().getId();
       when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
       when(userProfileRepository.findById(projectRequest.owner()))
           .thenReturn(Optional.of(userProfile));
@@ -164,7 +164,7 @@ class ProjectServiceImplTest {
       when(projectMapper.toProjectResponse(project)).thenReturn(expectedResponse);
 
       // when
-      var actual = projectService.update(1L, projectRequest);
+      var actual = projectService.update(id, projectRequest);
 
       // then
       assertEquals(expectedResponse, actual);
@@ -176,10 +176,12 @@ class ProjectServiceImplTest {
     @Test
     void deleteShouldCallDaoDeleteMethod() {
       // given
-      var id = 1L;
-
+      var id = ProjectTestData.builder().build().buildProject().getId();
+      var project = ProjectTestData.builder().build().buildProject();
+      // when
+      when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
       doNothing().when(projectRepository).deleteById(id);
-
+      // then
       assertThatNoException().isThrownBy(() -> projectService.delete(id));
     }
   }

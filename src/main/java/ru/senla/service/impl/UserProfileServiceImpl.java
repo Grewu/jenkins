@@ -1,6 +1,7 @@
 package ru.senla.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import ru.senla.service.api.UserProfileService;
  * Implementation of the UserProfileService interface, providing methods to manage user profiles.
  * This service handles CRUD operations and maps between entities and DTOs.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -141,6 +143,10 @@ public class UserProfileServiceImpl implements UserProfileService {
   @Override
   @Transactional
   public void delete(Long id) {
-    userProfileRepository.deleteById(id);
+    var userProfile =
+        userProfileRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException(UserProfile.class, id));
+    userProfileRepository.deleteById(userProfile.getId());
   }
 }

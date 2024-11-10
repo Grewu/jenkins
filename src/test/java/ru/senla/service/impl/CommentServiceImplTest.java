@@ -151,10 +151,12 @@ class CommentServiceImplTest {
     @Test
     void deleteShouldCallDaoDeleteMethod() {
       // given
-      var id = 1L;
-
+      var id = CommentTestData.builder().build().buildComment().getId();
+      var comment = CommentTestData.builder().build().buildComment();
+      // when
+      when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
       doNothing().when(commentRepository).deleteById(id);
-
+      // then
       assertThatNoException().isThrownBy(() -> commentService.delete(id));
     }
   }

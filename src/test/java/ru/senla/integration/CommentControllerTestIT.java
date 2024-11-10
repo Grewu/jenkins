@@ -2,6 +2,7 @@ package ru.senla.integration;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.senla.data.CommentTestData;
+import ru.senla.exception.EntityNotFoundException;
 import ru.senla.service.api.CommentService;
 import ru.senla.util.IntegrationTest;
 import ru.senla.util.PostgresqlTestContainer;
@@ -268,7 +270,6 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     void updateShouldReturnForbidden() throws Exception {
       // given
       var commentId = 1L;
-
       // when
       mockMvc
           .perform(put(URL_WITH_PARAMETER_ID, commentId))
@@ -285,21 +286,20 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     void deleteShouldReturnNoContent() throws Exception {
       // given
       var commentId = 1L;
-
       // when
       mockMvc
           .perform(delete(URL_WITH_PARAMETER_ID, commentId).contentType(MediaType.APPLICATION_JSON))
           // then
           .andExpect(status().isNoContent());
 
-      assertThatCode(() -> commentService.delete(commentId)).doesNotThrowAnyException();
+      assertThatThrownBy(() -> commentService.delete(commentId))
+          .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     void deleteShouldReturnForbidden() throws Exception {
       // given
       var commentId = 1L;
-
       // when
       mockMvc
           .perform(delete(URL_WITH_PARAMETER_ID, commentId).contentType(MediaType.APPLICATION_JSON))

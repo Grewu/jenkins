@@ -23,9 +23,9 @@ import ru.senla.model.entity.enums.RoleType;
 @Entity
 @Getter
 @Setter
-@Table(name = "roles")
-@AllArgsConstructor()
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "roles")
 public class Role {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -180,7 +180,7 @@ class UserProfileServiceImplTest {
       when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
       when(userProfileMapper.toUserProfileResponse(userProfile)).thenReturn(expected);
       // when
-      var actual = userProfileService.update(1L, userProfileRequest);
+      var actual = userProfileService.update(userProfile.getId(), userProfileRequest);
 
       // then
       assertEquals(expected, actual);
@@ -192,8 +192,11 @@ class UserProfileServiceImplTest {
     @Test
     void deleteShouldCallDaoDeleteMethod() {
       // given
-      var id = 1L;
-
+      var id = UserProfileTestData.builder().build().buildUserProfile().getId();
+      var userProfile = UserProfileTestData.builder().build().buildUserProfile();
+      // when
+      when(userProfileRepository.findById(userProfile.getId()))
+          .thenReturn(Optional.of(userProfile));
       doNothing().when(userProfileRepository).deleteById(id);
 
       assertThatNoException().isThrownBy(() -> userProfileService.delete(id));

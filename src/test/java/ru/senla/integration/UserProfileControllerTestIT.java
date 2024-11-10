@@ -2,6 +2,7 @@ package ru.senla.integration;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.senla.data.UserProfileTestData;
+import ru.senla.exception.EntityNotFoundException;
 import ru.senla.service.api.UserProfileService;
 import ru.senla.util.IntegrationTest;
 import ru.senla.util.PostgresqlTestContainer;
@@ -254,9 +256,10 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
   class Delete {
     @Test
     @WithMockUser(authorities = {"user_profile:delete"})
-    void deleteShouldReturnNoContent() throws Exception {
+    void deleteShouldReturnNoContentThrowEntityNotFoundException() throws Exception {
       // given
-      var userProfileId = 1L;
+      var userProfileResponse = UserProfileTestData.builder().build().buildUserProfileResponse();
+      var userProfileId = userProfileResponse.id();
 
       // when
       mockMvc
@@ -265,13 +268,14 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
           // then
           .andExpect(status().isNoContent());
 
-      assertThatCode(() -> userProfileService.delete(userProfileId)).doesNotThrowAnyException();
+      assertThatThrownBy(() -> userProfileService.delete(userProfileId))
+          .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     void deleteShouldReturnForbidden() throws Exception {
       // given
-      var userProfileId = 1L;
+      var userProfileId = UserProfileTestData.builder().build().buildUserProfileResponse().id();
 
       // when
       mockMvc
