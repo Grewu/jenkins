@@ -37,6 +37,7 @@ import ru.senla.util.TaskSpecificationGenerator;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TaskServiceImpl implements TaskService {
+  private static final Integer HOURS_AHEAD = 24;
 
   private final TaskMapper taskMapper;
   private final TaskHistoryMapper taskHistoryMapper;
@@ -220,7 +221,7 @@ public class TaskServiceImpl implements TaskService {
   @Scheduled(cron = "${notification.cron}")
   public void sendDueDateReminders() {
     taskRepository
-        .findAllByDueDateBetween(LocalDateTime.now(), LocalDateTime.now().plusHours(24))
+        .findAllByDueDateBetween(LocalDateTime.now(), LocalDateTime.now().plusHours(HOURS_AHEAD))
         .forEach(notificationService::sendNotification);
   }
 }
