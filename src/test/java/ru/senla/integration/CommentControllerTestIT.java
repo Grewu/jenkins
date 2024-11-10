@@ -269,7 +269,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     @Test
     void updateShouldReturnForbidden() throws Exception {
       // given
-      var commentId = 1L;
+      var commentId = CommentTestData.builder().build().buildComment().getId();
       // when
       mockMvc
           .perform(put(URL_WITH_PARAMETER_ID, commentId))
@@ -285,7 +285,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     @WithMockUser(authorities = {"comments:delete"})
     void deleteShouldReturnNoContent() throws Exception {
       // given
-      var commentId = 1L;
+      var commentId = CommentTestData.builder().build().buildComment().getId();
       // when
       mockMvc
           .perform(delete(URL_WITH_PARAMETER_ID, commentId).contentType(MediaType.APPLICATION_JSON))
@@ -299,7 +299,7 @@ class CommentControllerTestIT extends PostgresqlTestContainer {
     @Test
     void deleteShouldReturnForbidden() throws Exception {
       // given
-      var commentId = 1L;
+      var commentId = CommentTestData.builder().build().buildComment().getId();
       // when
       mockMvc
           .perform(delete(URL_WITH_PARAMETER_ID, commentId).contentType(MediaType.APPLICATION_JSON))

@@ -49,7 +49,7 @@ class UserServiceImplTest {
       var user = UserTestData.builder().build().buildUser();
 
       when(userRepository.findByEmail(userRequest.email())).thenReturn(Optional.of(user));
-      when(passwordEncoder.matches(userRequest.password(), user.getPassword())).thenReturn(true);
+      when(passwordEncoder.matches(userRequest.password(), user.getPassword())).thenReturn(Boolean.TRUE);
       when(tokenService.generateToken(user)).thenReturn(MOCKED_TOKEN);
 
       // when
@@ -159,7 +159,7 @@ class UserServiceImplTest {
 
       // when
       when(userRepository.findByEmail(userRequest.email())).thenReturn(Optional.of(user));
-      when(passwordEncoder.matches(userRequest.password(), user.getPassword())).thenReturn(false);
+      when(passwordEncoder.matches(userRequest.password(), user.getPassword())).thenReturn(Boolean.FALSE);
 
       // then
       assertThrows(

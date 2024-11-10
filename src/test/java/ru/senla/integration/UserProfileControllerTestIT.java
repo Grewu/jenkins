@@ -182,7 +182,7 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @WithMockUser(authorities = {"user_profile:write"})
     void updateShouldReturnUpdatedUserProfileResponse() throws Exception {
       // given
-      var userProfileId = 1L;
+      var userProfileId = UserProfileTestData.builder().build().buildUserProfile().getId();
       var userProfileRequest =
           UserProfileTestData.builder()
               .withFirstName("UpdatedName")
@@ -241,7 +241,7 @@ class UserProfileControllerTestIT extends PostgresqlTestContainer {
     @Test
     void updateShouldReturnForbidden() throws Exception {
       // given
-      var userProfileId = 1L;
+      var userProfileId = UserProfileTestData.builder().build().buildUserProfile().getId();
 
       // when
       mockMvc
