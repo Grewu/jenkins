@@ -35,6 +35,7 @@ ext {
     exceptionHandlingVersion = '1.0.0'
     springDocVersion = '2.1.0'
     jacksonDataTypeVersion = '2.15.2'
+    set('springCloudVersion', "2023.0.3")
 }
 
 dependencies {
@@ -53,6 +54,8 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDataTypeVersion}"
 
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    implementation'org.springframework.cloud:spring-cloud-starter-bootstrap'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -67,6 +70,12 @@ dependencies {
     testImplementation "org.testcontainers:postgresql:$testcontainersVersion"
     testImplementation "org.testcontainers:junit-jupiter:$testcontainersVersion"
     testImplementation 'org.springframework.security:spring-security-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.test {

@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
    * @throws InvalidPasswordException if the provided password is incorrect
    */
   @Override
-  public String getAuthorizationToken(UserRequest userRequest) throws InvalidEmailException {
+  public String getAuthorizationToken(UserRequest userRequest) {
     return userRepository
         .findByEmail(userRequest.email())
         .map(
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
    * @throws EntityNotFoundException if the user with the given email does not exist
    */
   @Override
-  public UserDetails loadUserByUsername(String email) throws EntityNotFoundException {
+  public UserDetails loadUserByUsername(String email) {
     return userRepository
         .findByEmail(email)
         .orElseThrow(() -> new EntityNotFoundException(User.class, email));
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   @Transactional
-  public UserResponse create(UserRequest userRequest) throws InvalidEmailException {
+  public UserResponse create(UserRequest userRequest) {
     try {
       return Optional.of(userRequest)
           .map(userMapper::toUser)
