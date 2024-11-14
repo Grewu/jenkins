@@ -6,13 +6,13 @@ services:
     build: config
     restart: always
     healthcheck:
-      test: curl http://localhost:8888 || exit 1
+      test: curl http://localhost:${CONFIG_SERVICE_PORT} || exit 1
       interval: 5s
       timeout: 3s
     networks:
       - news_ntwrk
     ports:
-      - "8888:8888"
+      - "${CONFIG_SERVICE_PORT}:${CONFIG_SERVICE_PORT}"
 
   senla-course:
     build:
@@ -23,43 +23,43 @@ services:
       db-tasks:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     networks:
       - news_ntwrk
     ports:
-      - "8080:8080"
+      - "${SENLA_COURSE_PORT}:${SENLA_COURSE_PORT}"
 
   db-tasks:
-    image: postgres:16
+    image: ${POSTGRES_IMAGE}
     ports:
-      - "5432:5432"
+      - "${DB_TASKS_PORT}:${DB_TASKS_PORT}"
     restart: always
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 3s
     networks:
       - news_ntwrk
 
   prometheus:
-    image: prom/prometheus:v2.44.0
+    image: ${PROMETHEUS_IMAGE}
     container_name: prometheus
     ports:
-      - "9090:9090"
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     volumes:
       - ./monitorining/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - news_ntwrk
 
   grafana:
-    image: grafana/grafana:9.5.2
+    image: ${GRAFANA_IMAGE}
     container_name: grafana
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
     restart: unless-stopped
     volumes:
       - ./monitorining/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
