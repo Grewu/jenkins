@@ -44,7 +44,7 @@ dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
     implementation "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
-    implementation "ru.senla:exception-handling-starter:${exceptionHandlingVersion}"
+    implementation project(":exception-handling-starter")
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     implementation 'org.liquibase:liquibase-core'
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"

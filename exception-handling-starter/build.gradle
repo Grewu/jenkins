@@ -2,8 +2,8 @@ plugins {
     id 'jacoco'
     id 'java-library'
     id 'maven-publish'
-    id "com.diffplug.spotless" version "7.0.0.BETA4"
     id 'io.freefair.lombok' version '8.0.1'
+    id "com.diffplug.spotless" version "7.0.0.BETA4"
 }
 
 group 'ru.senla'
