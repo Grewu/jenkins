@@ -27,6 +27,7 @@ ext {
     postgresqlTestContainer = '1.19.7'
     jsonassertVersion = '1.5.0'
     jakartaServletApi = '6.0.0'
+    slf4jVersion = '2.0.16'
 }
 
 dependencies {
@@ -42,20 +43,32 @@ dependencies {
     implementation "jakarta.servlet:jakarta.servlet-api:${jakartaServletApi}"
 
     implementation "org.springframework:spring-webmvc:${springVersion}"
+    implementation "org.springframework:spring-web:${springVersion}"
     implementation "org.springframework:spring-orm:${springVersion}"
     implementation "org.springframework:spring-core:${springVersion}"
     implementation "org.springframework:spring-context:${springVersion}"
+    implementation "org.springframework:spring-aop:${springVersion}"
+    implementation "org.springframework.security:spring-security-web:${springVersion}"
+    implementation "org.springframework.security:spring-security-config:${springVersion}"
 
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonCoreVersion}"
-
     implementation "org.postgresql:postgresql:${postgresVersion}"
     implementation "org.liquibase:liquibase-core:${liquibaseCore}"
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
+
+
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+
+    testImplementation "org.springframework.security:spring-security-test:${springVersion}"
     testImplementation "org.springframework:spring-test:${springVersion}"
     testImplementation "org.testcontainers:postgresql:${postgresqlTestContainer}"
     testImplementation "org.testcontainers:junit-jupiter:${postgresqlTestContainer}"
-    testImplementation "com.h2database:h2:${h2Version}"
     testImplementation "org.springframework:spring-test:${springVersion}"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"

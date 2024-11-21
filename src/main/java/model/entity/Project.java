@@ -1,92 +1,52 @@
 package model.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "projects")
 public class Project {
-    private final Long id;
-    private final String projectName;
-    private final String description;
-    private final LocalDateTime startDate;
-    private final LocalDateTime endDate;
-    private final Long ownerId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    public Project(Project.Builder builder) {
-        this.id = builder.id;
-        this.projectName = builder.projectName;
-        this.description = builder.description;
-        this.startDate = builder.startDate;
-        this.endDate = builder.endDate;
-        this.ownerId = builder.ownerId;
-    }
+    @Column(name = "project_code", nullable = false)
+    private String projectCode;
 
-    public static class Builder {
-        private Long id;
-        private String projectName;
-        private String description;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
-        private Long ownerId;
+    @Column(name = "description", nullable = false)
+    private String description;
 
-        public Builder() {
-        }
+    @Column(name = "start_date", nullable = false)
+    private LocalDateTime startDate;
 
-        public Project.Builder setId(Long id) {
-            this.id = id;
-            return this;
-        }
+    @Column(name = "end_date", nullable = false)
+    private LocalDateTime endDate;
 
-        public Project.Builder setProjectName(String projectName) {
-            this.projectName = projectName;
-            return this;
-        }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
+    private UserProfile owner;
 
-        public Project.Builder setDescription(String description) {
-            this.description = description;
-            return this;
-        }
-
-        public Project.Builder setStartDate(LocalDateTime startDate) {
-            this.startDate = startDate;
-            return this;
-        }
-
-        public Project.Builder setEndDate(LocalDateTime endDate) {
-            this.endDate = endDate;
-            return this;
-        }
-
-        public Project.Builder setOwnerId(Long ownerId) {
-            this.ownerId = ownerId;
-            return this;
-        }
-
-        public Project build() {
-            return new Project(this);
-        }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
+    public Project(Long project) {
+        this.id = project;
     }
 }

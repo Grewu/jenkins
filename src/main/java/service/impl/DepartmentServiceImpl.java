@@ -1,14 +1,18 @@
 package service.impl;
 
 import dao.api.DepartmentDao;
+import exception.EntityNotFoundException;
 import mapper.DepartmentMapper;
 import model.dto.request.DepartmentRequest;
 import model.dto.response.DepartmentResponse;
+import model.entity.Department;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import service.api.DepartmentService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -23,6 +27,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @Transactional
     public DepartmentResponse create(DepartmentRequest departmentRequest) {
         var department = departmentMapper.toDepartment(departmentRequest);
         return departmentMapper.toDepartmentResponse(departmentDao.create(department));
@@ -30,25 +35,29 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public List<DepartmentResponse> getAll() {
-        var department = departmentDao.findAll();
-        return departmentMapper.toListOfDepartmentResponse(department);
+        return departmentDao.findAll().stream()
+                .map(departmentMapper::toDepartmentResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     public DepartmentResponse getById(Long id) {
         return departmentDao.findById(id)
                 .map(departmentMapper::toDepartmentResponse)
-                .orElseThrow(() -> new IllegalArgumentException("Department not found with id " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Department.class, id));
     }
 
     @Override
-    public DepartmentResponse update(DepartmentRequest departmentRequest) {
-        var comment = departmentMapper.toDepartment(departmentRequest);
-        return departmentMapper.toDepartmentResponse(departmentDao.update(comment));
+    @Transactional
+    public DepartmentResponse update(Long id, DepartmentRequest departmentRequest) {
+        var department = departmentMapper.toDepartment(departmentRequest);
+        return departmentMapper.toDepartmentResponse(departmentDao.update(department));
     }
 
     @Override
-    public boolean delete(Long id) {
-        return departmentDao.delete(id);
-}
+    @Transactional
+    public void delete(DepartmentRequest departmentRequest) {
+        var department = departmentMapper.toDepartment(departmentRequest);
+        departmentDao.delete(department);
+    }
 }

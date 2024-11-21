@@ -1,16 +1,20 @@
 package model.dto.request;
 
-import model.entity.enums.Status;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import model.entity.enums.PriorityType;
+import model.entity.enums.StatusType;
 
 import java.time.LocalDateTime;
 
 public record TaskRequest(
-        Long id,
-        String taskName,
+        String name,
         Long assignedTo,
-        Long projectId,
+        Long createdBy,
+        Long project,
         LocalDateTime dueDate,
-        Status status,
-        Long priority
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        StatusType status,
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        PriorityType priority
 ) {
 }

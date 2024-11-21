@@ -3,40 +3,22 @@ package mapper;
 import model.dto.request.TaskRequest;
 import model.dto.response.TaskResponse;
 import model.entity.Task;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.List;
-import java.util.stream.Collectors;
+@Mapper(componentModel = "spring")
+public interface TaskMapper {
 
-@Component
-public class TaskMapper {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "assignedTo", expression = "java(new UserProfile(taskRequest.assignedTo()))")
+    @Mapping(target = "project", expression = "java(new Project(taskRequest.project()))")
+    @Mapping(target = "createdBy", expression = "java(new UserProfile(taskRequest.createdBy()))")
+    @Mapping(target = "taskHistory", ignore = true)
+    Task toTask(TaskRequest taskRequest);
 
-    public Task toTask(TaskRequest taskRequest) {
-        return new Task.Builder()
-                .setId(taskRequest.id())
-                .setTaskName(taskRequest.taskName())
-                .setProjectId(taskRequest.projectId())
-                .setAssignedTo(taskRequest.assignedTo())
-                .setDueDate(taskRequest.dueDate())
-                .setStatus(taskRequest.status())
-                .setPriority(taskRequest.priority())
-                .build();
-    }
+    @Mapping(target = "project", source = "project.id")
+    @Mapping(target = "createdBy", source = "createdBy.id")
+    @Mapping(target = "assignedTo", source = "assignedTo.id")
+    TaskResponse toTaskResponse(Task task);
 
-    public TaskResponse toTaskResponse(Task task) {
-        return new TaskResponse(
-                task.getId(),
-                task.getTaskName(),
-                task.getAssignedTo(),
-                task.getDueDate(),
-                task.getStatus(),
-                task.getPriority()
-        );
-    }
-
-    public List<TaskResponse> toListOfTaskResponse(List<Task> tasks) {
-        return tasks.stream()
-                .map(this::toTaskResponse)
-                .collect(Collectors.toList());
-    }
 }
