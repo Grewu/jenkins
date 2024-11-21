@@ -139,7 +139,7 @@ class CommentServiceImplTest {
       when(commentRepository.save(comment)).thenReturn(comment);
       when(commentMapper.toCommentResponse(comment)).thenReturn(expectedResponse);
       // when
-      var actualResponse = commentService.update(1L, commentRequest);
+      var actualResponse = commentService.update(comment.getId(), commentRequest);
 
       // then
       assertEquals(expectedResponse, actualResponse);

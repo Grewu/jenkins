@@ -184,7 +184,7 @@ class DepartmentServiceImplTest {
       when(departmentMapper.toDepartmentResponse(department)).thenReturn(expectedResponse);
 
       // when
-      var actualResponse = departmentService.update(1L, departmentRequest);
+      var actualResponse = departmentService.update(department.getId(), departmentRequest);
 
       // then
       assertEquals(expectedResponse, actualResponse);
