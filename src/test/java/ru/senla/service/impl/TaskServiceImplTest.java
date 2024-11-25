@@ -2,6 +2,7 @@ package ru.senla.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -9,12 +10,14 @@ import static org.mockito.Mockito.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+import org.awaitility.Durations;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +47,7 @@ class TaskServiceImplTest {
 
   @Mock private TaskHistoryMapper taskHistoryMapper;
 
-  @Mock private TaskRepository taskRepository;
+  @Spy private TaskRepository taskRepository;
 
   @Mock private TaskHistoryRepository taskHistoryRepository;
 
@@ -250,6 +253,14 @@ class TaskServiceImplTest {
       doNothing().when(taskRepository).deleteById(id);
       // then
       assertThatNoException().isThrownBy(() -> taskService.delete(id));
+    }
+  }
+
+  @Nested
+  class TaskSender {
+    @Test
+    public void reportCurrentTime() {
+      await().atMost(Durations.TEN_SECONDS).untilAsserted(() -> verify(taskRepository, atLeast(2)));
     }
   }
 }
