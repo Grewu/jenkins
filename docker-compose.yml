@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  config-service:
+    image: config-service
+    build: config
+    restart: always
+    healthcheck:
+      test: curl http://localhost:${CONFIG_SERVICE_PORT} || exit 1
+      interval: 5s
+      timeout: 3s
+    networks:
+      - news_ntwrk
+    ports:
+      - "${CONFIG_SERVICE_PORT}:${CONFIG_SERVICE_PORT}"
+
+  senla-course:
+    build:
+      dockerfile: Dockerfile
+      context: ./
+    image: senla-course
+    depends_on:
+      db-tasks:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    networks:
+      - news_ntwrk
+    ports:
+      - "${SENLA_COURSE_PORT}:${SENLA_COURSE_PORT}"
+
+  db-tasks:
+    image: ${POSTGRES_IMAGE}
+    ports:
+      - "${DB_TASKS_PORT}:${DB_TASKS_PORT}"
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 3s
+    networks:
+      - news_ntwrk
+
+  prometheus:
+    image: ${PROMETHEUS_IMAGE}
+    container_name: prometheus
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    volumes:
+      - ./monitorining/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - news_ntwrk
+
+  grafana:
+    image: ${GRAFANA_IMAGE}
+    container_name: grafana
+    ports:
+      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+    restart: unless-stopped
+    volumes:
+      - ./monitorining/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - news_ntwrk
+
+networks:
+  news_ntwrk:

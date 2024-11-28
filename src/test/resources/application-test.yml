@@ -1,0 +1,25 @@
+spring:
+  security:
+    secret: 244226452948404D6351655468576D5A7134743777217A25432A462D4A614E645267556A586E3272357538782F413F4428472B4B6250655368566D5970337336d
+    issuer: Senla
+  datasource:
+    username: test
+    password: test
+  liquibase:
+    change-log: changelog/db.changelog-test-master.yaml
+  cloud:
+    config:
+      enabled: false
+  mail:
+    username: test
+    password: test
+    host: smtp.gmail.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    port: 587
+notification:
+  cron: "0 0 9 * * ?"

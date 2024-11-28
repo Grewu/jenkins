@@ -1,13 +1,9 @@
-FROM tomcat:10.0
+FROM eclipse-temurin:17-jre-alpine
 
-RUN rm -rf /usr/local/tomcat/webapps/*
+WORKDIR /app
 
-ENV POSTGRES_URL=jdbc:postgresql://localhost:5433/postgres
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_PASSWORD=postgres
-
-COPY build/libs/senla.war /usr/local/tomcat/webapps/
+COPY build/libs/Senla-Course-1.0.0.jar .
 
 EXPOSE 8080
 
-CMD ["catalina.sh", "run"]
+ENTRYPOINT ["java", "-jar", "Senla-Course-1.0.0.jar"]

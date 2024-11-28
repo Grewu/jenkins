@@ -1,92 +1,118 @@
 plugins {
     id 'java'
-    id 'war'
-    id "org.liquibase.gradle" version "2.2.0"
+    id 'jacoco'
+    id "com.diffplug.spotless" version "7.0.0.BETA4"
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
-group 'org.example'
+group = 'ru.senla'
+version = '1.0.0'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 ext {
-    springVersion = '6.1.6'
-    postgresVersion = '42.3.0'
-    liquibaseCore = '4.5.0'
-    picocliVersion = '4.6.3'
-    junitVersion = '5.10.0'
-    jacksonCoreVersion = '2.17.2'
-    hibernateCore = '6.6.0.Final'
-    mapstructVersion = '1.5.5.Final'
-    lombokVersion = '1.18.34'
     lombokMapstructBindingVersion = '0.2.0'
-    servletVersion = '2.5'
-    h2Version = '2.2.224'
+    mapstructVersion = '1.5.5.Final'
     mockitoVersion = '5.12.0'
-    postgresqlTestContainer = '1.19.7'
-    jsonassertVersion = '1.5.0'
-    jakartaServletApi = '6.0.0'
-    slf4jVersion = '2.0.16'
+    testcontainersVersion = "1.20.2"
+    jjwtVersion = '0.11.5'
+    exceptionHandlingVersion = '1.0.0'
+    springDocVersion = '2.1.0'
+    jacksonDataTypeVersion = '2.15.2'
+    set('springCloudVersion', "2023.0.3")
 }
 
 dependencies {
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    implementation "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
-    implementation "org.hibernate:hibernate-core:${hibernateCore}"
-    annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernateCore}"
+    implementation "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+    implementation "ru.senla:exception-handling-starter:${exceptionHandlingVersion}"
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    implementation 'org.liquibase:liquibase-core'
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDataTypeVersion}"
 
-    implementation "jakarta.servlet:jakarta.servlet-api:${jakartaServletApi}"
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    implementation'org.springframework.cloud:spring-cloud-starter-bootstrap'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
 
-    implementation "org.springframework:spring-webmvc:${springVersion}"
-    implementation "org.springframework:spring-web:${springVersion}"
-    implementation "org.springframework:spring-orm:${springVersion}"
-    implementation "org.springframework:spring-core:${springVersion}"
-    implementation "org.springframework:spring-context:${springVersion}"
-    implementation "org.springframework:spring-aop:${springVersion}"
-    implementation "org.springframework.security:spring-security-web:${springVersion}"
-    implementation "org.springframework.security:spring-security-config:${springVersion}"
-
-    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonCoreVersion}"
-    implementation "org.postgresql:postgresql:${postgresVersion}"
-    implementation "org.liquibase:liquibase-core:${liquibaseCore}"
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-
-    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-    implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
-
-
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
-
-    testImplementation "org.springframework.security:spring-security-test:${springVersion}"
-    testImplementation "org.springframework:spring-test:${springVersion}"
-    testImplementation "org.testcontainers:postgresql:${postgresqlTestContainer}"
-    testImplementation "org.testcontainers:junit-jupiter:${postgresqlTestContainer}"
-    testImplementation "org.springframework:spring-test:${springVersion}"
-    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "org.skyscreamer:jsonassert:${jsonassertVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "org.testcontainers:postgresql:$testcontainersVersion"
+    testImplementation "org.testcontainers:junit-jupiter:$testcontainersVersion"
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
-test {
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
-war {
-    archiveBaseName.set('senla')
+spotless {
+    java {
+        googleJavaFormat()
+        target 'src/**/*.java'
+    }
 }
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs << '-parameters'
+jacoco {
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
+
+tasks.build {
+    dependsOn 'spotlessApply'
+}
+
+build.doLast {
+    delete fileTree (dir: "${buildDir("classes")}", include: "**/JiBX_bindings*.class")
+}
+
+tasks.compileJava {
+    options.compilerArgs = [
+            '-Amapstruct.defaultComponentModel=spring',
+            '-parameters'
+    ]
 }
