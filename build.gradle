@@ -26,6 +26,22 @@ configurations {
     }
 }
 
+buildscript {
+  repositories {
+    jcenter {
+        url "http://jcenter.bintray.com/"
+    }
+  }
+}
+
+allprojects {
+repositories {
+    jcenter {
+        url "http://jcenter.bintray.com/"
+    }
+  }
+}
+
 ext {
     lombokMapstructBindingVersion = '0.2.0'
     mapstructVersion = '1.5.5.Final'
