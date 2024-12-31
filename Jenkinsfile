@@ -4,9 +4,9 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Building...'
-                sh 'chmod +x gradlew'
-                sh './gradlew build'
+               echo 'Building...'
+               bat 'chmod +x gradlew'
+               bat './gradlew build'
             }
         }
     }
